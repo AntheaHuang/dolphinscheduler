@@ -71,18 +71,18 @@ public class RegexUtilsTest {
     public void testValidUsernames() {
         // Starts with a letter
         Assertions.assertTrue(RegexUtils.isValidLinuxUserName("a"));  // Length 1
-        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("a123456789012345678901234567890"));  // Length 30
-        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("a1234567890_abcd0987"));  // Length 20
+        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("b123456789012345678901234567890"));  // Length 31
+        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("c1234567890_abcd0987"));  // Length 20
 
         // Starts with a number
         Assertions.assertTrue(RegexUtils.isValidLinuxUserName("1"));  // Length 1
-        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("1abcdefg12345678901234567890"));  // Length 30
-        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("1abcdefg1234567"));  // Length 15
+        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("2abcdefg12345678901234567890oa1"));  // Length 31
+        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("0abcdefg1234567"));  // Length 15
 
         // Starts with an underscore
         Assertions.assertTrue(RegexUtils.isValidLinuxUserName("_"));  // Length 1
-        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("_abcdefgh12345678901234567890"));  // Length 30
-        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("_abcde"));  // Length 5
+        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("_abcdefgh12345678901234567890_1"));  // Length 31
+        Assertions.assertTrue(RegexUtils.isValidLinuxUserName("_abcd"));  // Length 5
     }
 
 
