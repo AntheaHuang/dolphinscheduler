@@ -85,5 +85,17 @@ public class RegexUtilsTest {
         Assertions.assertTrue(RegexUtils.isValidLinuxUserName("_abcd"));  // Length 5
     }
 
+    @Test
+    public void testInvalidStartsUsernames() {
+        //Invalid length of 0
+        Assertions.assertFalse(RegexUtils.isValidLinuxUserName(""));
+        
+        //Valid length but invalid starts
+        Assertions.assertFalse(RegexUtils.isValidLinuxUserName("$"));  //Length 1
+        Assertions.assertFalse(RegexUtils.isValidLinuxUserName("&1234"));  //Length 5
+        Assertions.assertFalse(RegexUtils.isValidLinuxUserName("@1234456789874563210abcdefghijk")); //Length 31
 
+        //Invalid length and invalid starts
+        Assertions.assertFalse(RegexUtils.isValidLinuxUserName("@1234456789874563210abcdefghijkl")); //Length 32
+    }
 }
