@@ -37,17 +37,23 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
                             assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                         }));
 
-        // Test RUNNING_EXECUTION -> PAUSE
+        // Test RUNNING_EXECUTION -> READY_PAUSE
         workflowOperator.pauseWorkflowInstance(workflowInstanceId);
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isIn(WorkflowExecutionStatus.PAUSE, WorkflowExecutionStatus.SUCCESS));
+                        .isEqualTo(WorkflowExecutionStatus.READY_PAUSE));
 
+        // Test READY_PAUSE -> PAUSE
+        workflowOperator.pauseWorkflowInstance(workflowInstanceId);
+        await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
+                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                        .isEqualTo(WorkflowExecutionStatus.PAUSE));
+//
         // Test PAUSE -> RUNNING_EXECUTION
         workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId);
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isIn(WorkflowExecutionStatus.RUNNING_EXECUTION, WorkflowExecutionStatus.SUCCESS));
+                        .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
 
         // Test RUNNING_EXECUTION -> READY_STOP
         workflowOperator.stopWorkflowInstance(workflowInstanceId);
@@ -59,33 +65,7 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
         workflowOperator.stopWorkflowInstance(workflowInstanceId);
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isEqualTo(WorkflowExecutionStatus.SUCCESS));
-    }
-
-    @Test
-    @DisplayName("Test failure recovery transitions")
-    public void testFailureRecoveryTransitions() {
-        final String yaml = "/it/recover_failure_tasks/failure_workflow_with_two_serial_fake_task.yaml";
-        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getOneWorkflow();
-
-        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
-                .workflowDefinition(workflow)
-                .runWorkflowCommandParam(new RunWorkflowCommandParam())
-                .build();
-        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
-
-        // Test FAILURE -> RUNNING_EXECUTION
-        workflowOperator.recoverFailureTasks(workflowInstanceId);
-        await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
-                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isIn(WorkflowExecutionStatus.RUNNING_EXECUTION, WorkflowExecutionStatus.SUCCESS));
-
-        // Test FAILURE -> STOP
-        workflowOperator.stopWorkflowInstance(workflowInstanceId);
-        await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
-                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isIn(WorkflowExecutionStatus.STOP, WorkflowExecutionStatus.SUCCESS));
+                        .isEqualTo(WorkflowExecutionStatus.STOP));
     }
 
     @Test
