@@ -48,7 +48,7 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
                         .isEqualTo(WorkflowExecutionStatus.PAUSE));
-//
+
         // Test PAUSE -> RUNNING_EXECUTION
         workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId);
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
