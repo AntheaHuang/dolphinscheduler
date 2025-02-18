@@ -77,4 +77,12 @@ public class ExcelUtilsTest {
         file.delete();
         Assertions.assertFalse(file.exists());
     }
+
+    //Test for when file doesn't exist
+    @Test
+    public void testGenExcelFileNoExist(){
+        Assertions.assertThrows(AlertEmailException.class, () ->{
+            ExcelUtils.genExcelFile("content", "title", "/noExistPath");
+        });
+    }
 }

@@ -119,6 +119,111 @@ public class HttpSenderTest {
         Assertions.assertTrue(alertResult.getMessage().contains(msg));
     }
 
+    @Test
+    void testEmptyUrl() throws Exception{
+
+        //Set the url to null string
+        paramsMap.put(HttpAlertConstants.NAME_URL, "");
+
+        //test the exception thrown
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->{
+            new HttpSender(paramsMap);
+        });
+
+        Assertions.assertEquals("url can not be null", e.getMessage());
+
+    }
+
+    @Test
+    void testInvalidHeaderParams() throws Exception{
+        String msg = "msg_test";
+
+        //invalid header params
+        paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, "invalid header params");
+
+        //valid url
+        String mockGetUrl = createMockWebServer(String.format("/get/%s", msg), HttpStatus.SC_OK);
+        String actualGetUrl = mockGetUrl.replace(msg, HttpAlertConstants.MSG_PARAMS);
+        paramsMap.put(HttpAlertConstants.NAME_URL, actualGetUrl);
+
+        //test the exception thrown
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->{
+            new HttpSender(paramsMap);
+        });
+
+        Assertions.assertEquals("headerParams is not a valid json", e.getMessage());
+
+    }
+
+    @Test
+    void testInvalidBodyParams() throws Exception{
+        //invalid body params
+        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, JSONUtils.toJsonString("invalid body params"));
+
+        //valid url
+        String mockPostUrl = createMockWebServer("/post", HttpStatus.SC_OK);
+        paramsMap.put(HttpAlertConstants.NAME_URL, mockPostUrl);
+
+        //test the exception thrown
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->{
+            new HttpSender(paramsMap);
+        });
+
+        Assertions.assertEquals("bodyParams is not a valid json", e.getMessage());
+    }
+
+    @Test
+    void testInvalidRequestType() throws Exception{
+        String msg = "msg_test";
+
+        //valid header params
+        Map<String, String> headerParams = new HashMap<>();
+        headerParams.put("msg", msg);
+        paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, JSONUtils.toJsonString(headerParams));
+
+        //valid url
+        String mockGetUrl = createMockWebServer(String.format("/get/%s", msg), HttpStatus.SC_OK);
+        String actualGetUrl = mockGetUrl.replace(msg, HttpAlertConstants.MSG_PARAMS);
+        paramsMap.put(HttpAlertConstants.NAME_URL, actualGetUrl);
+
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, "invalid request type");
+
+        //test the exception thrown
+         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->{
+            new HttpSender(paramsMap);
+        });
+
+        Assertions.assertEquals("requestType is not a valid value", e.getMessage());
+    }
+
+    @Test
+    void testInvalidContentType() throws Exception {
+        String msg = "msg_test";
+
+        //valid header params
+        Map<String, String> headerParams = new HashMap<>();
+        headerParams.put("msg", msg);
+        paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, JSONUtils.toJsonString(headerParams));
+
+        //invalid content type
+        paramsMap.put(HttpAlertConstants.NAME_CONTENT_TYPE, "invalid content type");
+
+        //valid url
+        String mockGetUrl = createMockWebServer(String.format("/get/%s", msg), HttpStatus.SC_OK);
+        String actualGetUrl = mockGetUrl.replace(msg, HttpAlertConstants.MSG_PARAMS);
+        paramsMap.put(HttpAlertConstants.NAME_URL, actualGetUrl);
+
+        //valid request type
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, HttpRequestMethod.GET.name());
+
+        //test the exception thrown
+        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class, () ->{
+            new HttpSender(paramsMap);
+        });
+
+        Assertions.assertEquals("contentType is not a valid value", e.getMessage());
+    }
+
     private String createMockWebServer(String path, int actualResponseCode) throws IOException {
         MockWebServer server = new MockWebServer();
         mockWebServers.add(server);

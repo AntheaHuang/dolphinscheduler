@@ -69,6 +69,37 @@ public class EmailAlertChannelTest {
         Assertions.assertFalse(alertResult.isSuccess());
     }
 
+    @Test
+    public void testProcessNullParams(){
+        EmailAlertChannel emailAlertChannel = new EmailAlertChannel();
+        LinkedHashMap<String, Object> map1 = new LinkedHashMap<>();
+        map1.put("mysql service name", "mysql200");
+        map1.put("mysql address", "192.168.xx.xx");
+        map1.put("port", "3306");
+        map1.put("no index of number", "80");
+        map1.put("database client connections", "190");
+        List<LinkedHashMap<String, Object>> maps = new ArrayList<>();
+        maps.add(0, map1);
+        String mapjson = JSONUtils.toJsonString(maps);
+
+        AlertData alertData = AlertData.builder()
+                .id(10)
+                .content(mapjson)
+                .log("10")
+                .title("test")
+                .build();
+        AlertInfo alertInfo = new AlertInfo();
+        alertInfo.setAlertData(alertData);
+        //Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(getEmailAlertParams());
+
+        //set the params to be null
+        alertInfo.setAlertParams(null);
+        AlertResult alertResult = emailAlertChannel.process(alertInfo);
+        Assertions.assertNotNull(alertResult);
+        Assertions.assertFalse(alertResult.isSuccess());
+        Assertions.assertEquals("mail params is null", alertResult.getMessage());
+    }
+
     public String getEmailAlertParams() {
         List<PluginParams> paramsList = new ArrayList<>();
         InputParam receivesParam =
