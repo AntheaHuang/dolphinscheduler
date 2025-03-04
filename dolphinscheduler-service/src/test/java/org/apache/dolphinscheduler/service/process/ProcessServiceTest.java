@@ -18,8 +18,10 @@
 package org.apache.dolphinscheduler.service.process;
 
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -50,6 +52,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -57,11 +60,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.service.utils.DagHelper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -356,5 +361,32 @@ public class ProcessServiceTest {
         taskGroupQueue.setUpdateTime(date);
         taskGroupQueue.setCreateTime(date);
         return taskGroupQueue;
+    }
+
+    @Test
+    void testDeleteWorkflowInstanceById() throws Exception {
+        // create the service
+        ProcessServiceImpl processService = new ProcessServiceImpl();
+
+        // mock the mapper
+        WorkflowInstanceMapper workflowInstanceMapper = Mockito.mock(WorkflowInstanceMapper.class);
+
+        // inject the mock directly into the private field using reflection
+        Field field = ProcessServiceImpl.class.getDeclaredField("workflowInstanceMapper");
+        field.setAccessible(true);
+        field.set(processService, workflowInstanceMapper);
+
+        // stub the mock's behavior
+        when(workflowInstanceMapper.deleteById(123)).thenReturn(1);  // simulate successful deletion
+
+        // call the method under test
+        int result = processService.deleteWorkflowInstanceById(123);
+
+        // verify interaction and assert result
+        verify(workflowInstanceMapper, times(1)).deleteById(123);
+        assertEquals(1, result);
+
+        // confirm no unexpected calls
+        verifyNoMoreInteractions(workflowInstanceMapper);
     }
 }
