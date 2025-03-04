@@ -1,0 +1,249 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractHAServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.registry.api.ha</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractHAServer (org.apache.dolphinscheduler.registry.api.ha)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractHAServer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/41)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.registry.api.ha;
+&nbsp;
+&nbsp;import static com.google.common.base.Preconditions.checkNotNull;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+&nbsp;import org.apache.dolphinscheduler.registry.api.Event;
+&nbsp;import org.apache.dolphinscheduler.registry.api.Registry;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.google.common.collect.Lists;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public abstract class AbstractHAServer implements HAServer {
+&nbsp;
+&nbsp;    private final Registry registry;
+&nbsp;
+&nbsp;    private final String selectorPath;
+&nbsp;
+&nbsp;    private final String serverIdentify;
+&nbsp;
+&nbsp;    private ServerStatus serverStatus;
+&nbsp;
+&nbsp;    private final List&lt;ServerStatusChangeListener&gt; serverStatusChangeListeners;
+&nbsp;
+&nbsp;    private static final long DEFAULT_RETRY_INTERVAL = 5_000;
+&nbsp;
+&nbsp;    private static final int DEFAULT_MAX_RETRY_TIMES = 20;
+&nbsp;
+<b class="nc">&nbsp;    public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {</b>
+<b class="nc">&nbsp;        this.registry = registry;</b>
+<b class="nc">&nbsp;        this.selectorPath = checkNotNull(selectorPath);</b>
+<b class="nc">&nbsp;        this.serverIdentify = checkNotNull(serverIdentify);</b>
+<b class="nc">&nbsp;        this.serverStatus = ServerStatus.STAND_BY;</b>
+<b class="nc">&nbsp;        this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void start() {
+<b class="nc">&nbsp;        registry.subscribe(selectorPath, event -&gt; {</b>
+<b class="nc">&nbsp;            if (Event.Type.REMOVE.equals(event.type())) {</b>
+<b class="nc">&nbsp;                if (serverIdentify.equals(event.data())) {</b>
+<b class="nc">&nbsp;                    statusChange(ServerStatus.STAND_BY);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    if (participateElection()) {</b>
+<b class="nc">&nbsp;                        statusChange(ServerStatus.ACTIVE);</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        if (participateElection()) {</b>
+<b class="nc">&nbsp;            statusChange(ServerStatus.ACTIVE);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            log.info(&quot;Server {} is standby&quot;, serverIdentify);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isActive() {
+<b class="nc">&nbsp;        return ServerStatus.ACTIVE.equals(getServerStatus());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean participateElection() {
+<b class="nc">&nbsp;        final String electionLock = selectorPath + &quot;-lock&quot;;</b>
+&nbsp;        // If meet exception during participate election, will retry.
+&nbsp;        // This can avoid the situation that the server is not elected as leader due to network jitter.
+<b class="nc">&nbsp;        for (int i = 0; i &lt; DEFAULT_MAX_RETRY_TIMES; i++) {</b>
+&nbsp;            try {
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (registry.acquireLock(electionLock)) {</b>
+<b class="nc">&nbsp;                        if (!registry.exists(selectorPath)) {</b>
+<b class="nc">&nbsp;                            registry.put(selectorPath, serverIdentify, true);</b>
+<b class="nc">&nbsp;                            return true;</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        return serverIdentify.equals(registry.get(selectorPath));</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    registry.releaseLock(electionLock);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Participate election error, meet an exception, will retry after {}ms&quot;,</b>
+<b class="nc">&nbsp;                        DEFAULT_RETRY_INTERVAL, e);</b>
+<b class="nc">&nbsp;                ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        throw new IllegalStateException(</b>
+&nbsp;                &quot;Participate election failed after retry &quot; + DEFAULT_MAX_RETRY_TIMES + &quot; times&quot;);
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addServerStatusChangeListener(ServerStatusChangeListener listener) {
+<b class="nc">&nbsp;        serverStatusChangeListeners.add(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ServerStatus getServerStatus() {
+<b class="nc">&nbsp;        return serverStatus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void statusChange(ServerStatus targetStatus) {
+<b class="nc">&nbsp;        final ServerStatus originStatus = serverStatus;</b>
+<b class="nc">&nbsp;        serverStatus = targetStatus;</b>
+<b class="nc">&nbsp;        synchronized (this) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                serverStatusChangeListeners.forEach(listener -&gt; listener.change(originStatus, serverStatus));</b>
+<b class="nc">&nbsp;            } catch (Exception ex) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Trigger ServerStatusChangeListener from {} -&gt; {} error&quot;, originStatus, targetStatus, ex);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,490 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FlinkArgsUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.flink</a>
+</div>
+
+<h1>Coverage Summary for Class: FlinkArgsUtils (org.apache.dolphinscheduler.plugin.task.flink)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FlinkArgsUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/75)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/137)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FlinkArgsUtils$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/75)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/139)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.flink;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * flink args utils
+&nbsp; */
+&nbsp;public class FlinkArgsUtils {
+&nbsp;
+<b class="nc">&nbsp;    private FlinkArgsUtils() {</b>
+<b class="nc">&nbsp;        throw new IllegalStateException(&quot;Utility class&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static final String LOCAL_DEPLOY_MODE = &quot;local&quot;;
+&nbsp;    private static final String FLINK_VERSION_BEFORE_1_10 = &quot;&lt;1.10&quot;;
+&nbsp;    private static final String FLINK_VERSION_AFTER_OR_EQUALS_1_12 = &quot;&gt;=1.12&quot;;
+&nbsp;    private static final String FLINK_VERSION_AFTER_OR_EQUALS_1_13 = &quot;&gt;=1.13&quot;;
+&nbsp;    /**
+&nbsp;     *  default flink deploy mode
+&nbsp;     */
+<b class="nc">&nbsp;    public static final FlinkDeployMode DEFAULT_DEPLOY_MODE = FlinkDeployMode.CLUSTER;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * build flink run command line
+&nbsp;     *
+&nbsp;     * @param param flink parameters
+&nbsp;     * @return argument list
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; buildRunCommandLine(TaskExecutionContext taskExecutionContext, FlinkParameters param) {
+<b class="nc">&nbsp;        switch (param.getProgramType()) {</b>
+&nbsp;            case SQL:
+<b class="nc">&nbsp;                return buildRunCommandLineForSql(taskExecutionContext, param);</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                return buildRunCommandLineForOthers(taskExecutionContext, param);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * build flink cancel command line
+&nbsp;     * @param taskExecutionContext
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; buildCancelCommandLine(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_COMMAND);</b>
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_CANCEL);</b>
+<b class="nc">&nbsp;        args.add(taskExecutionContext.getAppIds());</b>
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * build flink savepoint command line, the savepoint folder should be set in flink conf
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public static List&lt;String&gt; buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_COMMAND);</b>
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_SAVEPOINT);</b>
+<b class="nc">&nbsp;        args.add(taskExecutionContext.getAppIds());</b>
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * build flink run command line for SQL
+&nbsp;     *
+&nbsp;     * @return argument list
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; buildRunCommandLineForSql(TaskExecutionContext taskExecutionContext,
+&nbsp;                                                          FlinkParameters flinkParameters) {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_SQL_COMMAND);</b>
+&nbsp;
+&nbsp;        // -i
+<b class="nc">&nbsp;        String initScriptFilePath = FileUtils.getInitScriptFilePath(taskExecutionContext);</b>
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_SQL_INIT_FILE);</b>
+<b class="nc">&nbsp;        args.add(initScriptFilePath);</b>
+&nbsp;
+&nbsp;        // -f
+<b class="nc">&nbsp;        String scriptFilePath = FileUtils.getScriptFilePath(taskExecutionContext);</b>
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_SQL_SCRIPT_FILE);</b>
+<b class="nc">&nbsp;        args.add(scriptFilePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        String others = flinkParameters.getOthers();</b>
+<b class="nc">&nbsp;        if (StringUtils.isNotEmpty(others)) {</b>
+<b class="nc">&nbsp;            args.add(others);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; buildInitOptionsForSql(FlinkParameters flinkParameters) {
+<b class="nc">&nbsp;        List&lt;String&gt; initOptions = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        FlinkDeployMode deployMode =</b>
+<b class="nc">&nbsp;                Optional.ofNullable(flinkParameters.getDeployMode()).orElse(FlinkDeployMode.CLUSTER);</b>
+&nbsp;
+&nbsp;        /**
+&nbsp;         * Currently flink sql on yarn only supports yarn-per-job mode
+&nbsp;         */
+<b class="nc">&nbsp;        if (FlinkDeployMode.LOCAL == deployMode) {</b>
+&nbsp;            // execution.target
+<b class="nc">&nbsp;            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_LOCAL));</b>
+<b class="nc">&nbsp;        } else if (FlinkDeployMode.STANDALONE == deployMode) {</b>
+&nbsp;            // standalone exec
+&nbsp;        } else {
+&nbsp;            // execution.target
+<b class="nc">&nbsp;            initOptions.add(</b>
+<b class="nc">&nbsp;                    String.format(FlinkConstants.FLINK_FORMAT_EXECUTION_TARGET, FlinkConstants.FLINK_YARN_PER_JOB));</b>
+&nbsp;
+&nbsp;            // taskmanager.numberOfTaskSlots
+<b class="nc">&nbsp;            int slot = flinkParameters.getSlot();</b>
+<b class="nc">&nbsp;            if (slot &gt; 0) {</b>
+<b class="nc">&nbsp;                initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_NUMBEROFTASKSLOTS, slot));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // yarn.application.name
+<b class="nc">&nbsp;            String appName = flinkParameters.getAppName();</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(appName)) {</b>
+<b class="nc">&nbsp;                initOptions.add(</b>
+<b class="nc">&nbsp;                        String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_NAME, ArgsUtils.escape(appName)));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // jobmanager.memory.process.size
+<b class="nc">&nbsp;            String jobManagerMemory = flinkParameters.getJobManagerMemory();</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(jobManagerMemory)) {</b>
+<b class="nc">&nbsp;                initOptions.add(</b>
+<b class="nc">&nbsp;                        String.format(FlinkConstants.FLINK_FORMAT_JOBMANAGER_MEMORY_PROCESS_SIZE, jobManagerMemory));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // taskmanager.memory.process.size
+<b class="nc">&nbsp;            String taskManagerMemory = flinkParameters.getTaskManagerMemory();</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(taskManagerMemory)) {</b>
+<b class="nc">&nbsp;                initOptions.add(</b>
+<b class="nc">&nbsp;                        String.format(FlinkConstants.FLINK_FORMAT_TASKMANAGER_MEMORY_PROCESS_SIZE, taskManagerMemory));</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // yarn.application.queue
+<b class="nc">&nbsp;            String yarnQueue = flinkParameters.getYarnQueue();</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(yarnQueue)) {</b>
+<b class="nc">&nbsp;                initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_YARN_APPLICATION_QUEUE, yarnQueue));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // parallelism.default
+<b class="nc">&nbsp;        int parallelism = flinkParameters.getParallelism();</b>
+<b class="nc">&nbsp;        if (parallelism &gt; 0) {</b>
+<b class="nc">&nbsp;            initOptions.add(String.format(FlinkConstants.FLINK_FORMAT_PARALLELISM_DEFAULT, parallelism));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return initOptions;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static List&lt;String&gt; buildRunCommandLineForOthers(TaskExecutionContext taskExecutionContext,
+&nbsp;                                                             FlinkParameters flinkParameters) {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_COMMAND);</b>
+<b class="nc">&nbsp;        FlinkDeployMode deployMode = Optional.ofNullable(flinkParameters.getDeployMode()).orElse(DEFAULT_DEPLOY_MODE);</b>
+<b class="nc">&nbsp;        String flinkVersion = flinkParameters.getFlinkVersion();</b>
+&nbsp;        // build run command
+<b class="nc">&nbsp;        switch (deployMode) {</b>
+&nbsp;            case CLUSTER:
+<b class="nc">&nbsp;                if (FLINK_VERSION_AFTER_OR_EQUALS_1_12.equals(flinkVersion)</b>
+<b class="nc">&nbsp;                        || FLINK_VERSION_AFTER_OR_EQUALS_1_13.equals(flinkVersion)) {</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_RUN); // run</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_YARN_PER_JOB); // yarn-per-job</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_RUN); // run</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_RUN_MODE); // -m</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_YARN_CLUSTER); // yarn-cluster</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case APPLICATION:
+<b class="nc">&nbsp;                args.add(FlinkConstants.FLINK_RUN_APPLICATION); // run-application</b>
+<b class="nc">&nbsp;                args.add(FlinkConstants.FLINK_EXECUTION_TARGET); // -t</b>
+<b class="nc">&nbsp;                args.add(FlinkConstants.FLINK_YARN_APPLICATION); // yarn-application</b>
+&nbsp;                break;
+&nbsp;            case LOCAL:
+<b class="nc">&nbsp;                args.add(FlinkConstants.FLINK_RUN); // run</b>
+&nbsp;                break;
+&nbsp;            case STANDALONE:
+<b class="nc">&nbsp;                args.add(FlinkConstants.FLINK_RUN); // run</b>
+&nbsp;                break;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String others = flinkParameters.getOthers();</b>
+&nbsp;
+&nbsp;        // build args
+<b class="nc">&nbsp;        switch (deployMode) {</b>
+&nbsp;            case CLUSTER:
+&nbsp;            case APPLICATION:
+<b class="nc">&nbsp;                int slot = flinkParameters.getSlot();</b>
+<b class="nc">&nbsp;                if (slot &gt; 0) {</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_YARN_SLOT);</b>
+<b class="nc">&nbsp;                    args.add(String.format(&quot;%d&quot;, slot)); // -ys</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                String appName = flinkParameters.getAppName();</b>
+<b class="nc">&nbsp;                if (StringUtils.isNotEmpty(appName)) { // -ynm</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_APP_NAME);</b>
+<b class="nc">&nbsp;                    args.add(ArgsUtils.escape(appName));</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                // judge flink version, the parameter -yn has removed from flink 1.10
+<b class="nc">&nbsp;                if (flinkVersion == null || FLINK_VERSION_BEFORE_1_10.equals(flinkVersion)) {</b>
+<b class="nc">&nbsp;                    int taskManager = flinkParameters.getTaskManager();</b>
+<b class="nc">&nbsp;                    if (taskManager &gt; 0) { // -yn</b>
+<b class="nc">&nbsp;                        args.add(FlinkConstants.FLINK_TASK_MANAGE);</b>
+<b class="nc">&nbsp;                        args.add(String.format(&quot;%d&quot;, taskManager));</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                String jobManagerMemory = flinkParameters.getJobManagerMemory();</b>
+<b class="nc">&nbsp;                if (StringUtils.isNotEmpty(jobManagerMemory)) {</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_JOB_MANAGE_MEM);</b>
+<b class="nc">&nbsp;                    args.add(jobManagerMemory); // -yjm</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                String taskManagerMemory = flinkParameters.getTaskManagerMemory();</b>
+<b class="nc">&nbsp;                if (StringUtils.isNotEmpty(taskManagerMemory)) { // -ytm</b>
+<b class="nc">&nbsp;                    args.add(FlinkConstants.FLINK_TASK_MANAGE_MEM);</b>
+<b class="nc">&nbsp;                    args.add(taskManagerMemory);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                break;
+&nbsp;            case LOCAL:
+&nbsp;                break;
+&nbsp;            case STANDALONE:
+&nbsp;                break;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int parallelism = flinkParameters.getParallelism();</b>
+<b class="nc">&nbsp;        if (parallelism &gt; 0) {</b>
+<b class="nc">&nbsp;            args.add(FlinkConstants.FLINK_PARALLELISM);</b>
+<b class="nc">&nbsp;            args.add(String.format(&quot;%d&quot;, parallelism)); // -p</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated
+&nbsp;        // abruptly
+&nbsp;        // The task status will be synchronized with the cluster job status
+<b class="nc">&nbsp;        args.add(FlinkConstants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae</b>
+&nbsp;
+&nbsp;        // -s -yqu -yat -yD -D
+<b class="nc">&nbsp;        if (StringUtils.isNotEmpty(others)) {</b>
+<b class="nc">&nbsp;            args.add(others);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // determine yarn queue
+<b class="nc">&nbsp;        determinedYarnQueue(args, flinkParameters, deployMode, flinkVersion);</b>
+<b class="nc">&nbsp;        ProgramType programType = flinkParameters.getProgramType();</b>
+<b class="nc">&nbsp;        String mainClass = flinkParameters.getMainClass();</b>
+<b class="nc">&nbsp;        if (programType != null &amp;&amp; programType != ProgramType.PYTHON &amp;&amp; StringUtils.isNotEmpty(mainClass)) {</b>
+<b class="nc">&nbsp;            args.add(FlinkConstants.FLINK_MAIN_CLASS); // -c</b>
+<b class="nc">&nbsp;            args.add(flinkParameters.getMainClass()); // main class</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        ResourceInfo mainJar = flinkParameters.getMainJar();</b>
+<b class="nc">&nbsp;        if (mainJar != null) {</b>
+&nbsp;            // -py
+<b class="nc">&nbsp;            if (ProgramType.PYTHON == programType) {</b>
+<b class="nc">&nbsp;                args.add(FlinkConstants.FLINK_PYTHON);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            ResourceContext resourceContext = taskExecutionContext.getResourceContext();</b>
+<b class="nc">&nbsp;            args.add(resourceContext.getResourceItem(mainJar.getResourceName()).getResourceAbsolutePathInLocal());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String mainArgs = flinkParameters.getMainArgs();</b>
+<b class="nc">&nbsp;        if (StringUtils.isNotEmpty(mainArgs)) {</b>
+<b class="nc">&nbsp;            Map&lt;String, Property&gt; paramsMap = taskExecutionContext.getPrepareParamsMap();</b>
+<b class="nc">&nbsp;            args.add(ParameterUtils.convertParameterPlaceholders(mainArgs, ParameterUtils.convert(paramsMap)));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void determinedYarnQueue(List&lt;String&gt; args, FlinkParameters flinkParameters,
+&nbsp;                                            FlinkDeployMode deployMode, String flinkVersion) {
+<b class="nc">&nbsp;        switch (deployMode) {</b>
+&nbsp;            case CLUSTER:
+<b class="nc">&nbsp;                if (FLINK_VERSION_AFTER_OR_EQUALS_1_12.equals(flinkVersion)</b>
+<b class="nc">&nbsp;                        || FLINK_VERSION_AFTER_OR_EQUALS_1_13.equals(flinkVersion)) {</b>
+<b class="nc">&nbsp;                    doAddQueue(args, flinkParameters, FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    doAddQueue(args, flinkParameters, FlinkConstants.FLINK_YARN_QUEUE_FOR_MODE);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case APPLICATION:
+<b class="nc">&nbsp;                doAddQueue(args, flinkParameters, FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS);</b>
+&nbsp;                break;
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static void doAddQueue(List&lt;String&gt; args, FlinkParameters flinkParameters, String option) {
+<b class="nc">&nbsp;        String others = flinkParameters.getOthers();</b>
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(others) || !others.contains(option)) {</b>
+<b class="nc">&nbsp;            String yarnQueue = flinkParameters.getYarnQueue();</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(yarnQueue)) {</b>
+<b class="nc">&nbsp;                switch (option) {</b>
+&nbsp;                    case FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS:
+<b class="nc">&nbsp;                        args.add(String.format(FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS + &quot;=%s&quot;, yarnQueue));</b>
+&nbsp;                        break;
+&nbsp;                    case FlinkConstants.FLINK_YARN_QUEUE_FOR_MODE:
+<b class="nc">&nbsp;                        args.add(FlinkConstants.FLINK_YARN_QUEUE_FOR_MODE);</b>
+<b class="nc">&nbsp;                        args.add(yarnQueue);</b>
+&nbsp;                        break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

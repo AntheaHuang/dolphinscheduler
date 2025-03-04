@@ -1,0 +1,256 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskOutputParameterParser</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.api.parser</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskOutputParameterParser (org.apache.dolphinscheduler.plugin.task.api.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskOutputParameterParser</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/47)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.api.parser;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.tuple.ImmutablePair;
+&nbsp;import org.apache.commons.lang3.tuple.Pair;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import javax.annotation.concurrent.NotThreadSafe;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;/**
+&nbsp; * Used to parse ${setValue()} and #{setValue()} from given lines.
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;@NotThreadSafe
+&nbsp;public class TaskOutputParameterParser {
+&nbsp;
+&nbsp;    // Used to avoid &#39;${setValue(&#39; which loss the end of &#39;)}&#39;
+&nbsp;    private final int maxOneParameterRows;
+&nbsp;
+&nbsp;    // Used to avoid &#39;${setValue(&#39; which length is too long, this may case OOM
+&nbsp;    private final int maxOneParameterLength;
+&nbsp;
+&nbsp;    private final Map&lt;String, String&gt; taskOutputParams;
+&nbsp;
+&nbsp;    private List&lt;String&gt; currentTaskOutputParam;
+&nbsp;
+&nbsp;    private long currentTaskOutputParamLength;
+&nbsp;
+&nbsp;    public TaskOutputParameterParser() {
+&nbsp;        // the default max rows of one parameter is 1024, this should be enough
+<b class="nc">&nbsp;        this(1024, Integer.MAX_VALUE);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public TaskOutputParameterParser(int maxOneParameterRows, int maxOneParameterLength) {</b>
+<b class="nc">&nbsp;        this.maxOneParameterRows = maxOneParameterRows;</b>
+<b class="nc">&nbsp;        this.maxOneParameterLength = maxOneParameterLength;</b>
+<b class="nc">&nbsp;        this.taskOutputParams = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        this.currentTaskOutputParam = null;</b>
+<b class="nc">&nbsp;        this.currentTaskOutputParamLength = 0;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void appendParseLog(String logLine) {
+<b class="nc">&nbsp;        if (logLine == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (currentTaskOutputParam != null) {</b>
+<b class="nc">&nbsp;            if (currentTaskOutputParam.size() &gt; maxOneParameterRows</b>
+&nbsp;                    || currentTaskOutputParamLength &gt; maxOneParameterLength) {
+<b class="nc">&nbsp;                log.warn(</b>
+&nbsp;                        &quot;The output param expression &#39;{}&#39; is too long, the max rows is {}, max length is {}, will skip this param&quot;,
+<b class="nc">&nbsp;                        String.join(&quot;\n&quot;, currentTaskOutputParam), maxOneParameterLength, maxOneParameterRows);</b>
+<b class="nc">&nbsp;                currentTaskOutputParam = null;</b>
+<b class="nc">&nbsp;                currentTaskOutputParamLength = 0;</b>
+&nbsp;                return;
+&nbsp;            }
+&nbsp;            // continue to parse the rest of line
+<b class="nc">&nbsp;            int i = logLine.indexOf(&quot;)}&quot;);</b>
+<b class="nc">&nbsp;            if (i == -1) {</b>
+&nbsp;                // the end of var pool not found
+<b class="nc">&nbsp;                currentTaskOutputParam.add(logLine);</b>
+<b class="nc">&nbsp;                currentTaskOutputParamLength += logLine.length();</b>
+&nbsp;            } else {
+&nbsp;                // the end of var pool found
+<b class="nc">&nbsp;                currentTaskOutputParam.add(logLine.substring(0, i + 2));</b>
+<b class="nc">&nbsp;                Pair&lt;String, String&gt; keyValue = parseOutputParam(String.join(&quot;\n&quot;, currentTaskOutputParam));</b>
+<b class="nc">&nbsp;                if (keyValue.getKey() != null &amp;&amp; keyValue.getValue() != null) {</b>
+<b class="nc">&nbsp;                    taskOutputParams.put(keyValue.getKey(), keyValue.getValue());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                currentTaskOutputParam = null;</b>
+<b class="nc">&nbsp;                currentTaskOutputParamLength = 0;</b>
+&nbsp;                // continue to parse the rest of line
+<b class="nc">&nbsp;                if (i + 2 != logLine.length()) {</b>
+<b class="nc">&nbsp;                    appendParseLog(logLine.substring(i + 2));</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        int indexOfVarPoolBegin = logLine.indexOf(&quot;${setValue(&quot;);</b>
+<b class="nc">&nbsp;        if (indexOfVarPoolBegin == -1) {</b>
+<b class="nc">&nbsp;            indexOfVarPoolBegin = logLine.indexOf(&quot;#{setValue(&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (indexOfVarPoolBegin == -1) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        currentTaskOutputParam = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        appendParseLog(logLine.substring(indexOfVarPoolBegin));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; getTaskOutputParams() {
+<b class="nc">&nbsp;        return taskOutputParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // #{setValue(xx=xx)}
+&nbsp;    protected Pair&lt;String, String&gt; parseOutputParam(String outputParam) {
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(outputParam)) {</b>
+<b class="nc">&nbsp;            log.info(&quot;The task output param is empty&quot;);</b>
+<b class="nc">&nbsp;            return ImmutablePair.nullPair();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if ((!outputParam.startsWith(&quot;${setValue(&quot;) &amp;&amp; !outputParam.startsWith(&quot;#{setValue(&quot;))</b>
+<b class="nc">&nbsp;                || !outputParam.endsWith(&quot;)}&quot;)) {</b>
+<b class="nc">&nbsp;            log.info(&quot;The task output param {} should start with &#39;${setValue(&#39; or &#39;#{setValue(&#39; and end with &#39;)}&#39;&quot;,</b>
+&nbsp;                    outputParam);
+<b class="nc">&nbsp;            return ImmutablePair.nullPair();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String keyValueExpression = outputParam.substring(11, outputParam.length() - 2);</b>
+<b class="nc">&nbsp;        if (!keyValueExpression.contains(&quot;=&quot;)) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;The task output param {} should composite with key=value&quot;, outputParam);</b>
+<b class="nc">&nbsp;            return ImmutablePair.nullPair();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String[] keyValue = keyValueExpression.split(&quot;=&quot;, 2);</b>
+<b class="nc">&nbsp;        return ImmutablePair.of(keyValue[0], keyValue[1]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

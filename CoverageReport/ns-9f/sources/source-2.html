@@ -1,0 +1,564 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SqlTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.sql</a>
+</div>
+
+<h1>Coverage Summary for Class: SqlTask (org.apache.dolphinscheduler.plugin.task.sql)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SqlTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/74)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/181)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.sql;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.DateUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.DbType;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.PreparedStatement;
+&nbsp;import java.sql.ResultSet;
+&nbsp;import java.sql.ResultSetMetaData;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.node.ArrayNode;
+&nbsp;import com.fasterxml.jackson.databind.node.ObjectNode;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class SqlTask extends AbstractTask {
+&nbsp;
+&nbsp;    private final TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    private final SqlParameters sqlParameters;
+&nbsp;
+&nbsp;    private BaseConnectionParam baseConnectionParam;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create function format
+&nbsp;     * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
+&nbsp;     */
+&nbsp;    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT =
+&nbsp;            &quot;create or replace temporary function {0} as &#39;&#39;{1}&#39;&#39;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * default query sql limit
+&nbsp;     */
+&nbsp;    private static final int QUERY_LIMIT = 10000;
+&nbsp;
+&nbsp;    private SQLTaskExecutionContext sqlTaskExecutionContext;
+&nbsp;
+&nbsp;    public static final int TEST_FLAG_YES = 1;
+&nbsp;
+&nbsp;    private final DbType dbType;
+&nbsp;
+&nbsp;    public SqlTask(TaskExecutionContext taskRequest) {
+<b class="nc">&nbsp;        super(taskRequest);</b>
+<b class="nc">&nbsp;        this.taskExecutionContext = taskRequest;</b>
+<b class="nc">&nbsp;        this.sqlParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqlParameters.class);</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize sql task parameter {}&quot;, JSONUtils.toPrettyJsonString(sqlParameters));</b>
+<b class="nc">&nbsp;        if (sqlParameters == null || !sqlParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;sql task params is not valid&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (taskExecutionContext.getTestFlag() == TEST_FLAG_YES &amp;&amp; this.sqlParameters.getDatasource() == 0) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;unbound test data source&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        sqlTaskExecutionContext =</b>
+<b class="nc">&nbsp;                sqlParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());</b>
+<b class="nc">&nbsp;        dbType = DbType.valueOf(sqlParameters.getType());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return sqlParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void handle(TaskCallBack taskCallBack) throws TaskException {
+<b class="nc">&nbsp;        log.info(&quot;Full sql parameters: {}&quot;, sqlParameters);</b>
+<b class="nc">&nbsp;        log.info(</b>
+&nbsp;                &quot;sql type : {}, datasource : {}, sql : {} , localParams : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}&quot;,
+<b class="nc">&nbsp;                sqlParameters.getType(),</b>
+<b class="nc">&nbsp;                sqlParameters.getDatasource(),</b>
+<b class="nc">&nbsp;                sqlParameters.getSql(),</b>
+<b class="nc">&nbsp;                sqlParameters.getLocalParams(),</b>
+<b class="nc">&nbsp;                sqlParameters.getShowType(),</b>
+<b class="nc">&nbsp;                sqlParameters.getConnParams(),</b>
+<b class="nc">&nbsp;                sqlParameters.getVarPool(),</b>
+<b class="nc">&nbsp;                sqlParameters.getLimit());</b>
+&nbsp;        try {
+&nbsp;
+&nbsp;            // get datasource
+<b class="nc">&nbsp;            baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dbType,</b>
+<b class="nc">&nbsp;                    sqlTaskExecutionContext.getConnectionParams());</b>
+<b class="nc">&nbsp;            List&lt;String&gt; subSqls = DataSourceProcessorProvider.getDataSourceProcessor(dbType)</b>
+<b class="nc">&nbsp;                    .splitAndRemoveComment(sqlParameters.getSql());</b>
+&nbsp;
+&nbsp;            // ready to execute SQL and parameter entity Map
+<b class="nc">&nbsp;            List&lt;SqlBinds&gt; mainStatementSqlBinds = subSqls</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .map(this::getSqlAndSqlParamsMap)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;
+<b class="nc">&nbsp;            List&lt;SqlBinds&gt; preStatementSqlBinds = Optional.ofNullable(sqlParameters.getPreStatements())</b>
+<b class="nc">&nbsp;                    .orElse(new ArrayList&lt;&gt;())</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .map(this::getSqlAndSqlParamsMap)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;            List&lt;SqlBinds&gt; postStatementSqlBinds = Optional.ofNullable(sqlParameters.getPostStatements())</b>
+<b class="nc">&nbsp;                    .orElse(new ArrayList&lt;&gt;())</b>
+<b class="nc">&nbsp;                    .stream()</b>
+<b class="nc">&nbsp;                    .map(this::getSqlAndSqlParamsMap)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+&nbsp;
+&nbsp;            // execute sql task
+<b class="nc">&nbsp;            executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds);</b>
+&nbsp;
+<b class="nc">&nbsp;            setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);</b>
+&nbsp;
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            log.error(&quot;sql task error&quot;, e);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Execute sql task failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancel() throws TaskException {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * execute function and sql
+&nbsp;     *
+&nbsp;     * @param mainStatementsBinds main statements binds
+&nbsp;     * @param preStatementsBinds  pre statements binds
+&nbsp;     * @param postStatementsBinds post statements binds
+&nbsp;     */
+&nbsp;    public void executeFuncAndSql(List&lt;SqlBinds&gt; mainStatementsBinds,
+&nbsp;                                  List&lt;SqlBinds&gt; preStatementsBinds,
+&nbsp;                                  List&lt;SqlBinds&gt; postStatementsBinds) throws Exception {
+<b class="nc">&nbsp;        try (</b>
+<b class="nc">&nbsp;                Connection connection =</b>
+<b class="nc">&nbsp;                        DataSourceClientProvider.getAdHocConnection(DbType.valueOf(sqlParameters.getType()),</b>
+&nbsp;                                baseConnectionParam)) {
+&nbsp;
+&nbsp;            // pre execute
+<b class="nc">&nbsp;            executeUpdate(connection, preStatementsBinds, &quot;pre&quot;);</b>
+&nbsp;
+&nbsp;            // main execute
+<b class="nc">&nbsp;            String result = null;</b>
+&nbsp;            // decide whether to executeQuery or executeUpdate based on sqlType
+<b class="nc">&nbsp;            if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {</b>
+&nbsp;                // query statements need to be convert to JsonArray and inserted into Alert to send
+<b class="nc">&nbsp;                result = executeQuery(connection, mainStatementsBinds.get(0), &quot;main&quot;);</b>
+<b class="nc">&nbsp;            } else if (sqlParameters.getSqlType() == SqlType.NON_QUERY.ordinal()) {</b>
+&nbsp;                // non query statement
+<b class="nc">&nbsp;                String updateResult = executeUpdate(connection, mainStatementsBinds, &quot;main&quot;);</b>
+<b class="nc">&nbsp;                result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());</b>
+&nbsp;            }
+&nbsp;            // deal out params
+<b class="nc">&nbsp;            sqlParameters.dealOutParam(result);</b>
+&nbsp;
+&nbsp;            // post execute
+<b class="nc">&nbsp;            executeUpdate(connection, postStatementsBinds, &quot;post&quot;);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;execute sql error: {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            throw e;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String setNonQuerySqlReturn(String updateResult, List&lt;Property&gt; properties) {
+<b class="nc">&nbsp;        String result = null;</b>
+<b class="nc">&nbsp;        for (Property info : properties) {</b>
+<b class="nc">&nbsp;            if (Direct.OUT == info.getDirect()) {</b>
+<b class="nc">&nbsp;                List&lt;Map&lt;String, String&gt;&gt; updateRL = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;                Map&lt;String, String&gt; updateRM = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;                updateRM.put(info.getProp(), updateResult);</b>
+<b class="nc">&nbsp;                updateRL.add(updateRM);</b>
+<b class="nc">&nbsp;                result = JSONUtils.toJsonString(updateRL);</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * result process
+&nbsp;     *
+&nbsp;     * @param resultSet resultSet
+&nbsp;     * @throws Exception Exception
+&nbsp;     */
+&nbsp;    private String resultProcess(ResultSet resultSet) throws Exception {
+<b class="nc">&nbsp;        ArrayNode resultJSONArray = JSONUtils.createArrayNode();</b>
+<b class="nc">&nbsp;        if (resultSet != null) {</b>
+<b class="nc">&nbsp;            ResultSetMetaData md = resultSet.getMetaData();</b>
+<b class="nc">&nbsp;            int num = md.getColumnCount();</b>
+&nbsp;
+<b class="nc">&nbsp;            while (resultSet.next()) {</b>
+<b class="nc">&nbsp;                ObjectNode mapOfColValues = JSONUtils.createObjectNode();</b>
+<b class="nc">&nbsp;                for (int i = 1; i &lt;= num; i++) {</b>
+<b class="nc">&nbsp;                    mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                resultJSONArray.add(mapOfColValues);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int displayRows = sqlParameters.getDisplayRows() &gt; 0 ? sqlParameters.getDisplayRows()</b>
+<b class="nc">&nbsp;                    : TaskConstants.DEFAULT_DISPLAY_ROWS;</b>
+<b class="nc">&nbsp;            displayRows = Math.min(displayRows, resultJSONArray.size());</b>
+<b class="nc">&nbsp;            log.info(&quot;display sql result {} rows as follows:&quot;, displayRows);</b>
+<b class="nc">&nbsp;            for (int i = 0; i &lt; displayRows; i++) {</b>
+<b class="nc">&nbsp;                String row = JSONUtils.toJsonString(resultJSONArray.get(i));</b>
+<b class="nc">&nbsp;                log.info(&quot;row {} : {}&quot;, i + 1, row);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))</b>
+<b class="nc">&nbsp;                : JSONUtils.toJsonString(resultJSONArray);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {</b>
+<b class="nc">&nbsp;            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())</b>
+<b class="nc">&nbsp;                    ? sqlParameters.getTitle()</b>
+<b class="nc">&nbsp;                    : taskExecutionContext.getTaskName() + &quot; query result sets&quot;, result);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        log.debug(&quot;execute sql result : {}&quot;, result);</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * generate empty Results as ArrayNode
+&nbsp;     */
+&nbsp;    private ArrayNode generateEmptyRow(ResultSet resultSet) throws SQLException {
+<b class="nc">&nbsp;        ArrayNode resultJSONArray = JSONUtils.createArrayNode();</b>
+<b class="nc">&nbsp;        ObjectNode emptyOfColValues = JSONUtils.createObjectNode();</b>
+<b class="nc">&nbsp;        if (resultSet != null) {</b>
+<b class="nc">&nbsp;            ResultSetMetaData metaData = resultSet.getMetaData();</b>
+<b class="nc">&nbsp;            int columnsNum = metaData.getColumnCount();</b>
+<b class="nc">&nbsp;            log.info(&quot;sql query results is empty&quot;);</b>
+<b class="nc">&nbsp;            for (int i = 1; i &lt;= columnsNum; i++) {</b>
+<b class="nc">&nbsp;                emptyOfColValues.set(metaData.getColumnLabel(i), JSONUtils.toJsonNode(&quot;&quot;));</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            emptyOfColValues.set(&quot;error&quot;, JSONUtils.toJsonNode(&quot;resultSet is null&quot;));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        resultJSONArray.add(emptyOfColValues);</b>
+<b class="nc">&nbsp;        return resultJSONArray;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * send alert as an attachment
+&nbsp;     *
+&nbsp;     * @param title   title
+&nbsp;     * @param content content
+&nbsp;     */
+&nbsp;    private void sendAttachment(int groupId, String title, String content) {
+<b class="nc">&nbsp;        setNeedAlert(Boolean.TRUE);</b>
+<b class="nc">&nbsp;        TaskAlertInfo taskAlertInfo = new TaskAlertInfo();</b>
+<b class="nc">&nbsp;        taskAlertInfo.setAlertGroupId(groupId);</b>
+<b class="nc">&nbsp;        taskAlertInfo.setContent(content);</b>
+<b class="nc">&nbsp;        taskAlertInfo.setTitle(title);</b>
+<b class="nc">&nbsp;        setTaskAlertInfo(taskAlertInfo);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+<b class="nc">&nbsp;        try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {</b>
+<b class="nc">&nbsp;            log.info(&quot;{} statement execute query, for sql: {}&quot;, handlerType, sqlBinds.getSql());</b>
+<b class="nc">&nbsp;            ResultSet resultSet = statement.executeQuery();</b>
+<b class="nc">&nbsp;            return resultProcess(resultSet);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String executeUpdate(Connection connection, List&lt;SqlBinds&gt; statementsBinds,
+&nbsp;                                 String handlerType) throws Exception {
+<b class="nc">&nbsp;        int result = 0;</b>
+<b class="nc">&nbsp;        for (SqlBinds sqlBind : statementsBinds) {</b>
+<b class="nc">&nbsp;            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {</b>
+<b class="nc">&nbsp;                result = statement.executeUpdate();</b>
+<b class="nc">&nbsp;                log.info(&quot;{} statement execute update result: {}, for sql: {}&quot;, handlerType, result,</b>
+<b class="nc">&nbsp;                        sqlBind.getSql());</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return String.valueOf(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * close jdbc resource
+&nbsp;     *
+&nbsp;     * @param connection connection
+&nbsp;     */
+&nbsp;    private void close(Connection connection) {
+<b class="nc">&nbsp;        if (connection != null) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                connection.close();</b>
+<b class="nc">&nbsp;            } catch (SQLException e) {</b>
+<b class="nc">&nbsp;                log.error(&quot;close connection error : {}&quot;, e.getMessage(), e);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * preparedStatement bind
+&nbsp;     *
+&nbsp;     * @param connection connection
+&nbsp;     * @param sqlBinds   sqlBinds
+&nbsp;     * @return PreparedStatement
+&nbsp;     * @throws Exception Exception
+&nbsp;     */
+&nbsp;    private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) {
+&nbsp;        // is the timeout set
+&nbsp;        // todo: we need control the timeout at master side.
+<b class="nc">&nbsp;        boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED</b>
+<b class="nc">&nbsp;                || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());</b>
+<b class="nc">&nbsp;            if (timeoutFlag) {</b>
+<b class="nc">&nbsp;                stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            stmt.setMaxRows(sqlParameters.getLimit() &lt;= 0 ? QUERY_LIMIT : sqlParameters.getLimit());</b>
+<b class="nc">&nbsp;            Map&lt;Integer, Property&gt; params = sqlBinds.getParamsMap();</b>
+<b class="nc">&nbsp;            if (params != null) {</b>
+<b class="nc">&nbsp;                for (Map.Entry&lt;Integer, Property&gt; entry : params.entrySet()) {</b>
+<b class="nc">&nbsp;                    Property prop = entry.getValue();</b>
+<b class="nc">&nbsp;                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            log.info(&quot;prepare statement replace sql : {}, sql parameters : {}&quot;, sqlBinds.getSql(),</b>
+<b class="nc">&nbsp;                    sqlBinds.getParamsMap());</b>
+<b class="nc">&nbsp;            return stmt;</b>
+<b class="nc">&nbsp;        } catch (Exception exception) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;SQL task prepareStatementAndBind error&quot;, exception);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * print replace sql
+&nbsp;     *
+&nbsp;     * @param content      content
+&nbsp;     * @param formatSql    format sql
+&nbsp;     * @param rgex         rgex
+&nbsp;     * @param sqlParamsMap sql params map
+&nbsp;     */
+&nbsp;    private void printReplacedSql(String content, String formatSql, String rgex, Map&lt;Integer, Property&gt; sqlParamsMap) {
+&nbsp;        // parameter print style
+<b class="nc">&nbsp;        log.info(&quot;after replace sql , preparing : {}&quot;, formatSql);</b>
+<b class="nc">&nbsp;        StringBuilder logPrint = new StringBuilder(&quot;replaced sql , parameters:&quot;);</b>
+<b class="nc">&nbsp;        if (sqlParamsMap == null) {</b>
+<b class="nc">&nbsp;            log.info(&quot;printReplacedSql: sqlParamsMap is null.&quot;);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            for (int i = 1; i &lt;= sqlParamsMap.size(); i++) {</b>
+<b class="nc">&nbsp;                logPrint.append(sqlParamsMap.get(i).getValue()).append(&quot;(&quot;).append(sqlParamsMap.get(i).getType())</b>
+<b class="nc">&nbsp;                        .append(&quot;)&quot;);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;Sql Params are {}&quot;, logPrint);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * ready to execute SQL and parameter entity Map
+&nbsp;     *
+&nbsp;     * @return SqlBinds
+&nbsp;     */
+&nbsp;    private SqlBinds getSqlAndSqlParamsMap(String sql) {
+<b class="nc">&nbsp;        Map&lt;Integer, Property&gt; sqlParamsMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        StringBuilder sqlBuilder = new StringBuilder();</b>
+&nbsp;        // new
+&nbsp;        // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
+<b class="nc">&nbsp;        sql = ParameterUtils.replaceScheduleTime(sql,</b>
+<b class="nc">&nbsp;                DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, Property&gt; paramsMap = taskExecutionContext.getPrepareParamsMap();</b>
+&nbsp;
+&nbsp;        // spell SQL according to the final user-defined variable
+<b class="nc">&nbsp;        if (paramsMap == null) {</b>
+<b class="nc">&nbsp;            sqlBuilder.append(sql);</b>
+<b class="nc">&nbsp;            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {</b>
+<b class="nc">&nbsp;            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),</b>
+<b class="nc">&nbsp;                    ParameterUtils.convert(paramsMap));</b>
+<b class="nc">&nbsp;            log.info(&quot;SQL title : {}&quot;, title);</b>
+<b class="nc">&nbsp;            sqlParameters.setTitle(title);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // special characters need to be escaped, ${} needs to be escaped
+<b class="nc">&nbsp;        setSqlParamsMap(sql, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());</b>
+&nbsp;        // Replace the original value in sql ！{...} ，Does not participate in precompilation
+<b class="nc">&nbsp;        String rgexo = &quot;[&#39;\&quot;]*\\!\\{(.*?)\\}[&#39;\&quot;]*&quot;;</b>
+<b class="nc">&nbsp;        sql = replaceOriginalValue(sql, rgexo, paramsMap);</b>
+&nbsp;        // replace the ${} of the SQL statement with the Placeholder
+&nbsp;        // Convert the list parameter
+<b class="nc">&nbsp;        String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql);</b>
+<b class="nc">&nbsp;        sqlBuilder.append(formatSql);</b>
+&nbsp;        // print replace sql
+<b class="nc">&nbsp;        printReplacedSql(sql, formatSql, TaskConstants.SQL_PARAMS_REGEX, sqlParamsMap);</b>
+<b class="nc">&nbsp;        return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String replaceOriginalValue(String content, String rgex, Map&lt;String, Property&gt; sqlParamsMap) {
+<b class="nc">&nbsp;        Pattern pattern = Pattern.compile(rgex);</b>
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            Matcher m = pattern.matcher(content);</b>
+<b class="nc">&nbsp;            if (!m.find()) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            String paramName = m.group(1);</b>
+<b class="nc">&nbsp;            String paramValue = sqlParamsMap.get(paramName).getValue();</b>
+<b class="nc">&nbsp;            content = m.replaceFirst(paramValue);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return content;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskExecutorLifecycleEventListener</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.task.executor.listener</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskExecutorLifecycleEventListener (org.apache.dolphinscheduler.task.executor.listener)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskExecutorLifecycleEventListener</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.task.executor.listener;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
+&nbsp;import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
+&nbsp;import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
+&nbsp;import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
+&nbsp;import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
+&nbsp;import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.ITaskExecutorLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPausedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorSuccessLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycleEventListener {
+&nbsp;
+&nbsp;    private final ITaskExecutorContainerProvider taskExecutorContainerDelegator;
+&nbsp;
+&nbsp;    private final ITaskExecutorRepository taskExecutorRepository;
+&nbsp;
+&nbsp;    private final ITaskExecutorLifecycleEventReporter taskExecutorLifecycleEventReporter;
+&nbsp;
+&nbsp;    public TaskExecutorLifecycleEventListener(final ITaskExecutorContainerProvider taskExecutorContainerDelegator,
+&nbsp;                                              final ITaskExecutorRepository taskExecutorRepository,
+<b class="nc">&nbsp;                                              final ITaskExecutorLifecycleEventReporter taskExecutorLifecycleEventReporter) {</b>
+<b class="nc">&nbsp;        this.taskExecutorContainerDelegator = taskExecutorContainerDelegator;</b>
+<b class="nc">&nbsp;        this.taskExecutorRepository = taskExecutorRepository;</b>
+<b class="nc">&nbsp;        this.taskExecutorLifecycleEventReporter = taskExecutorLifecycleEventReporter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorDispatchedLifecycleEvent(final TaskExecutorDispatchedLifecycleEvent event) {
+<b class="nc">&nbsp;        reportTaskExecutorLifecycleEventToMaster(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorStartedLifecycleEvent(final TaskExecutorStartedLifecycleEvent event) {
+<b class="nc">&nbsp;        reportTaskExecutorLifecycleEventToMaster(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorRuntimeContextChangedEvent(TaskExecutorRuntimeContextChangedLifecycleEvent event) {
+<b class="nc">&nbsp;        reportTaskExecutorLifecycleEventToMaster(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorPauseLifecycleEvent(final TaskExecutorPauseLifecycleEvent event) {
+<b class="nc">&nbsp;        final ITaskExecutor taskExecutor = getTaskExecutor(event);</b>
+<b class="nc">&nbsp;        taskExecutor.pause();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorPausedLifecycleEvent(final TaskExecutorPausedLifecycleEvent event) {
+<b class="nc">&nbsp;        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorKillLifecycleEvent(final TaskExecutorKillLifecycleEvent event) {
+<b class="nc">&nbsp;        final ITaskExecutor taskExecutor = getTaskExecutor(event);</b>
+<b class="nc">&nbsp;        taskExecutor.kill();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorKilledLifecycleEvent(final TaskExecutorKilledLifecycleEvent event) {
+<b class="nc">&nbsp;        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorSuccessLifecycleEvent(final TaskExecutorSuccessLifecycleEvent event) {
+<b class="nc">&nbsp;        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorFailLifecycleEvent(TaskExecutorFailedLifecycleEvent event) {
+<b class="nc">&nbsp;        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(event);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void onTaskExecutorFinalizeLifecycleEvent(final TaskExecutorFinalizeLifecycleEvent event) {
+<b class="nc">&nbsp;        TaskInstanceLogHeader.printFinalizeTaskHeader();</b>
+<b class="nc">&nbsp;        final ITaskExecutor taskExecutor = getTaskExecutor(event);</b>
+&nbsp;
+<b class="nc">&nbsp;        taskExecutorRepository.remove(taskExecutor.getId());</b>
+&nbsp;
+<b class="nc">&nbsp;        final ITaskExecutorContainer executorContainer = taskExecutorContainerDelegator.getExecutorContainer();</b>
+<b class="nc">&nbsp;        executorContainer.finalize(taskExecutor);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void reportTaskExecutorLifecycleEventToMaster(IReportableTaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
+<b class="nc">&nbsp;        taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(taskExecutorLifecycleEvent);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ITaskExecutor getTaskExecutor(final ITaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
+<b class="nc">&nbsp;        return taskExecutorRepository.get(taskExecutorLifecycleEvent.getTaskInstanceId()).orElseThrow(</b>
+<b class="nc">&nbsp;                () -&gt; new TaskExecutorNotFoundException(taskExecutorLifecycleEvent.getTaskInstanceId()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

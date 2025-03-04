@@ -1,0 +1,434 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RemoteExecutor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.remoteshell</a>
+</div>
+
+<h1>Coverage Summary for Class: RemoteExecutor (org.apache.dolphinscheduler.plugin.task.remoteshell)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RemoteExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/113)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">RemoteExecutor$COMMAND</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/115)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.remoteshell;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.remoteshell.RemoteExecutor.COMMAND.PSTREE_COMMAND;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.math.NumberUtils;
+&nbsp;import org.apache.sshd.client.SshClient;
+&nbsp;import org.apache.sshd.client.channel.ChannelExec;
+&nbsp;import org.apache.sshd.client.channel.ClientChannelEvent;
+&nbsp;import org.apache.sshd.client.session.ClientSession;
+&nbsp;import org.apache.sshd.sftp.client.SftpClientFactory;
+&nbsp;import org.apache.sshd.sftp.client.fs.SftpFileSystem;
+&nbsp;
+&nbsp;import java.io.ByteArrayOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Path;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.util.EnumSet;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import lombok.SneakyThrows;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class RemoteExecutor implements AutoCloseable {
+&nbsp;
+&nbsp;    static final String REMOTE_SHELL_HOME = &quot;/tmp/dolphinscheduler-remote-shell-%s/&quot;;
+&nbsp;    static final String STATUS_TAG_MESSAGE = &quot;DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-&quot;;
+&nbsp;    static final int TRACK_INTERVAL = 5000;
+&nbsp;
+<b class="nc">&nbsp;    protected Map&lt;String, String&gt; taskOutputParams = new HashMap&lt;&gt;();</b>
+&nbsp;    private SshClient sshClient;
+&nbsp;    private ClientSession session;
+&nbsp;    private SSHConnectionParam sshConnectionParam;
+&nbsp;
+<b class="nc">&nbsp;    public RemoteExecutor(SSHConnectionParam sshConnectionParam) {</b>
+&nbsp;
+<b class="nc">&nbsp;        this.sshConnectionParam = sshConnectionParam;</b>
+<b class="nc">&nbsp;        initClient();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initClient() {
+<b class="nc">&nbsp;        sshClient = SshClient.setUpDefaultClient();</b>
+<b class="nc">&nbsp;        sshClient.start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private ClientSession getSession() {
+<b class="nc">&nbsp;        if (session != null &amp;&amp; session.isOpen()) {</b>
+<b class="nc">&nbsp;            return session;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            session = SSHUtils.getSession(sshClient, sshConnectionParam);</b>
+<b class="nc">&nbsp;            if (session == null || !session.auth().verify().isSuccess()) {</b>
+<b class="nc">&nbsp;                throw new TaskException(&quot;SSH connection failed&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;SSH connection failed&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return session;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int run(String taskId, String localFile) throws IOException {
+&nbsp;        try {
+&nbsp;            // only run task if no exist same task
+<b class="nc">&nbsp;            String pid = getTaskPid(taskId);</b>
+<b class="nc">&nbsp;            if (StringUtils.isEmpty(pid)) {</b>
+<b class="nc">&nbsp;                saveCommand(taskId, localFile);</b>
+<b class="nc">&nbsp;                String runCommand = String.format(COMMAND.RUN_COMMAND, getRemoteShellHome(), taskId,</b>
+<b class="nc">&nbsp;                        getRemoteShellHome(), taskId);</b>
+<b class="nc">&nbsp;                runRemote(runCommand);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            track(taskId);</b>
+<b class="nc">&nbsp;            return getTaskExitCode(taskId);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Remote shell task error&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void track(String taskId) throws Exception {
+<b class="nc">&nbsp;        int logN = 0;</b>
+&nbsp;        String pid;
+<b class="nc">&nbsp;        log.info(&quot;Remote shell task log:&quot;);</b>
+<b class="nc">&nbsp;        TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();</b>
+&nbsp;        do {
+<b class="nc">&nbsp;            pid = getTaskPid(taskId);</b>
+<b class="nc">&nbsp;            String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);</b>
+<b class="nc">&nbsp;            String logLine = runRemote(trackCommand);</b>
+<b class="nc">&nbsp;            if (StringUtils.isEmpty(logLine)) {</b>
+<b class="nc">&nbsp;                Thread.sleep(TRACK_INTERVAL);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                logN += logLine.split(&quot;\n&quot;).length;</b>
+<b class="nc">&nbsp;                log.info(logLine);</b>
+<b class="nc">&nbsp;                taskOutputParameterParser.appendParseLog(logLine);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } while (StringUtils.isNotEmpty(pid));</b>
+<b class="nc">&nbsp;        taskOutputParams.putAll(taskOutputParameterParser.getTaskOutputParams());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; getTaskOutputParams() {
+<b class="nc">&nbsp;        return taskOutputParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getTaskExitCode(String taskId) throws IOException {
+<b class="nc">&nbsp;        String trackCommand = String.format(COMMAND.LOG_TAIL_COMMAND, getRemoteShellHome(), taskId);</b>
+<b class="nc">&nbsp;        String logLine = runRemote(trackCommand);</b>
+<b class="nc">&nbsp;        int exitCode = -1;</b>
+<b class="nc">&nbsp;        log.info(&quot;Remote shell task run status: {}&quot;, logLine);</b>
+<b class="nc">&nbsp;        if (logLine.contains(STATUS_TAG_MESSAGE)) {</b>
+<b class="nc">&nbsp;            String status = StringUtils.substringAfter(logLine, STATUS_TAG_MESSAGE).trim();</b>
+<b class="nc">&nbsp;            if (status.equals(&quot;0&quot;)) {</b>
+<b class="nc">&nbsp;                log.info(&quot;Remote shell task success&quot;);</b>
+<b class="nc">&nbsp;                exitCode = 0;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.error(&quot;Remote shell task failed&quot;);</b>
+<b class="nc">&nbsp;                exitCode = Integer.parseInt(status);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        cleanData(taskId);</b>
+<b class="nc">&nbsp;        return exitCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void cleanData(String taskId) {
+<b class="nc">&nbsp;        String cleanCommand =</b>
+<b class="nc">&nbsp;                String.format(COMMAND.CLEAN_COMMAND, getRemoteShellHome(), taskId, getRemoteShellHome(), taskId);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            runRemote(cleanCommand);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Remote shell task clean data failed, but will not affect the task execution&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void kill(String taskId) throws IOException {
+<b class="nc">&nbsp;        String pid = getTaskPid(taskId);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(pid)) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;query remote-shell task remote process id with empty&quot;);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (!NumberUtils.isParsable(pid)) {</b>
+<b class="nc">&nbsp;            log.error(&quot;query remote-shell task remote process id error, pid {} can not parse to number&quot;, pid);</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+&nbsp;        // query all pid
+<b class="nc">&nbsp;        String remotePidStr = getAllRemotePidStr(pid);</b>
+<b class="nc">&nbsp;        String killCommand = String.format(COMMAND.KILL_COMMAND, remotePidStr);</b>
+<b class="nc">&nbsp;        log.info(&quot;prepare to execute kill command in host: {}, kill cmd: {}&quot;, sshConnectionParam.getHost(),</b>
+&nbsp;                killCommand);
+<b class="nc">&nbsp;        runRemote(killCommand);</b>
+<b class="nc">&nbsp;        cleanData(taskId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String getAllRemotePidStr(String pid) {
+&nbsp;
+<b class="nc">&nbsp;        String remoteProcessIdStr = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String cmd = String.format(PSTREE_COMMAND, pid);</b>
+<b class="nc">&nbsp;        log.info(&quot;query all process id cmd: {}&quot;, cmd);</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            String rawPidStr = runRemote(cmd);</b>
+<b class="nc">&nbsp;            remoteProcessIdStr = ProcessUtils.parsePidStr(rawPidStr);</b>
+<b class="nc">&nbsp;            if (!remoteProcessIdStr.startsWith(pid)) {</b>
+<b class="nc">&nbsp;                log.error(&quot;query remote process id error, [{}] first pid not equal [{}]&quot;, remoteProcessIdStr, pid);</b>
+<b class="nc">&nbsp;                remoteProcessIdStr = pid;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;query remote all process id error&quot;, e);</b>
+<b class="nc">&nbsp;            remoteProcessIdStr = pid;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return remoteProcessIdStr;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTaskPid(String taskId) throws IOException {
+<b class="nc">&nbsp;        String pidCommand = String.format(COMMAND.GET_PID_COMMAND, taskId);</b>
+<b class="nc">&nbsp;        return runRemote(pidCommand).trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void saveCommand(String taskId, String localFile) throws IOException {
+<b class="nc">&nbsp;        String checkDirCommand = String.format(COMMAND.CHECK_DIR, getRemoteShellHome(), getRemoteShellHome());</b>
+<b class="nc">&nbsp;        runRemote(checkDirCommand);</b>
+<b class="nc">&nbsp;        uploadScript(taskId, localFile);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;The final script is: \n{}&quot;,</b>
+<b class="nc">&nbsp;                runRemote(String.format(COMMAND.CAT_FINAL_SCRIPT, getRemoteShellHome(), taskId)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void uploadScript(String taskId, String localFile) throws IOException {
+&nbsp;
+<b class="nc">&nbsp;        String remotePath = getRemoteShellHome() + taskId + &quot;.sh&quot;;</b>
+<b class="nc">&nbsp;        log.info(&quot;upload script from local:{} to remote: {}&quot;, localFile, remotePath);</b>
+<b class="nc">&nbsp;        try (SftpFileSystem fs = SftpClientFactory.instance().createSftpFileSystem(getSession())) {</b>
+<b class="nc">&nbsp;            Path path = fs.getPath(remotePath);</b>
+<b class="nc">&nbsp;            Files.copy(Paths.get(localFile), path);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String runRemote(String command) throws IOException {
+<b class="nc">&nbsp;        try (</b>
+<b class="nc">&nbsp;                ChannelExec channel = getSession().createExecChannel(command);</b>
+<b class="nc">&nbsp;                ByteArrayOutputStream out = new ByteArrayOutputStream();</b>
+<b class="nc">&nbsp;                ByteArrayOutputStream err = new ByteArrayOutputStream()) {</b>
+&nbsp;
+<b class="nc">&nbsp;            channel.setOut(System.out);</b>
+<b class="nc">&nbsp;            channel.setOut(out);</b>
+<b class="nc">&nbsp;            channel.setErr(err);</b>
+<b class="nc">&nbsp;            channel.open();</b>
+<b class="nc">&nbsp;            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0);</b>
+<b class="nc">&nbsp;            channel.close();</b>
+<b class="nc">&nbsp;            Integer exitStatus = channel.getExitStatus();</b>
+<b class="nc">&nbsp;            if (exitStatus == null || exitStatus != 0) {</b>
+<b class="nc">&nbsp;                throw new TaskException(</b>
+&nbsp;                        &quot;Remote shell task error, exitStatus: &quot; + exitStatus + &quot; error message: &quot; + err);
+&nbsp;            }
+<b class="nc">&nbsp;            return out.toString();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getRemoteShellHome() {
+<b class="nc">&nbsp;        return String.format(REMOTE_SHELL_HOME, sshConnectionParam.getUser());</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        if (session != null &amp;&amp; session.isOpen()) {</b>
+<b class="nc">&nbsp;            session.close();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (sshClient != null &amp;&amp; sshClient.isStarted()) {</b>
+<b class="nc">&nbsp;            sshClient.close();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    static class COMMAND {
+&nbsp;
+<b class="nc">&nbsp;        private COMMAND() {</b>
+<b class="nc">&nbsp;            throw new IllegalStateException(&quot;Utility class&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        static final String CHECK_DIR = &quot;if [ ! -d %s ]; then mkdir -p %s; fi&quot;;
+&nbsp;        static final String RUN_COMMAND = &quot;nohup /bin/bash %s%s.sh &gt;%s%s.log 2&gt;&amp;1 &amp;&quot;;
+&nbsp;        static final String TRACK_COMMAND = &quot;tail -n +%s %s%s.log&quot;;
+&nbsp;
+&nbsp;        static final String LOG_TAIL_COMMAND = &quot;tail -n 1 %s%s.log&quot;;
+&nbsp;        static final String GET_PID_COMMAND = &quot;ps -ef | grep \&quot;%s.sh\&quot; | grep -v grep | awk &#39;{print $2}&#39;&quot;;
+&nbsp;        static final String KILL_COMMAND = &quot;kill -9 %s&quot;;
+&nbsp;        static final String CLEAN_COMMAND = &quot;rm %s%s.sh %s%s.log&quot;;
+&nbsp;
+&nbsp;        static final String HEADER = &quot;#!/bin/bash\n&quot;;
+&nbsp;
+&nbsp;        static final String ADD_STATUS_COMMAND = &quot;\necho %s$?&quot;;
+&nbsp;
+&nbsp;        static final String CAT_FINAL_SCRIPT = &quot;cat %s%s.sh&quot;;
+&nbsp;
+&nbsp;        static final String PSTREE_COMMAND = &quot;pstree -p %s&quot;;
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,574 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceConstants</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.datasource.api.constants</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceConstants (org.apache.dolphinscheduler.plugin.datasource.api.constants)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataSourceConstants</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.datasource.api.constants;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.constants.DateConstants;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import lombok.experimental.UtilityClass;
+&nbsp;
+&nbsp;import com.google.common.collect.Sets;
+&nbsp;
+&nbsp;@UtilityClass
+&nbsp;public class DataSourceConstants {
+&nbsp;
+&nbsp;    public static final String ORG_POSTGRESQL_DRIVER = &quot;org.postgresql.Driver&quot;;
+&nbsp;    public static final String COM_MYSQL_CJ_JDBC_DRIVER = &quot;com.mysql.cj.jdbc.Driver&quot;;
+&nbsp;    public static final String COM_MYSQL_JDBC_DRIVER = &quot;com.mysql.jdbc.Driver&quot;;
+&nbsp;    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = &quot;org.apache.hive.jdbc.HiveDriver&quot;;
+&nbsp;    public static final String COM_CLICKHOUSE_JDBC_DRIVER = &quot;com.clickhouse.jdbc.ClickHouseDriver&quot;;
+&nbsp;    public static final String COM_DATABEND_JDBC_DRIVER = &quot;com.databend.jdbc.DatabendDriver&quot;;
+&nbsp;    public static final String COM_ORACLE_JDBC_DRIVER = &quot;oracle.jdbc.OracleDriver&quot;;
+&nbsp;    public static final String COM_SQLSERVER_JDBC_DRIVER = &quot;com.microsoft.sqlserver.jdbc.SQLServerDriver&quot;;
+&nbsp;    public static final String COM_DB2_JDBC_DRIVER = &quot;com.ibm.db2.jcc.DB2Driver&quot;;
+&nbsp;    public static final String COM_PRESTO_JDBC_DRIVER = &quot;com.facebook.presto.jdbc.PrestoDriver&quot;;
+&nbsp;    public static final String COM_REDSHIFT_JDBC_DRIVER = &quot;com.amazon.redshift.jdbc42.Driver&quot;;
+&nbsp;    public static final String COM_ATHENA_JDBC_DRIVER = &quot;com.simba.athena.jdbc.Driver&quot;;
+&nbsp;    public static final String COM_TRINO_JDBC_DRIVER = &quot;io.trino.jdbc.TrinoDriver&quot;;
+&nbsp;    public static final String COM_DAMENG_JDBC_DRIVER = &quot;dm.jdbc.driver.DmDriver&quot;;
+&nbsp;    public static final String ORG_APACHE_KYUUBI_JDBC_DRIVER = &quot;org.apache.kyuubi.jdbc.KyuubiHiveDriver&quot;;
+&nbsp;    public static final String COM_OCEANBASE_JDBC_DRIVER = &quot;com.oceanbase.jdbc.Driver&quot;;
+&nbsp;    public static final String NET_SNOWFLAKE_JDBC_DRIVER = &quot;net.snowflake.client.jdbc.SnowflakeDriver&quot;;
+&nbsp;    public static final String COM_VERTICA_JDBC_DRIVER = &quot;com.vertica.jdbc.Driver&quot;;
+&nbsp;    public static final String COM_HANA_DB_JDBC_DRIVER = &quot;com.sap.db.jdbc.Driver&quot;;
+&nbsp;
+&nbsp;    public static final String JDBC_MYSQL = &quot;jdbc:mysql://&quot;;
+&nbsp;    public static final String JDBC_MYSQL_LOADBALANCE = &quot;jdbc:mysql:loadbalance://&quot;;
+&nbsp;    public static final String JDBC_POSTGRESQL = &quot;jdbc:postgresql://&quot;;
+&nbsp;    public static final String JDBC_HIVE_2 = &quot;jdbc:hive2://&quot;;
+&nbsp;    public static final String JDBC_KYUUBI = &quot;jdbc:kyuubi://&quot;;
+&nbsp;    public static final String JDBC_CLICKHOUSE = &quot;jdbc:clickhouse://&quot;;
+&nbsp;    public static final String JDBC_DATABEND = &quot;jdbc:databend://&quot;;
+&nbsp;    public static final String JDBC_ORACLE_SID = &quot;jdbc:oracle:thin:@&quot;;
+&nbsp;    public static final String JDBC_ORACLE_SERVICE_NAME = &quot;jdbc:oracle:thin:@//&quot;;
+&nbsp;    public static final String JDBC_SQLSERVER = &quot;jdbc:sqlserver://&quot;;
+&nbsp;    public static final String JDBC_DB2 = &quot;jdbc:db2://&quot;;
+&nbsp;    public static final String JDBC_PRESTO = &quot;jdbc:presto://&quot;;
+&nbsp;    public static final String JDBC_REDSHIFT = &quot;jdbc:redshift://&quot;;
+&nbsp;    public static final String JDBC_REDSHIFT_IAM = &quot;jdbc:redshift:iam://&quot;;
+&nbsp;    public static final String JDBC_ATHENA = &quot;jdbc:awsathena://&quot;;
+&nbsp;    public static final String JDBC_TRINO = &quot;jdbc:trino://&quot;;
+&nbsp;    public static final String JDBC_DAMENG = &quot;jdbc:dm://&quot;;
+&nbsp;    public static final String JDBC_OCEANBASE = &quot;jdbc:oceanbase://&quot;;
+&nbsp;    public static final String JDBC_SNOWFLAKE = &quot;jdbc:snowflake://&quot;;
+&nbsp;    public static final String JDBC_VERTICA = &quot;jdbc:vertica://&quot;;
+&nbsp;    public static final String JDBC_HANA = &quot;jdbc:sap://&quot;;
+&nbsp;
+&nbsp;    public static final String POSTGRESQL_VALIDATION_QUERY = &quot;select version()&quot;;
+&nbsp;    public static final String MYSQL_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String HIVE_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String CLICKHOUSE_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String DATABEND_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String ORACLE_VALIDATION_QUERY = &quot;select 1 from dual&quot;;
+&nbsp;    public static final String SQLSERVER_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String DB2_VALIDATION_QUERY = &quot;select 1 from sysibm.sysdummy1&quot;;
+&nbsp;    public static final String PRESTO_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String REDHIFT_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String ATHENA_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String TRINO_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String DAMENG_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String SNOWFLAKE_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;
+&nbsp;    public static final String KYUUBI_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String VERTICA_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;
+&nbsp;    public static final String HANA_VALIDATION_QUERY = &quot;select 1 from DUMMY&quot;;
+&nbsp;
+&nbsp;    public static final String SPRING_DATASOURCE_MIN_IDLE = &quot;spring.datasource.minIdle&quot;;
+&nbsp;
+&nbsp;    public static final String SPRING_DATASOURCE_MAX_ACTIVE = &quot;spring.datasource.maxActive&quot;;
+&nbsp;
+&nbsp;    public static final String SUPPORT_HIVE_ONE_SESSION = &quot;support.hive.oneSession&quot;;
+&nbsp;    /**
+&nbsp;     * QUESTION ?
+&nbsp;     */
+&nbsp;    public static final String QUESTION = &quot;?&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * comma ,
+&nbsp;     */
+&nbsp;    public static final String COMMA = &quot;,&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hyphen
+&nbsp;     */
+&nbsp;    public static final String HYPHEN = &quot;-&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * slash /
+&nbsp;     */
+&nbsp;    public static final String SLASH = &quot;/&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * COLON :
+&nbsp;     */
+&nbsp;    public static final String COLON = &quot;:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SPACE &quot; &quot;
+&nbsp;     */
+&nbsp;    public static final String SPACE = &quot; &quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SINGLE_SLASH /
+&nbsp;     */
+&nbsp;    public static final String SINGLE_SLASH = &quot;/&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * DOUBLE_SLASH //
+&nbsp;     */
+&nbsp;    public static final String DOUBLE_SLASH = &quot;//&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SINGLE_QUOTES &quot;&#39;&quot;
+&nbsp;     */
+&nbsp;    public static final String SINGLE_QUOTES = &quot;&#39;&quot;;
+&nbsp;    /**
+&nbsp;     * DOUBLE_QUOTES &quot;\&quot;&quot;
+&nbsp;     */
+&nbsp;    public static final String DOUBLE_QUOTES = &quot;\&quot;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SEMICOLON ;
+&nbsp;     */
+&nbsp;    public static final String SEMICOLON = &quot;;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * EQUAL SIGN
+&nbsp;     */
+&nbsp;    public static final String EQUAL_SIGN = &quot;=&quot;;
+&nbsp;    /**
+&nbsp;     * AT SIGN
+&nbsp;     */
+&nbsp;    public static final String AT_SIGN = &quot;@&quot;;
+&nbsp;    /**
+&nbsp;     * UNDERLINE
+&nbsp;     */
+&nbsp;    public static final String UNDERLINE = &quot;_&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sleep time
+&nbsp;     */
+&nbsp;    public static final int SLEEP_TIME_MILLIS = 1000;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * exit code failure
+&nbsp;     */
+&nbsp;    public static final int EXIT_CODE_FAILURE = -1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * exit code success
+&nbsp;     */
+&nbsp;    public static final int EXIT_CODE_SUCCESS = 0;
+&nbsp;    /**
+&nbsp;     * running code
+&nbsp;     */
+&nbsp;    public static final int RUNNING_CODE = 1;
+&nbsp;
+&nbsp;    public static final String SH = &quot;sh&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * log flush interval?output when reach the interval
+&nbsp;     */
+&nbsp;    public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * pstree, get pud and sub pid
+&nbsp;     */
+&nbsp;    public static final String PSTREE = &quot;pstree&quot;;
+&nbsp;
+&nbsp;    public static final String RWXR_XR_X = &quot;rwxr-xr-x&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * date format of yyyyMMddHHmmss
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_FORMAT_TIME = &quot;yyyyMMddHHmmss&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * new
+&nbsp;     * schedule time
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_SHECDULE_TIME = &quot;schedule.time&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * system date(yyyyMMddHHmmss)
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_DATETIME = DateConstants.PARAMETER_DATETIME;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * system date(yyyymmdd) today
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_CURRENT_DATE = DateConstants.PARAMETER_CURRENT_DATE;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * system date(yyyymmdd) yesterday
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_BUSINESS_DATE = DateConstants.PARAMETER_BUSINESS_DATE;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the absolute path of current executing task
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_TASK_EXECUTE_PATH = &quot;system.task.execute.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the instance id of current task
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_TASK_INSTANCE_ID = &quot;system.task.instance.id&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the definition code of current task
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_TASK_DEFINITION_CODE = &quot;system.task.definition.code&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the definition name of current task
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_TASK_DEFINITION_NAME = &quot;system.task.definition.name&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the instance id of the workflow to which current task belongs
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_WORKFLOW_INSTANCE_ID = &quot;system.workflow.instance.id&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the definition code of the workflow to which current task belongs
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_WORKFLOW_DEFINITION_CODE = &quot;system.workflow.definition.code&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the definition name of the workflow to which current task belongs
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_WORKFLOW_DEFINITION_NAME = &quot;system.workflow.definition.name&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the code of the project to which current task belongs
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_PROJECT_CODE = &quot;system.project.code&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the name of the project to which current task belongs
+&nbsp;     */
+&nbsp;    public static final String PARAMETER_PROJECT_NAME = &quot;system.project.name&quot;;
+&nbsp;    /**
+&nbsp;     * month_begin
+&nbsp;     */
+&nbsp;    public static final String MONTH_BEGIN = &quot;month_begin&quot;;
+&nbsp;    /**
+&nbsp;     * add_months
+&nbsp;     */
+&nbsp;    public static final String ADD_MONTHS = &quot;add_months&quot;;
+&nbsp;    /**
+&nbsp;     * month_end
+&nbsp;     */
+&nbsp;    public static final String MONTH_END = &quot;month_end&quot;;
+&nbsp;    /**
+&nbsp;     * week_begin
+&nbsp;     */
+&nbsp;    public static final String WEEK_BEGIN = &quot;week_begin&quot;;
+&nbsp;    /**
+&nbsp;     * week_end
+&nbsp;     */
+&nbsp;    public static final String WEEK_END = &quot;week_end&quot;;
+&nbsp;    /**
+&nbsp;     * this_day
+&nbsp;     */
+&nbsp;    public static final String THIS_DAY = &quot;this_day&quot;;
+&nbsp;    /**
+&nbsp;     * last_day
+&nbsp;     */
+&nbsp;    public static final String LAST_DAY = &quot;last_day&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * month_first_day
+&nbsp;     */
+&nbsp;    public static final String MONTH_FIRST_DAY = &quot;month_first_day&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * month_last_day
+&nbsp;     */
+&nbsp;    public static final String MONTH_LAST_DAY = &quot;month_last_day&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * week_first_day
+&nbsp;     */
+&nbsp;    public static final String WEEK_FIRST_DAY = &quot;week_first_day&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * week_last_day
+&nbsp;     */
+&nbsp;    public static final String WEEK_LAST_DAY = &quot;week_last_day&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * year_week
+&nbsp;     */
+&nbsp;    public static final String YEAR_WEEK = &quot;year_week&quot;;
+&nbsp;    /**
+&nbsp;     * timestamp
+&nbsp;     */
+&nbsp;    public static final String TIMESTAMP = &quot;timestamp&quot;;
+&nbsp;    public static final char SUBTRACT_CHAR = &#39;-&#39;;
+&nbsp;    public static final char ADD_CHAR = &#39;+&#39;;
+&nbsp;    public static final char MULTIPLY_CHAR = &#39;*&#39;;
+&nbsp;    public static final char DIVISION_CHAR = &#39;/&#39;;
+&nbsp;    public static final char LEFT_BRACE_CHAR = &#39;(&#39;;
+&nbsp;    public static final char RIGHT_BRACE_CHAR = &#39;)&#39;;
+&nbsp;    public static final String ADD_STRING = &quot;+&quot;;
+&nbsp;    public static final String MULTIPLY_STRING = &quot;*&quot;;
+&nbsp;    public static final String DIVISION_STRING = &quot;/&quot;;
+&nbsp;    public static final String LEFT_BRACE_STRING = &quot;(&quot;;
+&nbsp;    public static final char P = &#39;P&#39;;
+&nbsp;    public static final char N = &#39;N&#39;;
+&nbsp;    public static final String SUBTRACT_STRING = &quot;-&quot;;
+&nbsp;    public static final String LOCAL_PARAMS_LIST = &quot;localParamsList&quot;;
+&nbsp;    public static final String TASK_TYPE = &quot;taskType&quot;;
+&nbsp;    public static final String QUEUE = &quot;queue&quot;;
+&nbsp;    /**
+&nbsp;     * default display rows
+&nbsp;     */
+&nbsp;    public static final int DEFAULT_DISPLAY_ROWS = 10;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * jar
+&nbsp;     */
+&nbsp;    public static final String JAR = &quot;jar&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop
+&nbsp;     */
+&nbsp;    public static final String HADOOP = &quot;hadoop&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * -D &lt;property&gt;=&lt;value&gt;
+&nbsp;     */
+&nbsp;    public static final String D = &quot;-D&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * datasource encryption salt
+&nbsp;     */
+&nbsp;    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = &quot;!@#$%^&amp;*&quot;;
+&nbsp;    public static final String DATASOURCE_ENCRYPTION_ENABLE = &quot;datasource.encryption.enable&quot;;
+&nbsp;    public static final String DATASOURCE_ENCRYPTION_SALT = &quot;datasource.encryption.salt&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * kerberos
+&nbsp;     */
+&nbsp;    public static final String KERBEROS = &quot;kerberos&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * kerberos expire time
+&nbsp;     */
+&nbsp;    public static final String KERBEROS_EXPIRE_TIME = &quot;kerberos.expire.time&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * java.security.krb5.conf
+&nbsp;     */
+&nbsp;    public static final String JAVA_SECURITY_KRB5_CONF = &quot;java.security.krb5.conf&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * java.security.krb5.conf.path
+&nbsp;     */
+&nbsp;    public static final String JAVA_SECURITY_KRB5_CONF_PATH = &quot;java.security.krb5.conf.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * loginUserFromKeytab user
+&nbsp;     */
+&nbsp;    public static final String LOGIN_USER_KEY_TAB_USERNAME = &quot;login.user.keytab.username&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * loginUserFromKeytab path
+&nbsp;     */
+&nbsp;    public static final String LOGIN_USER_KEY_TAB_PATH = &quot;login.user.keytab.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop.security.authentication
+&nbsp;     */
+&nbsp;    public static final String HADOOP_SECURITY_AUTHENTICATION = &quot;hadoop.security.authentication&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop.security.authentication
+&nbsp;     */
+&nbsp;    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+&nbsp;            &quot;hadoop.security.authentication.startup.state&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hdfs/s3 configuration
+&nbsp;     * resource.storage.upload.base.path
+&nbsp;     */
+&nbsp;    public static final String RESOURCE_UPLOAD_PATH = &quot;resource.storage.upload.base.path&quot;;
+&nbsp;
+<b class="nc">&nbsp;    public static final Set&lt;String&gt; TASK_TYPE_SET_K8S = Sets.newHashSet(&quot;K8S&quot;, &quot;KUBEFLOW&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * azure config
+&nbsp;     */
+&nbsp;    public static final String AZURE_CLIENT_ID = &quot;resource.azure.client.id&quot;;
+&nbsp;    public static final String AZURE_CLIENT_SECRET = &quot;resource.azure.client.secret&quot;;
+&nbsp;    public static final String AZURE_ACCESS_SUB_ID = &quot;resource.azure.subId&quot;;
+&nbsp;    public static final String AZURE_SECRET_TENANT_ID = &quot;resource.azure.tenant.id&quot;;
+&nbsp;    public static final String QUERY_INTERVAL = &quot;resource.query.interval&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * use for k8s task
+&nbsp;     */
+&nbsp;    public static final String API_VERSION = &quot;batch/v1&quot;;
+&nbsp;    public static final String RESTART_POLICY = &quot;Never&quot;;
+&nbsp;    public static final String MEMORY = &quot;memory&quot;;
+&nbsp;    public static final String CPU = &quot;cpu&quot;;
+&nbsp;    public static final String LAYER_LABEL = &quot;k8s.cn/layer&quot;;
+&nbsp;    public static final String LAYER_LABEL_VALUE = &quot;batch&quot;;
+&nbsp;    public static final String NAME_LABEL = &quot;k8s.cn/name&quot;;
+&nbsp;    public static final String TASK_INSTANCE_ID = &quot;taskInstanceId&quot;;
+&nbsp;    public static final String MI = &quot;Mi&quot;;
+&nbsp;    public static final int JOB_TTL_SECONDS = 300;
+&nbsp;    public static final int LOG_LINES = 500;
+&nbsp;    public static final String NAMESPACE_NAME = &quot;name&quot;;
+&nbsp;    public static final String CLUSTER = &quot;cluster&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * spark / flink on k8s label name
+&nbsp;     */
+&nbsp;    public static final String UNIQUE_LABEL_NAME = &quot;dolphinscheduler-label&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * conda config used by jupyter task plugin
+&nbsp;     */
+&nbsp;    public static final String CONDA_PATH = &quot;conda.path&quot;;
+&nbsp;
+&nbsp;    // Loop task constants
+<b class="nc">&nbsp;    public static final Duration DEFAULT_LOOP_STATUS_INTERVAL = Duration.ofSeconds(5L);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sql params regex
+&nbsp;     */
+&nbsp;    public static final String GROUP_NAME1 = &quot;paramName1&quot;;
+&nbsp;    public static final String GROUP_NAME2 = &quot;paramName2&quot;;
+<b class="nc">&nbsp;    public static final String SQL_PARAMS_REGEX =</b>
+<b class="nc">&nbsp;            String.format(&quot;[&#39;\&quot;]\\$\\{(?&lt;%s&gt;.*?)}[&#39;\&quot;]|\\$\\{(?&lt;%s&gt;.*?)}&quot;, GROUP_NAME1, GROUP_NAME2);</b>
+<b class="nc">&nbsp;    public static final Pattern SQL_PARAMS_PATTERN = Pattern.compile(SQL_PARAMS_REGEX);</b>
+&nbsp;
+&nbsp;    public static final String AZURE_SQL_DATABASE_SPN = &quot;https://database.windows.net/&quot;;
+&nbsp;    public static final String AZURE_SQL_DATABASE_TOKEN_SCOPE = &quot;/.default&quot;;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

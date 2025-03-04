@@ -1,0 +1,335 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > KubernetesApplicationManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.api.am</a>
+</div>
+
+<h1>Coverage Summary for Class: KubernetesApplicationManager (org.apache.dolphinscheduler.plugin.task.api.am)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">KubernetesApplicationManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/70)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.api.am;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLEEP_TIME_MILLIS;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;
+&nbsp;import lombok.SneakyThrows;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.google.auto.service.AutoService;
+&nbsp;
+&nbsp;import io.fabric8.kubernetes.api.model.Pod;
+&nbsp;import io.fabric8.kubernetes.api.model.PodList;
+&nbsp;import io.fabric8.kubernetes.client.Config;
+&nbsp;import io.fabric8.kubernetes.client.KubernetesClient;
+&nbsp;import io.fabric8.kubernetes.client.KubernetesClientBuilder;
+&nbsp;import io.fabric8.kubernetes.client.dsl.FilterWatchListDeletable;
+&nbsp;import io.fabric8.kubernetes.client.dsl.LogWatch;
+&nbsp;import io.fabric8.kubernetes.client.dsl.PodResource;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;@AutoService(ApplicationManager.class)
+<b class="nc">&nbsp;public class KubernetesApplicationManager implements ApplicationManager&lt;KubernetesApplicationManagerContext&gt; {</b>
+&nbsp;
+&nbsp;    private static final String PENDING = &quot;Pending&quot;;
+&nbsp;    private static final String RUNNING = &quot;Running&quot;;
+&nbsp;    private static final String FINISH = &quot;Succeeded&quot;;
+&nbsp;    private static final String FAILED = &quot;Failed&quot;;
+&nbsp;    private static final String UNKNOWN = &quot;Unknown&quot;;
+&nbsp;
+&nbsp;    private static final int MAX_RETRY_TIMES = 10;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * cache k8s client for same task
+&nbsp;     */
+<b class="nc">&nbsp;    private final Map&lt;String, KubernetesClient&gt; cacheClientMap = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean killApplication(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) throws TaskException {
+&nbsp;
+&nbsp;        boolean isKill;
+<b class="nc">&nbsp;        String labelValue = kubernetesApplicationManagerContext.getLabelValue();</b>
+<b class="nc">&nbsp;        FilterWatchListDeletable&lt;Pod, PodList, PodResource&gt; watchList =</b>
+<b class="nc">&nbsp;                getListenPod(kubernetesApplicationManagerContext);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (getApplicationStatus(kubernetesApplicationManagerContext, watchList).isFailure()) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Driver pod is in FAILED or UNKNOWN status.&quot;);</b>
+<b class="nc">&nbsp;                isKill = false;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                watchList.delete();</b>
+<b class="nc">&nbsp;                isKill = true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Failed to kill Kubernetes application with label &quot; + labelValue, e);</b>
+&nbsp;        } finally {
+&nbsp;            // remove client cache after killing application
+<b class="nc">&nbsp;            removeCache(labelValue);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return isKill;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResourceManagerType getResourceManagerType() {
+<b class="nc">&nbsp;        return ResourceManagerType.KUBERNETES;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get driver pod
+&nbsp;     *
+&nbsp;     * @param kubernetesApplicationManagerContext
+&nbsp;     * @return
+&nbsp;     */
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    private FilterWatchListDeletable&lt;Pod, PodList, PodResource&gt; getListenPod(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+<b class="nc">&nbsp;        KubernetesClient client = getClient(kubernetesApplicationManagerContext);</b>
+<b class="nc">&nbsp;        String labelValue = kubernetesApplicationManagerContext.getLabelValue();</b>
+<b class="nc">&nbsp;        List&lt;Pod&gt; podList = null;</b>
+<b class="nc">&nbsp;        FilterWatchListDeletable&lt;Pod, PodList, PodResource&gt; watchList = null;</b>
+<b class="nc">&nbsp;        int retryTimes = 0;</b>
+<b class="nc">&nbsp;        while (CollectionUtils.isEmpty(podList) &amp;&amp; retryTimes &lt; MAX_RETRY_TIMES) {</b>
+<b class="nc">&nbsp;            watchList = client.pods()</b>
+<b class="nc">&nbsp;                    .inNamespace(kubernetesApplicationManagerContext.getK8sTaskExecutionContext().getNamespace())</b>
+<b class="nc">&nbsp;                    .withLabel(UNIQUE_LABEL_NAME, labelValue);</b>
+<b class="nc">&nbsp;            podList = watchList.list().getItems();</b>
+<b class="nc">&nbsp;            if (!CollectionUtils.isEmpty(podList)) {</b>
+&nbsp;                break;
+&nbsp;            }
+<b class="nc">&nbsp;            Thread.sleep(SLEEP_TIME_MILLIS);</b>
+<b class="nc">&nbsp;            retryTimes += 1;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return watchList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create client or get from cache map
+&nbsp;     *
+&nbsp;     * @param kubernetesApplicationManagerContext
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+<b class="nc">&nbsp;        K8sTaskExecutionContext k8sTaskExecutionContext =</b>
+<b class="nc">&nbsp;                kubernetesApplicationManagerContext.getK8sTaskExecutionContext();</b>
+<b class="nc">&nbsp;        return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),</b>
+<b class="nc">&nbsp;                key -&gt; new KubernetesClientBuilder()</b>
+<b class="nc">&nbsp;                        .withConfig(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())).build());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void removeCache(String cacheKey) {
+<b class="nc">&nbsp;        try (KubernetesClient ignored = cacheClientMap.remove(cacheKey)) {</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get application execution status
+&nbsp;     *
+&nbsp;     * @param kubernetesApplicationManagerContext
+&nbsp;     * @return TaskExecutionStatus  SUCCESS / FAILURE
+&nbsp;     * @throws TaskException
+&nbsp;     */
+&nbsp;    public TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) throws TaskException {
+<b class="nc">&nbsp;        return getApplicationStatus(kubernetesApplicationManagerContext, null);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get application (driver pod) status
+&nbsp;     *
+&nbsp;     * @param kubernetesApplicationManagerContext
+&nbsp;     * @param watchList
+&nbsp;     * @return
+&nbsp;     * @throws TaskException
+&nbsp;     */
+&nbsp;    private TaskExecutionStatus getApplicationStatus(KubernetesApplicationManagerContext kubernetesApplicationManagerContext,
+&nbsp;                                                     FilterWatchListDeletable&lt;Pod, PodList, PodResource&gt; watchList) throws TaskException {
+&nbsp;        String phase;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (Objects.isNull(watchList)) {</b>
+<b class="nc">&nbsp;                watchList = getListenPod(kubernetesApplicationManagerContext);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            List&lt;Pod&gt; driverPod = watchList.list().getItems();</b>
+<b class="nc">&nbsp;            if (!driverPod.isEmpty()) {</b>
+&nbsp;                // cluster mode
+<b class="nc">&nbsp;                Pod driver = driverPod.get(0);</b>
+<b class="nc">&nbsp;                phase = driver.getStatus().getPhase();</b>
+&nbsp;            } else {
+&nbsp;                // client mode
+<b class="nc">&nbsp;                phase = FINISH;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Failed to get Kubernetes application status&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return phase.equals(FAILED) || phase.equals(UNKNOWN) ? TaskExecutionStatus.FAILURE</b>
+<b class="nc">&nbsp;                : TaskExecutionStatus.SUCCESS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get pod&#39;s log watcher
+&nbsp;     *
+&nbsp;     * @param kubernetesApplicationManagerContext
+&nbsp;     * @return
+&nbsp;     */
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    public LogWatch getPodLogWatcher(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
+<b class="nc">&nbsp;        KubernetesClient client = getClient(kubernetesApplicationManagerContext);</b>
+<b class="nc">&nbsp;        boolean podIsReady = false;</b>
+<b class="nc">&nbsp;        Pod pod = null;</b>
+<b class="nc">&nbsp;        while (!podIsReady) {</b>
+<b class="nc">&nbsp;            FilterWatchListDeletable&lt;Pod, PodList, PodResource&gt; watchList =</b>
+<b class="nc">&nbsp;                    getListenPod(kubernetesApplicationManagerContext);</b>
+<b class="nc">&nbsp;            List&lt;Pod&gt; podList = watchList == null ? null : watchList.list().getItems();</b>
+<b class="nc">&nbsp;            if (CollectionUtils.isEmpty(podList)) {</b>
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            pod = podList.get(0);</b>
+<b class="nc">&nbsp;            String phase = pod.getStatus().getPhase();</b>
+<b class="nc">&nbsp;            if (phase.equals(PENDING) || phase.equals(UNKNOWN)) {</b>
+<b class="nc">&nbsp;                Thread.sleep(SLEEP_TIME_MILLIS);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                podIsReady = true;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return client.pods().inNamespace(pod.getMetadata().getNamespace())</b>
+<b class="nc">&nbsp;                .withName(pod.getMetadata().getName())</b>
+<b class="nc">&nbsp;                .inContainer(kubernetesApplicationManagerContext.getContainerName())</b>
+<b class="nc">&nbsp;                .watchLog();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,290 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > JdkDynamicServerHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.extract.base.server</a>
+</div>
+
+<h1>Coverage Summary for Class: JdkDynamicServerHandler (org.apache.dolphinscheduler.extract.base.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">JdkDynamicServerHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.extract.base.server;
+&nbsp;
+&nbsp;import static com.google.common.base.Preconditions.checkNotNull;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.extract.base.StandardRpcRequest;
+&nbsp;import org.apache.dolphinscheduler.extract.base.StandardRpcResponse;
+&nbsp;import org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter;
+&nbsp;import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
+&nbsp;import org.apache.dolphinscheduler.extract.base.protocal.TransporterHeader;
+&nbsp;import org.apache.dolphinscheduler.extract.base.serialize.JsonSerializer;
+&nbsp;import org.apache.dolphinscheduler.extract.base.utils.ChannelUtils;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.RejectedExecutionException;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import io.netty.channel.Channel;
+&nbsp;import io.netty.channel.ChannelConfig;
+&nbsp;import io.netty.channel.ChannelHandler;
+&nbsp;import io.netty.channel.ChannelHandlerContext;
+&nbsp;import io.netty.channel.ChannelInboundHandlerAdapter;
+&nbsp;import io.netty.handler.timeout.IdleState;
+&nbsp;import io.netty.handler.timeout.IdleStateEvent;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;@ChannelHandler.Sharable
+&nbsp;class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
+&nbsp;
+&nbsp;    private final ExecutorService methodInvokeExecutor;
+&nbsp;
+&nbsp;    private final Map&lt;String, ServerMethodInvoker&gt; methodInvokerMap;
+&nbsp;
+<b class="nc">&nbsp;    JdkDynamicServerHandler(ExecutorService methodInvokeExecutor) {</b>
+<b class="nc">&nbsp;        this.methodInvokeExecutor = methodInvokeExecutor;</b>
+<b class="nc">&nbsp;        this.methodInvokerMap = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void channelInactive(ChannelHandlerContext ctx) {
+<b class="nc">&nbsp;        ctx.channel().close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+<b class="nc">&nbsp;        processReceived(ctx.channel(), (Transporter) msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerMethodInvoker(ServerMethodInvoker methodInvoker) {
+<b class="nc">&nbsp;        checkNotNull(methodInvoker);</b>
+<b class="nc">&nbsp;        checkNotNull(methodInvoker.getMethodIdentify());</b>
+&nbsp;
+<b class="nc">&nbsp;        methodInvokerMap.put(methodInvoker.getMethodIdentify(), methodInvoker);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void processReceived(final Channel channel, final Transporter transporter) {
+<b class="nc">&nbsp;        final String methodIdentifier = transporter.getHeader().getMethodIdentifier();</b>
+<b class="nc">&nbsp;        if (HeartBeatTransporter.METHOD_IDENTIFY.equals(methodIdentifier)) {</b>
+<b class="nc">&nbsp;            if (log.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;                log.debug(&quot;server receive heart beat from: host: {}&quot;, ChannelUtils.getRemoteAddress(channel));</b>
+&nbsp;            }
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        ServerMethodInvoker methodInvoker = methodInvokerMap.get(methodIdentifier);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (methodInvoker == null) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Cannot find the ServerMethodInvoker of : {}&quot;, transporter);</b>
+<b class="nc">&nbsp;                StandardRpcResponse iRpcResponse =</b>
+<b class="nc">&nbsp;                        StandardRpcResponse.fail(&quot;Cannot find the ServerMethodInvoker of &quot; + methodIdentifier);</b>
+<b class="nc">&nbsp;                TransporterHeader transporterHeader =</b>
+<b class="nc">&nbsp;                        TransporterHeader.of(transporter.getHeader().getOpaque(), methodIdentifier);</b>
+<b class="nc">&nbsp;                Transporter response = Transporter.of(transporterHeader, iRpcResponse);</b>
+<b class="nc">&nbsp;                channel.writeAndFlush(response);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            methodInvokeExecutor.execute(() -&gt; {</b>
+&nbsp;                StandardRpcResponse iRpcResponse;
+&nbsp;                try {
+<b class="nc">&nbsp;                    StandardRpcRequest standardRpcRequest =</b>
+<b class="nc">&nbsp;                            JsonSerializer.deserialize(transporter.getBody(), StandardRpcRequest.class);</b>
+&nbsp;                    Object[] args;
+<b class="nc">&nbsp;                    if (standardRpcRequest.getArgs() == null || standardRpcRequest.getArgs().length == 0) {</b>
+<b class="nc">&nbsp;                        args = null;</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        args = new Object[standardRpcRequest.getArgs().length];</b>
+<b class="nc">&nbsp;                        for (int i = 0; i &lt; standardRpcRequest.getArgs().length; i++) {</b>
+<b class="nc">&nbsp;                            args[i] = JsonSerializer.deserialize(standardRpcRequest.getArgs()[i],</b>
+<b class="nc">&nbsp;                                    standardRpcRequest.getArgsTypes()[i]);</b>
+&nbsp;                        }
+&nbsp;                    }
+<b class="nc">&nbsp;                    Object result = methodInvoker.invoke(args);</b>
+<b class="nc">&nbsp;                    if (result == null) {</b>
+<b class="nc">&nbsp;                        iRpcResponse = StandardRpcResponse.success(null, null);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        iRpcResponse = StandardRpcResponse.success(JsonSerializer.serialize(result), result.getClass());</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (Throwable e) {</b>
+<b class="nc">&nbsp;                    log.error(&quot;Invoke method {} failed, {}.&quot;, methodIdentifier, e.getMessage(), e);</b>
+<b class="nc">&nbsp;                    iRpcResponse = StandardRpcResponse.fail(e.getMessage());</b>
+&nbsp;                }
+<b class="nc">&nbsp;                TransporterHeader transporterHeader =</b>
+<b class="nc">&nbsp;                        TransporterHeader.of(transporter.getHeader().getOpaque(), methodIdentifier);</b>
+<b class="nc">&nbsp;                Transporter response = Transporter.of(transporterHeader, iRpcResponse);</b>
+<b class="nc">&nbsp;                channel.writeAndFlush(response);</b>
+&nbsp;            });
+<b class="nc">&nbsp;        } catch (RejectedExecutionException e) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;NettyRemotingServer&#39;s thread pool is full, discard msg {} from {}&quot;, transporter,</b>
+<b class="nc">&nbsp;                    ChannelUtils.getRemoteAddress(channel));</b>
+<b class="nc">&nbsp;            StandardRpcResponse iRpcResponse = StandardRpcResponse.fail(&quot;NettyRemotingServer&#39;s thread pool is full&quot;);</b>
+<b class="nc">&nbsp;            TransporterHeader transporterHeader =</b>
+<b class="nc">&nbsp;                    TransporterHeader.of(transporter.getHeader().getOpaque(), methodIdentifier);</b>
+<b class="nc">&nbsp;            Transporter response = Transporter.of(transporterHeader, iRpcResponse);</b>
+<b class="nc">&nbsp;            channel.writeAndFlush(response);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+<b class="nc">&nbsp;        log.error(&quot;exceptionCaught : {}&quot;, cause.getMessage(), cause);</b>
+<b class="nc">&nbsp;        ctx.channel().close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
+<b class="nc">&nbsp;        Channel ch = ctx.channel();</b>
+<b class="nc">&nbsp;        ChannelConfig config = ch.config();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!ch.isWritable()) {</b>
+<b class="nc">&nbsp;            if (log.isWarnEnabled()) {</b>
+<b class="nc">&nbsp;                log.warn(&quot;{} is not writable, over high water level : {}&quot;,</b>
+<b class="nc">&nbsp;                        ch, config.getWriteBufferHighWaterMark());</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            config.setAutoRead(false);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (log.isWarnEnabled()) {</b>
+<b class="nc">&nbsp;                log.warn(&quot;{} is writable, to low water : {}&quot;, ch, config.getWriteBufferLowWaterMark());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            config.setAutoRead(true);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+<b class="nc">&nbsp;        if (evt instanceof IdleStateEvent) {</b>
+<b class="nc">&nbsp;            IdleStateEvent event = (IdleStateEvent) evt;</b>
+<b class="nc">&nbsp;            if (event.state() == IdleState.READER_IDLE) {</b>
+<b class="nc">&nbsp;                log.warn(&quot;Not receive heart beat from: {}, will close the channel&quot;, ctx.channel().remoteAddress());</b>
+<b class="nc">&nbsp;                ctx.close();</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            super.userEventTriggered(ctx, evt);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

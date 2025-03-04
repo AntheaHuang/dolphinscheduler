@@ -1,0 +1,662 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Constants</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.constants</a>
+</div>
+
+<h1>Coverage Summary for Class: Constants (org.apache.dolphinscheduler.common.constants)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Constants</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.constants;
+&nbsp;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import lombok.experimental.UtilityClass;
+&nbsp;
+&nbsp;@UtilityClass
+&nbsp;public final class Constants {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * common properties path
+&nbsp;     */
+&nbsp;    public static final String COMMON_PROPERTIES_PATH = &quot;/common.properties&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_YAML_PATH = &quot;/remote-logging.yaml&quot;;
+&nbsp;    public static final String AWS_YAML_PATH = &quot;/aws.yaml&quot;;
+&nbsp;    public static final String RESOURCE_CENTER_YAML_PATH = &quot;/resource-center.yaml&quot;;
+&nbsp;
+&nbsp;    public static final String FORMAT_S_S = &quot;%s/%s&quot;;
+&nbsp;    public static final String FORMAT_S_S_COLON = &quot;%s:%s&quot;;
+&nbsp;    public static final String FOLDER_SEPARATOR = &quot;/&quot;;
+&nbsp;
+&nbsp;    public static final String EMPTY_STRING = &quot;&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * resource.hdfs.fs.defaultFS
+&nbsp;     */
+&nbsp;    public static final String FS_DEFAULT_FS = &quot;resource.hdfs.fs.defaultFS&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hdfs/s3 configuration
+&nbsp;     * resource.storage.upload.base.path
+&nbsp;     */
+&nbsp;    public static final String RESOURCE_UPLOAD_PATH = &quot;resource.storage.upload.base.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * data basedir path
+&nbsp;     */
+&nbsp;    public static final String DATA_BASEDIR_PATH = &quot;data.basedir.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * resource.view.suffixs
+&nbsp;     */
+&nbsp;    public static final String RESOURCE_VIEW_SUFFIXES = &quot;resource.view.suffixs&quot;;
+&nbsp;
+&nbsp;    public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE =
+&nbsp;            &quot;txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * development.state
+&nbsp;     */
+&nbsp;    public static final String DEVELOPMENT_STATE = &quot;development.state&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sudo enable
+&nbsp;     */
+&nbsp;    public static final String SUDO_ENABLE = &quot;sudo.enable&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * resource storage type
+&nbsp;     */
+&nbsp;    public static final String RESOURCE_STORAGE_TYPE = &quot;resource.storage.type&quot;;
+&nbsp;
+&nbsp;    public static final String AWS_S3_BUCKET_NAME = &quot;aws.s3.bucket.name&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * comma ,
+&nbsp;     */
+&nbsp;    public static final String COMMA = &quot;,&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * COLON :
+&nbsp;     */
+&nbsp;    public static final String COLON = &quot;:&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SPACE &quot; &quot;
+&nbsp;     */
+&nbsp;    public static final String SPACE = &quot; &quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SINGLE_SLASH /
+&nbsp;     */
+&nbsp;    public static final String SINGLE_SLASH = &quot;/&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * DOUBLE_SLASH //
+&nbsp;     */
+&nbsp;    public static final String DOUBLE_SLASH = &quot;//&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * AT SIGN
+&nbsp;     */
+&nbsp;    public static final String AT_SIGN = &quot;@&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SLASH /
+&nbsp;     */
+&nbsp;    public static final String SLASH = &quot;/&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * SEMICOLON ;
+&nbsp;     */
+&nbsp;    public static final String SEMICOLON = &quot;;&quot;;
+&nbsp;
+&nbsp;    public static final String ADDRESS = &quot;address&quot;;
+&nbsp;    public static final String DATABASE = &quot;database&quot;;
+&nbsp;    public static final String OTHER = &quot;other&quot;;
+&nbsp;    public static final String USER = &quot;user&quot;;
+&nbsp;    public static final String JDBC_URL = &quot;jdbcUrl&quot;;
+&nbsp;
+&nbsp;    public static final String IMPORT_SUFFIX = &quot;_import_&quot;;
+&nbsp;
+&nbsp;    public static final String COPY_SUFFIX = &quot;_copy_&quot;;
+&nbsp;    /**
+&nbsp;     * http connect time out
+&nbsp;     */
+&nbsp;    public static final int HTTP_CONNECT_TIMEOUT = 60 * 1000;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * http connect request time out
+&nbsp;     */
+&nbsp;    public static final int HTTP_CONNECTION_REQUEST_TIMEOUT = 60 * 1000;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * httpclient socket time out
+&nbsp;     */
+&nbsp;    public static final int SOCKET_TIMEOUT = 60 * 1000;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * http header
+&nbsp;     */
+&nbsp;    public static final String HTTP_HEADER_UNKNOWN = &quot;unKnown&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * http X-Forwarded-For
+&nbsp;     */
+&nbsp;    public static final String HTTP_X_FORWARDED_FOR = &quot;X-Forwarded-For&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * http X-Real-IP
+&nbsp;     */
+&nbsp;    public static final String HTTP_X_REAL_IP = &quot;X-Real-IP&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * user name regex
+&nbsp;     */
+<b class="nc">&nbsp;    public static final Pattern REGEX_USER_NAME = Pattern.compile(&quot;^[a-zA-Z0-9._-]{3,39}$&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * read permission
+&nbsp;     */
+&nbsp;    public static final int READ_PERMISSION = 2;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * write permission
+&nbsp;     */
+&nbsp;    public static final int WRITE_PERMISSION = 2 * 2;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * execute permission
+&nbsp;     */
+&nbsp;    public static final int EXECUTE_PERMISSION = 1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * default admin permission
+&nbsp;     */
+&nbsp;    public static final int DEFAULT_ADMIN_PERMISSION = 7;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * default hash map size
+&nbsp;     */
+&nbsp;    public static final int DEFAULT_HASH_MAP_SIZE = 16;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * all permissions
+&nbsp;     */
+&nbsp;    public static final int ALL_PERMISSIONS = READ_PERMISSION | WRITE_PERMISSION | EXECUTE_PERMISSION;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * forbid running task
+&nbsp;     */
+&nbsp;    public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = &quot;FORBIDDEN&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * normal running task
+&nbsp;     */
+&nbsp;    public static final String FLOWNODE_RUN_FLAG_NORMAL = &quot;NORMAL&quot;;
+&nbsp;
+&nbsp;    public static final String DEFAULT = &quot;default&quot;;
+&nbsp;    public static final String PASSWORD = &quot;password&quot;;
+&nbsp;    public static final String XXXXXX = &quot;******&quot;;
+&nbsp;    public static final String NULL = &quot;NULL&quot;;
+&nbsp;    public static final String THREAD_NAME_MASTER_SERVER = &quot;Master-Server&quot;;
+&nbsp;    public static final String THREAD_NAME_WORKER_SERVER = &quot;Worker-Server&quot;;
+&nbsp;    public static final String THREAD_NAME_ALERT_SERVER = &quot;Alert-Server&quot;;
+&nbsp;
+&nbsp;    // suffix of crc file
+&nbsp;    public static final String CRC_SUFFIX = &quot;.crc&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * complement date default cron string
+&nbsp;     */
+&nbsp;    public static final String DEFAULT_CRON_STRING = &quot;0 0 0 * * ? *&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sleep 1000ms
+&nbsp;     */
+&nbsp;    public static final long SLEEP_TIME_MILLIS = 1_000L;
+&nbsp;
+<b class="nc">&nbsp;    public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * jar
+&nbsp;     */
+&nbsp;    public static final String JAR = &quot;jar&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop
+&nbsp;     */
+&nbsp;    public static final String HADOOP = &quot;hadoop&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * -D &lt;property&gt;=&lt;value&gt;
+&nbsp;     */
+&nbsp;    public static final String D = &quot;-D&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * exit code success
+&nbsp;     */
+&nbsp;    public static final int EXIT_CODE_SUCCESS = 0;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * exit code failure
+&nbsp;     */
+&nbsp;    public static final int EXIT_CODE_FAILURE = -1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * workflow or task definition failure
+&nbsp;     */
+&nbsp;    public static final int DEFINITION_FAILURE = -1;
+&nbsp;
+&nbsp;    public static final int OPPOSITE_VALUE = -1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * workflow or task definition first version
+&nbsp;     */
+&nbsp;    public static final int VERSION_FIRST = 1;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * FAILED
+&nbsp;     */
+&nbsp;    public static final String FAILED = &quot;FAILED&quot;;
+&nbsp;    /**
+&nbsp;     * RUNNING
+&nbsp;     */
+&nbsp;    public static final String RUNNING = &quot;RUNNING&quot;;
+&nbsp;    /**
+&nbsp;     * underline  &quot;_&quot;
+&nbsp;     */
+&nbsp;    public static final String UNDERLINE = &quot;_&quot;;
+&nbsp;
+&nbsp;    public static final String STAR = &quot;*&quot;;
+&nbsp;    public static final String GLOBAL_PARAMS = &quot;globalParams&quot;;
+&nbsp;    public static final String LOCAL_PARAMS = &quot;localParams&quot;;
+&nbsp;    public static final String SUBWORKFLOW_INSTANCE_ID = &quot;subWorkflowInstanceId&quot;;
+&nbsp;    public static final String WORKFLOW_INSTANCE_STATE = &quot;workflowInstanceState&quot;;
+&nbsp;    public static final String PARENT_WORKFLOW_INSTANCE = &quot;parentWorkflowInstance&quot;;
+&nbsp;    public static final String TASK_LIST = &quot;taskList&quot;;
+&nbsp;    public static final String QUEUE = &quot;queue&quot;;
+&nbsp;    public static final String QUEUE_NAME = &quot;queueName&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * dependent task
+&nbsp;     */
+&nbsp;    public static final long DEPENDENT_ALL_TASK_CODE = -1;
+&nbsp;    public static final long DEPENDENT_WORKFLOW_CODE = 0;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * preview schedule execute count
+&nbsp;     */
+&nbsp;    public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * kerberos
+&nbsp;     */
+&nbsp;    public static final String KERBEROS = &quot;kerberos&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * java.security.krb5.conf
+&nbsp;     */
+&nbsp;    public static final String JAVA_SECURITY_KRB5_CONF = &quot;java.security.krb5.conf&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * java.security.krb5.conf.path
+&nbsp;     */
+&nbsp;    public static final String JAVA_SECURITY_KRB5_CONF_PATH = &quot;java.security.krb5.conf.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop.security.authentication
+&nbsp;     */
+&nbsp;    public static final String HADOOP_SECURITY_AUTHENTICATION = &quot;hadoop.security.authentication&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop.security.authentication
+&nbsp;     */
+&nbsp;    public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
+&nbsp;            &quot;hadoop.security.authentication.startup.state&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * loginUserFromKeytab user
+&nbsp;     */
+&nbsp;    public static final String LOGIN_USER_KEY_TAB_USERNAME = &quot;login.user.keytab.username&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * loginUserFromKeytab path
+&nbsp;     */
+&nbsp;    public static final String LOGIN_USER_KEY_TAB_PATH = &quot;login.user.keytab.path&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sso.login.user.state
+&nbsp;     */
+&nbsp;    public static final String SSO_LOGIN_USER_STATE = &quot;sso.login.user.state&quot;;
+&nbsp;
+&nbsp;    public static final String TASK_INSTANCE_ID_MDC_KEY = &quot;taskInstanceId&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * status
+&nbsp;     */
+&nbsp;    public static final String STATUS = &quot;status&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * message
+&nbsp;     */
+&nbsp;    public static final String MSG = &quot;msg&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * page size
+&nbsp;     */
+&nbsp;    public static final String PAGE_SIZE = &quot;pageSize&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * current page no
+&nbsp;     */
+&nbsp;    public static final String PAGE_NUMBER = &quot;pageNo&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public static final String DATA_LIST = &quot;data&quot;;
+&nbsp;
+&nbsp;    public static final String TOTAL_LIST = &quot;totalList&quot;;
+&nbsp;
+&nbsp;    public static final String CURRENT_PAGE = &quot;currentPage&quot;;
+&nbsp;
+&nbsp;    public static final String TOTAL_PAGE = &quot;totalPage&quot;;
+&nbsp;
+&nbsp;    public static final String TOTAL = &quot;total&quot;;
+&nbsp;
+&nbsp;    public static final long DEFAULT_PROJECT_CODE = 0;
+&nbsp;
+&nbsp;    public static final long DEPENDENT_ALL_TASK = 0;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * session user
+&nbsp;     */
+&nbsp;    public static final String SESSION_USER = &quot;session.user&quot;;
+&nbsp;
+&nbsp;    public static final String SESSION_ID = &quot;sessionId&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * locale
+&nbsp;     */
+&nbsp;    public static final String LOCALE_LANGUAGE = &quot;language&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * session timeout
+&nbsp;     */
+&nbsp;    public static final int SESSION_TIME_OUT = 7200;
+&nbsp;
+&nbsp;    public static final String CLASS = &quot;class&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * authorize writable perm
+&nbsp;     */
+&nbsp;    public static final int AUTHORIZE_WRITABLE_PERM = 7;
+&nbsp;
+&nbsp;    public static final String START_TIME = &quot;start time&quot;;
+&nbsp;    public static final String END_TIME = &quot;end time&quot;;
+&nbsp;    public static final String START_END_DATE = &quot;startDate,endDate&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * system line separator
+&nbsp;     */
+<b class="nc">&nbsp;    public static final String SYSTEM_LINE_SEPARATOR = System.getProperty(&quot;line.separator&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * exec shell scripts
+&nbsp;     */
+&nbsp;    public static final String SH = &quot;sh&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * use for k8s
+&nbsp;     */
+&nbsp;    public static final String NAMESPACE = &quot;namespace&quot;;
+&nbsp;    public static final String CLUSTER = &quot;cluster&quot;;
+<b class="nc">&nbsp;    public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * schedule timezone
+&nbsp;     */
+&nbsp;    public static final String SCHEDULE_TIMEZONE = &quot;schedule_timezone&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * tenant
+&nbsp;     */
+&nbsp;    public static final int TENANT_FULL_NAME_MAX_LENGTH = 30;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * password max and min LENGTH
+&nbsp;     */
+&nbsp;    public static final int USER_PASSWORD_MAX_LENGTH = 20;
+&nbsp;
+&nbsp;    public static final int USER_PASSWORD_MIN_LENGTH = 2;
+&nbsp;
+&nbsp;    public static final String FUNCTION_START_WITH = &quot;$&quot;;
+&nbsp;
+<b class="nc">&nbsp;    public static final Integer DEFAULT_QUEUE_ID = 1;</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Security authentication types (supported types: PASSWORD,LDAP)
+&nbsp;     */
+&nbsp;    public static final String SECURITY_CONFIG_TYPE = &quot;securityConfigType&quot;;
+&nbsp;
+&nbsp;    public static final String SECURITY_CONFIG_TYPE_PASSWORD = &quot;PASSWORD&quot;;
+&nbsp;
+&nbsp;    public static final String SECURITY_CONFIG_TYPE_LDAP = &quot;LDAP&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Task Types
+&nbsp;     */
+&nbsp;    public static final String TYPE_UNIVERSAL = &quot;Universal&quot;;
+&nbsp;    public static final String TYPE_DATA_INTEGRATION = &quot;DataIntegration&quot;;
+&nbsp;    public static final String TYPE_CLOUD = &quot;Cloud&quot;;
+&nbsp;    public static final String TYPE_LOGIC = &quot;Logic&quot;;
+&nbsp;    public static final String TYPE_OTHER = &quot;Other&quot;;
+&nbsp;    public static final String TYPE_MACHINE_LEARNING = &quot;MachineLearning&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * spi constants
+&nbsp;     */
+&nbsp;    /** alert plugin param field string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_FIELD = &quot;field&quot;;
+&nbsp;    /** alert plugin param name string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_NAME = &quot;name&quot;;
+&nbsp;    /** alert plugin param props string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_PROPS = &quot;props&quot;;
+&nbsp;    /** alert plugin param type string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_TYPE = &quot;type&quot;;
+&nbsp;    /** alert plugin param title string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_TITLE = &quot;title&quot;;
+&nbsp;    /** alert plugin param value string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_VALUE = &quot;value&quot;;
+&nbsp;    /** alert plugin param validate string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_VALIDATE = &quot;validate&quot;;
+&nbsp;    /** alert plugin param options string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_OPTIONS = &quot;options&quot;;
+&nbsp;    /**plugin param emit string **/
+&nbsp;    public static final String STRING_PLUGIN_PARAM_EMIT = &quot;emit&quot;;
+&nbsp;
+&nbsp;    /** string true */
+&nbsp;    public static final String STRING_TRUE = &quot;true&quot;;
+&nbsp;    /** string false */
+&nbsp;    public static final String STRING_FALSE = &quot;false&quot;;
+&nbsp;    /** string yes */
+&nbsp;    public static final String STRING_YES = &quot;YES&quot;;
+&nbsp;    /** string no */
+&nbsp;    public static final String STRING_NO = &quot;NO&quot;;
+&nbsp;
+<b class="nc">&nbsp;    public static final Integer QUERY_ALL_ON_SYSTEM = 0;</b>
+<b class="nc">&nbsp;    public static final Integer QUERY_ALL_ON_PROJECT = 1;</b>
+<b class="nc">&nbsp;    public static final Integer QUERY_ALL_ON_WORKFLOW = 2;</b>
+<b class="nc">&nbsp;    public static final Integer QUERY_ALL_ON_TASK = 3;</b>
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_ENABLE = &quot;remote.logging.enable&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_TARGET = &quot;remote.logging.target&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_BASE_DIR = &quot;remote.logging.base.dir&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_THREAD_POOL_SIZE = &quot;remote.logging.thread.pool.size&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * remote logging for OSS
+&nbsp;     */
+&nbsp;    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_ID = &quot;remote.logging.oss.access.key.id&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_SECRET = &quot;remote.logging.oss.access.key.secret&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = &quot;remote.logging.oss.bucket.name&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_OSS_ENDPOINT = &quot;remote.logging.oss.endpoint&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * remote logging for GCS
+&nbsp;     */
+&nbsp;    public static final String REMOTE_LOGGING_GCS_CREDENTIAL = &quot;remote.logging.google.cloud.storage.credential&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = &quot;remote.logging.google.cloud.storage.bucket.name&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * remote logging for ABS
+&nbsp;     */
+&nbsp;    public static final String REMOTE_LOGGING_ABS_ACCOUNT_NAME = &quot;remote.logging.abs.account.name&quot;;
+&nbsp;    public static final String REMOTE_LOGGING_ABS_ACCOUNT_KEY = &quot;remote.logging.abs.account.key&quot;;
+&nbsp;    public static final String REMOTE_LOGGING_ABS_CONTAINER_NAME = &quot;remote.logging.abs.container.name&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * remote logging for COS
+&nbsp;     */
+&nbsp;    public static final String REMOTE_LOGGING_COS_ACCESS_KEY_ID = &quot;remote.logging.cos.access.key.id&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_COS_ACCESS_KEY_SECRET = &quot;remote.logging.cos.access.key.secret&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_COS_BUCKET_NAME = &quot;remote.logging.cos.bucket.name&quot;;
+&nbsp;
+&nbsp;    public static final String REMOTE_LOGGING_COS_REGION = &quot;remote.logging.cos.region&quot;;
+&nbsp;
+&nbsp;    public static final String DATABASES_QUERY = &quot;show databases&quot;;
+&nbsp;    public static final String DATABASES_QUERY_PG = &quot;SELECT datname FROM pg_database&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * K8S sensitive param
+&nbsp;     */
+&nbsp;    public static final String K8S_CONFIG_REGEX = &quot;(?&lt;=((?i)configYaml(\&quot; : \&quot;))).*?(?=(\&quot;,\\n))&quot;;
+&nbsp;
+&nbsp;    public static final String RELEASE_STATE = &quot;releaseState&quot;;
+&nbsp;    public static final String EXECUTE_TYPE = &quot;executeType&quot;;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

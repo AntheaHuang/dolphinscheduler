@@ -1,0 +1,416 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > NettyRemotingClient</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.extract.base.client</a>
+</div>
+
+<h1>Coverage Summary for Class: NettyRemotingClient (org.apache.dolphinscheduler.extract.base.client)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">NettyRemotingClient</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/104)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">NettyRemotingClient$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/109)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.extract.base.client;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+&nbsp;import org.apache.dolphinscheduler.extract.base.IRpcResponse;
+&nbsp;import org.apache.dolphinscheduler.extract.base.RpcMethodRetryStrategy;
+&nbsp;import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
+&nbsp;import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+&nbsp;import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
+&nbsp;import org.apache.dolphinscheduler.extract.base.exception.RemoteTimeoutException;
+&nbsp;import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
+&nbsp;import org.apache.dolphinscheduler.extract.base.metrics.ClientSyncDurationMetrics;
+&nbsp;import org.apache.dolphinscheduler.extract.base.metrics.ClientSyncExceptionMetrics;
+&nbsp;import org.apache.dolphinscheduler.extract.base.metrics.RpcMetrics;
+&nbsp;import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
+&nbsp;import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
+&nbsp;import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
+&nbsp;import org.apache.dolphinscheduler.extract.base.utils.Host;
+&nbsp;import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
+&nbsp;
+&nbsp;import java.net.InetSocketAddress;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.ThreadFactory;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;import java.util.concurrent.locks.ReentrantLock;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import io.netty.bootstrap.Bootstrap;
+&nbsp;import io.netty.channel.Channel;
+&nbsp;import io.netty.channel.ChannelFuture;
+&nbsp;import io.netty.channel.ChannelInitializer;
+&nbsp;import io.netty.channel.ChannelOption;
+&nbsp;import io.netty.channel.EventLoopGroup;
+&nbsp;import io.netty.channel.epoll.Epoll;
+&nbsp;import io.netty.channel.epoll.EpollEventLoopGroup;
+&nbsp;import io.netty.channel.nio.NioEventLoopGroup;
+&nbsp;import io.netty.channel.socket.SocketChannel;
+&nbsp;import io.netty.handler.timeout.IdleStateHandler;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public class NettyRemotingClient implements AutoCloseable {</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Bootstrap bootstrap = new Bootstrap();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final ReentrantLock channelsLock = new ReentrantLock();</b>
+<b class="nc">&nbsp;    private final Map&lt;Host, Channel&gt; channels = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final AtomicBoolean isStarted = new AtomicBoolean(false);</b>
+&nbsp;
+&nbsp;    private final EventLoopGroup workerGroup;
+&nbsp;
+&nbsp;    private final NettyClientConfig clientConfig;
+&nbsp;
+&nbsp;    private final NettyClientHandler clientHandler;
+&nbsp;
+<b class="nc">&nbsp;    public NettyRemotingClient(final NettyClientConfig clientConfig) {</b>
+<b class="nc">&nbsp;        this.clientConfig = clientConfig;</b>
+<b class="nc">&nbsp;        ThreadFactory nettyClientThreadFactory = ThreadUtils.newDaemonThreadFactory(&quot;NettyClientThread-&quot;);</b>
+<b class="nc">&nbsp;        if (Epoll.isAvailable()) {</b>
+<b class="nc">&nbsp;            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), nettyClientThreadFactory);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), nettyClientThreadFactory);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.clientHandler = new NettyClientHandler(this);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.start();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void start() {
+&nbsp;
+<b class="nc">&nbsp;        this.bootstrap</b>
+<b class="nc">&nbsp;                .group(this.workerGroup)</b>
+<b class="nc">&nbsp;                .channel(NettyUtils.getSocketChannelClass())</b>
+<b class="nc">&nbsp;                .option(ChannelOption.SO_KEEPALIVE, clientConfig.isSoKeepalive())</b>
+<b class="nc">&nbsp;                .option(ChannelOption.TCP_NODELAY, clientConfig.isTcpNoDelay())</b>
+<b class="nc">&nbsp;                .option(ChannelOption.SO_SNDBUF, clientConfig.getSendBufferSize())</b>
+<b class="nc">&nbsp;                .option(ChannelOption.SO_RCVBUF, clientConfig.getReceiveBufferSize())</b>
+<b class="nc">&nbsp;                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, clientConfig.getConnectTimeoutMillis())</b>
+<b class="nc">&nbsp;                .handler(new ChannelInitializer&lt;SocketChannel&gt;() {</b>
+&nbsp;
+&nbsp;                    @Override
+&nbsp;                    public void initChannel(SocketChannel ch) {
+<b class="nc">&nbsp;                        ch.pipeline()</b>
+<b class="nc">&nbsp;                                .addLast(&quot;client-idle-handler&quot;,</b>
+&nbsp;                                        new IdleStateHandler(
+&nbsp;                                                0,
+<b class="nc">&nbsp;                                                clientConfig.getHeartBeatIntervalMillis(),</b>
+&nbsp;                                                0,
+&nbsp;                                                TimeUnit.MILLISECONDS))
+<b class="nc">&nbsp;                                .addLast(new TransporterDecoder(), clientHandler, new TransporterEncoder());</b>
+&nbsp;                    }
+&nbsp;                });
+<b class="nc">&nbsp;        isStarted.compareAndSet(false, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public IRpcResponse sendSync(final SyncRequestDto syncRequestDto) throws RemoteException {
+<b class="nc">&nbsp;        final Host host = syncRequestDto.getServerHost();</b>
+<b class="nc">&nbsp;        final Transporter transporter = syncRequestDto.getTransporter();</b>
+<b class="nc">&nbsp;        final long timeoutMillis = syncRequestDto.getTimeoutMillis() &lt; 0 ? clientConfig.getDefaultRpcTimeoutMillis()</b>
+<b class="nc">&nbsp;                : syncRequestDto.getTimeoutMillis();</b>
+&nbsp;
+<b class="nc">&nbsp;        final RpcMethodRetryStrategy retryStrategy = syncRequestDto.getRetryStrategy();</b>
+&nbsp;
+<b class="nc">&nbsp;        int maxRetryTimes = retryStrategy.maxRetryTimes();</b>
+<b class="nc">&nbsp;        int currentExecuteTimes = 1;</b>
+&nbsp;
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            final long start = System.currentTimeMillis();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return doSendSync(transporter, host, timeoutMillis);</b>
+<b class="nc">&nbsp;            } catch (Exception ex) {</b>
+<b class="nc">&nbsp;                ClientSyncExceptionMetrics clientSyncExceptionMetrics =</b>
+<b class="nc">&nbsp;                        ClientSyncExceptionMetrics.of(syncRequestDto, ex);</b>
+<b class="nc">&nbsp;                RpcMetrics.recordClientSyncRequestException(clientSyncExceptionMetrics);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (currentExecuteTimes &lt; maxRetryTimes</b>
+<b class="nc">&nbsp;                        &amp;&amp; Arrays.stream(retryStrategy.retryFor()).anyMatch(e -&gt; e.isInstance(ex))) {</b>
+<b class="nc">&nbsp;                    currentExecuteTimes++;</b>
+<b class="nc">&nbsp;                    if (retryStrategy.retryInterval() &gt; 0) {</b>
+<b class="nc">&nbsp;                        ThreadUtils.sleep(retryStrategy.retryInterval());</b>
+&nbsp;                    }
+&nbsp;                    continue;
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                if (ex instanceof RemoteException) {</b>
+<b class="nc">&nbsp;                    throw (RemoteException) ex;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    throw new RemoteException(&quot;Call method to &quot; + host + &quot; failed&quot;, ex);</b>
+&nbsp;                }
+&nbsp;            } finally {
+<b class="nc">&nbsp;                ClientSyncDurationMetrics clientSyncDurationMetrics = ClientSyncDurationMetrics</b>
+<b class="nc">&nbsp;                        .of(syncRequestDto)</b>
+<b class="nc">&nbsp;                        .withMilliseconds(System.currentTimeMillis() - start);</b>
+<b class="nc">&nbsp;                RpcMetrics.recordClientSyncRequestDuration(clientSyncDurationMetrics);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private IRpcResponse doSendSync(final Transporter transporter,
+&nbsp;                                    final Host serverHost,
+&nbsp;                                    long timeoutMills) throws RemoteException, InterruptedException {
+<b class="nc">&nbsp;        final Channel channel = getOrCreateChannel(serverHost);</b>
+<b class="nc">&nbsp;        if (channel == null) {</b>
+<b class="nc">&nbsp;            throw new RemoteException(String.format(&quot;connect to : %s fail&quot;, serverHost));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        final ResponseFuture responseFuture = new ResponseFuture(transporter.getHeader().getOpaque(), timeoutMills);</b>
+<b class="nc">&nbsp;        channel.writeAndFlush(transporter).addListener(future -&gt; {</b>
+<b class="nc">&nbsp;            if (future.isSuccess()) {</b>
+<b class="nc">&nbsp;                responseFuture.setSendOk(true);</b>
+&nbsp;                return;
+&nbsp;            } else {
+<b class="nc">&nbsp;                responseFuture.setSendOk(false);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            responseFuture.setCause(future.cause());</b>
+<b class="nc">&nbsp;            responseFuture.putResponse(null);</b>
+<b class="nc">&nbsp;            log.error(&quot;Send Sync request {} to host {} failed&quot;, transporter, serverHost, responseFuture.getCause());</b>
+&nbsp;        });
+&nbsp;        /*
+&nbsp;         * sync wait for result
+&nbsp;         */
+<b class="nc">&nbsp;        final IRpcResponse iRpcResponse = responseFuture.waitResponse();</b>
+<b class="nc">&nbsp;        if (iRpcResponse != null) {</b>
+<b class="nc">&nbsp;            return iRpcResponse;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (responseFuture.isSendOK()) {</b>
+<b class="nc">&nbsp;            throw new RemoteTimeoutException(serverHost.toString(), timeoutMills, responseFuture.getCause());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new RemoteException(serverHost.toString(), responseFuture.getCause());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    Channel getOrCreateChannel(Host host) {
+<b class="nc">&nbsp;        Channel channel = channels.get(host);</b>
+<b class="nc">&nbsp;        if (channel != null &amp;&amp; channel.isActive()) {</b>
+<b class="nc">&nbsp;            return channel;</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            channelsLock.lock();</b>
+<b class="nc">&nbsp;            channel = channels.get(host);</b>
+<b class="nc">&nbsp;            if (channel != null &amp;&amp; channel.isActive()) {</b>
+<b class="nc">&nbsp;                return channel;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            channel = createChannel(host);</b>
+<b class="nc">&nbsp;            channels.put(host, channel);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            channelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return channel;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create channel
+&nbsp;     *
+&nbsp;     * @param host host
+&nbsp;     * @return channel
+&nbsp;     */
+&nbsp;    Channel createChannel(Host host) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));</b>
+<b class="nc">&nbsp;            future = future.sync();</b>
+<b class="nc">&nbsp;            if (future.isSuccess()) {</b>
+<b class="nc">&nbsp;                return future.channel();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new IllegalArgumentException(&quot;connect to host: &quot; + host + &quot; failed&quot;, future.cause());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Connect to host: &quot; + host + &quot; failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        if (isStarted.compareAndSet(true, false)) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                closeChannels();</b>
+<b class="nc">&nbsp;                if (workerGroup != null) {</b>
+<b class="nc">&nbsp;                    this.workerGroup.shutdownGracefully();</b>
+&nbsp;                }
+<b class="nc">&nbsp;                log.info(&quot;netty client closed&quot;);</b>
+<b class="nc">&nbsp;            } catch (Exception ex) {</b>
+<b class="nc">&nbsp;                log.error(&quot;netty client close exception&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void closeChannels() {
+&nbsp;        try {
+<b class="nc">&nbsp;            channelsLock.lock();</b>
+<b class="nc">&nbsp;            channels.values().forEach(Channel::close);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            channelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void closeChannel(Host host) {
+&nbsp;        try {
+<b class="nc">&nbsp;            channelsLock.lock();</b>
+<b class="nc">&nbsp;            Channel channel = this.channels.remove(host);</b>
+<b class="nc">&nbsp;            if (channel != null) {</b>
+<b class="nc">&nbsp;                channel.close();</b>
+&nbsp;            }
+&nbsp;        } finally {
+<b class="nc">&nbsp;            channelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Registry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.registry.api</a>
+</div>
+
+<h1>Coverage Summary for Class: Registry (org.apache.dolphinscheduler.registry.api)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Registry</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.registry.api;
+&nbsp;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.IOException;
+&nbsp;import java.time.Duration;
+&nbsp;import java.util.Collection;
+&nbsp;
+&nbsp;import lombok.NonNull;
+&nbsp;
+&nbsp;/**
+&nbsp; * The SPI interface for registry center, each registry plugin should implement this interface.
+&nbsp; */
+&nbsp;public interface Registry extends Closeable {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Start the registry, once started, the registry will connect to the registry center.
+&nbsp;     */
+&nbsp;    void start();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether the registry is connected
+&nbsp;     *
+&nbsp;     * @return true if connected, false otherwise.
+&nbsp;     */
+&nbsp;    boolean isConnected();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Connect to the registry, will wait in the given timeout
+&nbsp;     *
+&nbsp;     * @param timeout max timeout, if timeout &lt;= 0 will wait indefinitely.
+&nbsp;     * @throws RegistryException cannot connect in the given timeout
+&nbsp;     */
+&nbsp;    void connectUntilTimeout(@NonNull Duration timeout) throws RegistryException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subscribe the path, when the path has expose {@link Event}, the listener will be triggered.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * The sub path will also be watched, if the sub path has event, the listener will be triggered.
+&nbsp;     *
+&nbsp;     * @param path     the path to subscribe
+&nbsp;     * @param listener the listener to be triggered
+&nbsp;     */
+&nbsp;    void subscribe(String path, SubscribeListener listener);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Add a connection listener to collection.
+&nbsp;     */
+&nbsp;    void addConnectionStateListener(ConnectionListener listener);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the value of the key, if key not exist will throw {@link RegistryException}
+&nbsp;     */
+&nbsp;    String get(String key) throws RegistryException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Put the key-value pair into the registry
+&nbsp;     *
+&nbsp;     * @param key                the key, cannot be null
+&nbsp;     * @param value              the value, cannot be null
+&nbsp;     * @param deleteOnDisconnect if true, when the connection state is disconnected, the key will be deleted
+&nbsp;     */
+&nbsp;    void put(String key, String value, boolean deleteOnDisconnect);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete the key from the registry
+&nbsp;     */
+&nbsp;    void delete(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the children of the key
+&nbsp;     */
+&nbsp;    Collection&lt;String&gt; children(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if the key exists
+&nbsp;     *
+&nbsp;     * @param key the key to check
+&nbsp;     * @return true if the key exists
+&nbsp;     */
+&nbsp;    boolean exists(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Acquire the lock of the prefix {@param key}
+&nbsp;     */
+&nbsp;    boolean acquireLock(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Acquire the lock of the prefix {@param key}, if acquire in the given timeout return true, else return false.
+&nbsp;     */
+&nbsp;    boolean acquireLock(String key, long timeout);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Release the lock of the prefix {@param key}
+&nbsp;     */
+&nbsp;    boolean releaseLock(String key);
+&nbsp;
+&nbsp;    @Override
+&nbsp;    void close() throws IOException;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

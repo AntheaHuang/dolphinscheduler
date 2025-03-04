@@ -1,0 +1,209 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ServerLifeCycleManager</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.lifecycle</a>
+</div>
+
+<h1>Coverage Summary for Class: ServerLifeCycleManager (org.apache.dolphinscheduler.common.lifecycle)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ServerLifeCycleManager</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.lifecycle;
+&nbsp;
+&nbsp;import lombok.experimental.UtilityClass;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;@UtilityClass
+&nbsp;public class ServerLifeCycleManager {
+&nbsp;
+<b class="nc">&nbsp;    private static volatile ServerStatus serverStatus = ServerStatus.RUNNING;</b>
+&nbsp;
+<b class="nc">&nbsp;    private static long serverStartupTime = System.currentTimeMillis();</b>
+&nbsp;
+&nbsp;    public static long getServerStartupTime() {
+<b class="nc">&nbsp;        return serverStartupTime;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void toRunning() {
+<b class="nc">&nbsp;        serverStatus = ServerStatus.RUNNING;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    public static boolean isRunning() {
+<b class="nc">&nbsp;        return serverStatus == ServerStatus.RUNNING;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isStopped() {
+<b class="nc">&nbsp;        return serverStatus == ServerStatus.STOPPED;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static ServerStatus getServerStatus() {
+<b class="nc">&nbsp;        return serverStatus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Change the current server state to {@link ServerStatus#WAITING}, only {@link ServerStatus#RUNNING} can change to {@link ServerStatus#WAITING}.
+&nbsp;     *
+&nbsp;     * @throws ServerLifeCycleException if change failed.
+&nbsp;     */
+&nbsp;    public static synchronized void toWaiting() throws ServerLifeCycleException {
+<b class="nc">&nbsp;        if (isStopped()) {</b>
+<b class="nc">&nbsp;            throw new ServerLifeCycleException(&quot;The current server is already stopped, cannot change to waiting&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (serverStatus == ServerStatus.WAITING) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;The current server is already at waiting status, cannot change to waiting&quot;);</b>
+<b class="nc">&nbsp;            return;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        serverStatus = ServerStatus.WAITING;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Recover from {@link ServerStatus#WAITING} to {@link ServerStatus#RUNNING}.
+&nbsp;     */
+&nbsp;    public static synchronized void recoverFromWaiting() throws ServerLifeCycleException {
+<b class="nc">&nbsp;        if (isStopped()) {</b>
+<b class="nc">&nbsp;            throw new ServerLifeCycleException(&quot;The current server is already stopped, cannot recovery&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (serverStatus == ServerStatus.RUNNING) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;The current server status is already running, cannot recover form waiting&quot;);</b>
+<b class="nc">&nbsp;            return;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        serverStartupTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        serverStatus = ServerStatus.RUNNING;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    public static synchronized boolean toStopped() {
+<b class="nc">&nbsp;        if (serverStatus == ServerStatus.STOPPED) {</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;The current server status changed from {} to {}&quot;, serverStatus, ServerStatus.STOPPED);</b>
+<b class="nc">&nbsp;        serverStatus = ServerStatus.STOPPED;</b>
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

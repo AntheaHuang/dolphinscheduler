@@ -1,0 +1,345 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > RedshiftDataSourceProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.datasource.redshift.param</a>
+</div>
+
+<h1>Coverage Summary for Class: RedshiftDataSourceProcessor (org.apache.dolphinscheduler.plugin.datasource.redshift.param)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">RedshiftDataSourceProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/85)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.constants.Constants;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+&nbsp;import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.DbType;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.MapUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.DriverManager;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import com.google.auto.service.AutoService;
+&nbsp;
+&nbsp;@AutoService(DataSourceProcessor.class)
+<b class="nc">&nbsp;public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+<b class="nc">&nbsp;        return JSONUtils.parseObject(paramJson, RedshiftDataSourceParamDTO.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+<b class="nc">&nbsp;        RedshiftConnectionParam connectionParams = (RedshiftConnectionParam) createConnectionParams(connectionJson);</b>
+&nbsp;
+<b class="nc">&nbsp;        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);</b>
+<b class="nc">&nbsp;        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        RedshiftDataSourceParamDTO redshiftDatasourceParamDTO = new RedshiftDataSourceParamDTO();</b>
+<b class="nc">&nbsp;        redshiftDatasourceParamDTO.setMode(connectionParams.getMode());</b>
+<b class="nc">&nbsp;        redshiftDatasourceParamDTO.setDbUser(connectionParams.getDbUser());</b>
+<b class="nc">&nbsp;        if (connectionParams.getMode().equals(RedshiftAuthMode.PASSWORD)) {</b>
+<b class="nc">&nbsp;            redshiftDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));</b>
+<b class="nc">&nbsp;            redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (hostPortArray[0].contains(Constants.COLON)) {</b>
+<b class="nc">&nbsp;                String portString = hostPortArray[0].split(Constants.COLON)[1];</b>
+<b class="nc">&nbsp;                if (StringUtils.isNumeric(portString)) {</b>
+<b class="nc">&nbsp;                    redshiftDatasourceParamDTO.setPort(Integer.parseInt(portString));</b>
+<b class="nc">&nbsp;                    redshiftDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    redshiftDatasourceParamDTO.setHost(hostPortArray[0]);</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                redshiftDatasourceParamDTO.setHost(hostPortArray[0]);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;        }
+<b class="nc">&nbsp;        redshiftDatasourceParamDTO.setDatabase(connectionParams.getDatabase());</b>
+<b class="nc">&nbsp;        redshiftDatasourceParamDTO.setUserName(connectionParams.getUser());</b>
+<b class="nc">&nbsp;        redshiftDatasourceParamDTO.setOther(connectionParams.getOther());</b>
+&nbsp;
+<b class="nc">&nbsp;        return redshiftDatasourceParamDTO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+<b class="nc">&nbsp;        RedshiftDataSourceParamDTO redshiftParam = (RedshiftDataSourceParamDTO) datasourceParam;</b>
+<b class="nc">&nbsp;        String address = getAddress(redshiftParam);</b>
+<b class="nc">&nbsp;        String jdbcUrl = address + Constants.SLASH + redshiftParam.getDatabase();</b>
+&nbsp;
+<b class="nc">&nbsp;        RedshiftConnectionParam redshiftConnectionParam = new RedshiftConnectionParam();</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setUser(redshiftParam.getUserName());</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setPassword(PasswordUtils.encodePassword(redshiftParam.getPassword()));</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setOther(redshiftParam.getOther());</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setAddress(address);</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setJdbcUrl(jdbcUrl);</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setDatabase(redshiftParam.getDatabase());</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setDriverClassName(getDatasourceDriver());</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setValidationQuery(getValidationQuery());</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setMode(redshiftParam.getMode());</b>
+<b class="nc">&nbsp;        redshiftConnectionParam.setDbUser(redshiftParam.getDbUser());</b>
+&nbsp;
+<b class="nc">&nbsp;        return redshiftConnectionParam;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ConnectionParam createConnectionParams(String connectionJson) {
+<b class="nc">&nbsp;        return JSONUtils.parseObject(connectionJson, RedshiftConnectionParam.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDatasourceDriver() {
+<b class="nc">&nbsp;        return DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getValidationQuery() {
+<b class="nc">&nbsp;        return DataSourceConstants.REDHIFT_VALIDATION_QUERY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getJdbcUrl(ConnectionParam connectionParam) {
+<b class="nc">&nbsp;        RedshiftConnectionParam redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;</b>
+<b class="nc">&nbsp;        if (MapUtils.isNotEmpty(redshiftConnectionParam.getOther())) {</b>
+<b class="nc">&nbsp;            return String.format(&quot;%s?%s&quot;, redshiftConnectionParam.getJdbcUrl(),</b>
+<b class="nc">&nbsp;                    transformOther(redshiftConnectionParam.getOther()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return redshiftConnectionParam.getJdbcUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+<b class="nc">&nbsp;        RedshiftConnectionParam redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;</b>
+<b class="nc">&nbsp;        Class.forName(getDatasourceDriver());</b>
+<b class="nc">&nbsp;        if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {</b>
+<b class="nc">&nbsp;            return DriverManager.getConnection(getJdbcUrl(connectionParam),</b>
+<b class="nc">&nbsp;                    redshiftConnectionParam.getUser(),</b>
+<b class="nc">&nbsp;                    PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));</b>
+<b class="nc">&nbsp;        } else if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {</b>
+<b class="nc">&nbsp;            return getConnectionByIAM(redshiftConnectionParam);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DbType getDbType() {
+<b class="nc">&nbsp;        return DbType.REDSHIFT;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DataSourceProcessor create() {
+<b class="nc">&nbsp;        return new RedshiftDataSourceProcessor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 2 auth mode
+&nbsp;     * PASSWORD: address example: jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439
+&nbsp;     * IAM_ACCESS_KEY:
+&nbsp;     * address example1: jdbc:redshift:iam://examplecluster:us-west-2
+&nbsp;     * address example2: jdbc:redshift:iam://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439
+&nbsp;     *
+&nbsp;     * @param redshiftParam
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    private String getAddress(RedshiftDataSourceParamDTO redshiftParam) {
+<b class="nc">&nbsp;        if (redshiftParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {</b>
+<b class="nc">&nbsp;            return String.format(&quot;%s%s:%s&quot;, DataSourceConstants.JDBC_REDSHIFT, redshiftParam.getHost(),</b>
+<b class="nc">&nbsp;                    redshiftParam.getPort());</b>
+<b class="nc">&nbsp;        } else if (redshiftParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {</b>
+<b class="nc">&nbsp;            if (redshiftParam.getPort() == null) {</b>
+&nbsp;                // construct IAM_ACCESS_KEY example 1 format
+<b class="nc">&nbsp;                return String.format(&quot;%s%s&quot;, DataSourceConstants.JDBC_REDSHIFT_IAM, redshiftParam.getHost());</b>
+&nbsp;            } else {
+&nbsp;                // construct IAM_ACCESS_KEY example 2 format
+<b class="nc">&nbsp;                return String.format(&quot;%s%s:%s&quot;, DataSourceConstants.JDBC_REDSHIFT_IAM, redshiftParam.getHost(),</b>
+<b class="nc">&nbsp;                        redshiftParam.getPort());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String transformOther(Map&lt;String, String&gt; otherMap) {
+<b class="nc">&nbsp;        if (MapUtils.isNotEmpty(otherMap)) {</b>
+<b class="nc">&nbsp;            List&lt;String&gt; list = new ArrayList&lt;&gt;(otherMap.size());</b>
+<b class="nc">&nbsp;            otherMap.forEach((key, value) -&gt; list.add(String.format(&quot;%s=%s&quot;, key, value)));</b>
+<b class="nc">&nbsp;            return String.join(Constants.SEMICOLON, list);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * 2 auth mode
+&nbsp;     * PASSWORD: address example: jdbc:redshift://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
+&nbsp;     * IAM_ACCESS_KEY:
+&nbsp;     * address example1: jdbc:redshift:iam://examplecluster:us-west-2/dev?AccessKeyID=xxx&amp;SecretAccessKey=xxx&amp;DbUser=kristen
+&nbsp;     * address example2: jdbc:redshift:iam://examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev?AccessKeyID=xxx&amp;SecretAccessKey=xxx&amp;DbUser=kristen
+&nbsp;     *
+&nbsp;     * @param redshiftConnectionParam
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public static Connection getConnectionByIAM(RedshiftConnectionParam redshiftConnectionParam) {
+&nbsp;        String basic;
+<b class="nc">&nbsp;        String authParams = String.format(&quot;AccessKeyID=%s&amp;SecretAccessKey=%s&amp;DbUser=%s&quot;,</b>
+<b class="nc">&nbsp;                redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()),</b>
+<b class="nc">&nbsp;                redshiftConnectionParam.getDbUser());</b>
+&nbsp;        String connectionUrl;
+<b class="nc">&nbsp;        if (MapUtils.isNotEmpty(redshiftConnectionParam.getOther())) {</b>
+<b class="nc">&nbsp;            basic = String.format(&quot;%s?%s&quot;, redshiftConnectionParam.getJdbcUrl(),</b>
+<b class="nc">&nbsp;                    transformOther(redshiftConnectionParam.getOther()));</b>
+&nbsp;            // if have other params map, basic will be
+&nbsp;            // &#39;jdbc:redshift:iam://examplecluster:us-west-2/dev?param1=xx&amp;param2=xx&#39;
+&nbsp;            // append AccessKeyID &amp;SecretAccessKey &amp;DbUser
+<b class="nc">&nbsp;            connectionUrl = String.format(&quot;%s&amp;%s&quot;, basic, authParams);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            basic = redshiftConnectionParam.getJdbcUrl();</b>
+&nbsp;            // if none other params map, basic will be &#39;jdbc:redshift:iam://examplecluster:us-west-2/dev&#39;
+&nbsp;            // append AccessKeyID &amp;SecretAccessKey &amp;DbUser
+<b class="nc">&nbsp;            connectionUrl = String.format(&quot;%s?%s&quot;, basic, authParams);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            Class.forName(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER);</b>
+<b class="nc">&nbsp;            return DriverManager.getConnection(connectionUrl);</b>
+<b class="nc">&nbsp;        } catch (SQLException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;        } catch (ClassNotFoundException e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CodeGenerateUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: CodeGenerateUtils (org.apache.dolphinscheduler.common.utils)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CodeGenerateUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">CodeGenerateUtils$CodeGenerateException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">CodeGenerateUtils$CodeGenerator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/**
+&nbsp; * Copyright 2010-2012 Twitter, Inc.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.utils;
+&nbsp;
+&nbsp;import java.net.InetAddress;
+&nbsp;import java.net.UnknownHostException;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;/**
+&nbsp; * Rewriting based on Twitter snowflake algorithm
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public class CodeGenerateUtils {</b>
+&nbsp;
+&nbsp;    private static final CodeGenerator codeGenerator;
+&nbsp;
+&nbsp;    static {
+&nbsp;        try {
+<b class="nc">&nbsp;            codeGenerator = new CodeGenerator(InetAddress.getLocalHost().getHostName() + &quot;-&quot; + OSUtils.getProcessID());</b>
+<b class="nc">&nbsp;        } catch (UnknownHostException e) {</b>
+<b class="nc">&nbsp;            throw new CodeGenerateException(e.getMessage());</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    public static long genCode() throws CodeGenerateException {
+<b class="nc">&nbsp;        return codeGenerator.genCode();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class CodeGenerator {
+&nbsp;
+&nbsp;        // start timestamp
+&nbsp;        private static final long START_TIMESTAMP = 1609430400000L; // 2021-01-01 00:00:00
+&nbsp;        // Each machine generates 32 in the same millisecond
+&nbsp;        private static final long LOW_DIGIT_BIT = 5L;
+&nbsp;        private static final long MACHINE_BIT = 5L;
+&nbsp;        private static final long MAX_LOW_DIGIT = ~(-1L &lt;&lt; LOW_DIGIT_BIT);
+&nbsp;        // The displacement to the left
+&nbsp;        private static final long HIGH_DIGIT_LEFT = LOW_DIGIT_BIT + MACHINE_BIT;
+&nbsp;        public final long machineHash;
+<b class="nc">&nbsp;        private long lowDigit = 0L;</b>
+<b class="nc">&nbsp;        private long recordMillisecond = -1L;</b>
+&nbsp;
+<b class="nc">&nbsp;        private static final long SYSTEM_TIMESTAMP = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        private static final long SYSTEM_NANOTIME = System.nanoTime();</b>
+&nbsp;
+<b class="nc">&nbsp;        public CodeGenerator(String appName) {</b>
+<b class="nc">&nbsp;            this.machineHash = Math.abs(Objects.hash(appName)) % (1 &lt;&lt; MACHINE_BIT);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        public synchronized long genCode() throws CodeGenerateException {
+<b class="nc">&nbsp;            long nowtMillisecond = systemMillisecond();</b>
+<b class="nc">&nbsp;            if (nowtMillisecond &lt; recordMillisecond) {</b>
+<b class="nc">&nbsp;                throw new CodeGenerateException(&quot;New code exception because time is set back.&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (nowtMillisecond == recordMillisecond) {</b>
+<b class="nc">&nbsp;                lowDigit = (lowDigit + 1) &amp; MAX_LOW_DIGIT;</b>
+<b class="nc">&nbsp;                if (lowDigit == 0L) {</b>
+<b class="nc">&nbsp;                    while (nowtMillisecond &lt;= recordMillisecond) {</b>
+<b class="nc">&nbsp;                        nowtMillisecond = systemMillisecond();</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                lowDigit = 0L;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            recordMillisecond = nowtMillisecond;</b>
+<b class="nc">&nbsp;            return (nowtMillisecond - START_TIMESTAMP) &lt;&lt; HIGH_DIGIT_LEFT | machineHash &lt;&lt; LOW_DIGIT_BIT | lowDigit;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        private long systemMillisecond() {
+<b class="nc">&nbsp;            return SYSTEM_TIMESTAMP + (System.nanoTime() - SYSTEM_NANOTIME) / 1000000;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public static class CodeGenerateException extends RuntimeException {
+&nbsp;
+&nbsp;        public CodeGenerateException(String message) {
+<b class="nc">&nbsp;            super(message);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

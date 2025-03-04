@@ -1,0 +1,361 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SeatunnelTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.seatunnel</a>
+</div>
+
+<h1>Coverage Summary for Class: SeatunnelTask (org.apache.dolphinscheduler.plugin.task.seatunnel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SeatunnelTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/82)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.seatunnel;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;
+&nbsp;import org.apache.commons.io.FileUtils;
+&nbsp;import org.apache.commons.lang3.BooleanUtils;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class SeatunnelTask extends AbstractRemoteTask {
+&nbsp;
+&nbsp;    private static final String SEATUNNEL_BIN_DIR = &quot;${SEATUNNEL_HOME}/bin/&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * seatunnel parameters
+&nbsp;     */
+&nbsp;    private SeatunnelParameters seatunnelParameters;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * shell command executor
+&nbsp;     */
+&nbsp;    private ShellCommandExecutor shellCommandExecutor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * taskExecutionContext
+&nbsp;     */
+&nbsp;    protected final TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * constructor
+&nbsp;     *
+&nbsp;     * @param taskExecutionContext taskExecutionContext
+&nbsp;     */
+&nbsp;    public SeatunnelTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+<b class="nc">&nbsp;        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getApplicationIds() throws TaskException {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+<b class="nc">&nbsp;        log.info(&quot;Intialize SeaTunnel task params {}&quot;, JSONUtils.toPrettyJsonString(seatunnelParameters));</b>
+<b class="nc">&nbsp;        if (seatunnelParameters == null || !seatunnelParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;SeaTunnel task params is not valid&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // todo split handle to submit and track
+&nbsp;    @Override
+&nbsp;    public void handle(TaskCallBack taskCallBack) throws TaskException {
+&nbsp;        try {
+&nbsp;            // construct process
+<b class="nc">&nbsp;            String command = buildCommand();</b>
+<b class="nc">&nbsp;            IShellInterceptorBuilder&lt;?, ?&gt; shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()</b>
+<b class="nc">&nbsp;                    .appendScript(command);</b>
+&nbsp;
+<b class="nc">&nbsp;            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);</b>
+<b class="nc">&nbsp;            setExitStatusCode(commandExecuteResult.getExitStatusCode());</b>
+<b class="nc">&nbsp;            setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));</b>
+<b class="nc">&nbsp;            setProcessId(commandExecuteResult.getProcessId());</b>
+<b class="nc">&nbsp;            seatunnelParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(&quot;The current SeaTunnel task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;The current SeaTunnel task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;SeaTunnel task error&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Execute Seatunnel task failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void submitApplication() throws TaskException {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void trackApplicationStatus() throws TaskException {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelApplication() throws TaskException {
+&nbsp;        // cancel process
+&nbsp;        try {
+<b class="nc">&nbsp;            shellCommandExecutor.cancelApplication();</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;cancel application error&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildCommand() throws Exception {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(SEATUNNEL_BIN_DIR + seatunnelParameters.getStartupScript());</b>
+<b class="nc">&nbsp;        args.addAll(buildOptions());</b>
+&nbsp;
+<b class="nc">&nbsp;        String command = String.join(&quot; &quot;, args);</b>
+<b class="nc">&nbsp;        log.info(&quot;SeaTunnel task command: {}&quot;, command);</b>
+&nbsp;
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected List&lt;String&gt; buildOptions() throws Exception {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(CONFIG_OPTIONS);</b>
+&nbsp;        String scriptContent;
+<b class="nc">&nbsp;        if (BooleanUtils.isTrue(seatunnelParameters.getUseCustom())) {</b>
+<b class="nc">&nbsp;            scriptContent = buildCustomConfigContent();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            String resourceFileName = seatunnelParameters.getResourceList().get(0).getResourceName();</b>
+<b class="nc">&nbsp;            ResourceContext resourceContext = taskExecutionContext.getResourceContext();</b>
+<b class="nc">&nbsp;            scriptContent = FileUtils.readFileToString(</b>
+<b class="nc">&nbsp;                    new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),</b>
+&nbsp;                    StandardCharsets.UTF_8);
+&nbsp;        }
+<b class="nc">&nbsp;        String filePath = buildConfigFilePath();</b>
+<b class="nc">&nbsp;        createConfigFileIfNotExists(scriptContent, filePath);</b>
+<b class="nc">&nbsp;        args.add(filePath);</b>
+<b class="nc">&nbsp;        args.addAll(generateTaskParameters());</b>
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;String&gt; generateTaskParameters() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; variables = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        Map&lt;String, Property&gt; paramsMap = taskExecutionContext.getPrepareParamsMap();</b>
+<b class="nc">&nbsp;        List&lt;Property&gt; propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);</b>
+<b class="nc">&nbsp;        if (propertyList != null &amp;&amp; !propertyList.isEmpty()) {</b>
+<b class="nc">&nbsp;            for (Property property : propertyList) {</b>
+<b class="nc">&nbsp;                variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;Property&gt; localParams = this.seatunnelParameters.getLocalParams();</b>
+<b class="nc">&nbsp;        if (localParams != null &amp;&amp; !localParams.isEmpty()) {</b>
+<b class="nc">&nbsp;            for (Property property : localParams) {</b>
+<b class="nc">&nbsp;                if (property.getDirect().equals(Direct.IN)) {</b>
+<b class="nc">&nbsp;                    variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());</b>
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;String&gt; parameters = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        variables.forEach((k, v) -&gt; {</b>
+<b class="nc">&nbsp;            parameters.add(&quot;-i&quot;);</b>
+<b class="nc">&nbsp;            parameters.add(String.format(&quot;%s=&#39;%s&#39;&quot;, k, v));</b>
+&nbsp;        });
+<b class="nc">&nbsp;        return parameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildCustomConfigContent() {
+<b class="nc">&nbsp;        log.info(&quot;raw custom config content : {}&quot;, seatunnelParameters.getRawScript());</b>
+<b class="nc">&nbsp;        String script = seatunnelParameters.getRawScript().replaceAll(&quot;\\r\\n&quot;, System.lineSeparator());</b>
+<b class="nc">&nbsp;        script = parseScript(script);</b>
+<b class="nc">&nbsp;        return script;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildConfigFilePath() {
+<b class="nc">&nbsp;        return String.format(&quot;%s/seatunnel_%s.%s&quot;, taskExecutionContext.getExecutePath(),</b>
+<b class="nc">&nbsp;                taskExecutionContext.getTaskAppId(), formatDetector());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String formatDetector() {
+<b class="nc">&nbsp;        return JSONUtils.checkJsonValid(seatunnelParameters.getRawScript(), false) ? Constants.JSON_SUFFIX</b>
+<b class="nc">&nbsp;                : Constants.CONF_SUFFIX;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
+<b class="nc">&nbsp;        log.info(&quot;tenantCode :{}, task dir:{}&quot;, taskExecutionContext.getTenantCode(),</b>
+<b class="nc">&nbsp;                taskExecutionContext.getExecutePath());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!Files.exists(Paths.get(scriptFile))) {</b>
+<b class="nc">&nbsp;            log.info(&quot;generate script file:{}&quot;, scriptFile);</b>
+&nbsp;
+&nbsp;            // write data to file
+<b class="nc">&nbsp;            FileUtils.writeStringToFile(new File(scriptFile), script, StandardCharsets.UTF_8);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return seatunnelParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String parseScript(String script) {
+<b class="nc">&nbsp;        Map&lt;String, Property&gt; paramsMap = taskExecutionContext.getPrepareParamsMap();</b>
+<b class="nc">&nbsp;        return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSeatunnelParameters(SeatunnelParameters seatunnelParameters) {
+<b class="nc">&nbsp;        this.seatunnelParameters = seatunnelParameters;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

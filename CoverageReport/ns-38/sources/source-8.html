@@ -1,0 +1,232 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WechatAppMessage</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.alert.wechat</a>
+</div>
+
+<h1>Coverage Summary for Class: WechatAppMessage (org.apache.dolphinscheduler.plugin.alert.wechat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WechatAppMessage</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.alert.wechat;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.alert.api.ShowType;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public class WechatAppMessage {
+&nbsp;
+&nbsp;    private String touser;
+&nbsp;    private String msgtype;
+&nbsp;    private Integer agentid;
+&nbsp;    private Map&lt;String, String&gt; text;
+&nbsp;    private Map&lt;String, String&gt; markdown;
+&nbsp;    private Integer safe;
+&nbsp;    private Integer enable_id_trans;
+&nbsp;    private Integer enable_duplicate_check;
+&nbsp;
+&nbsp;    public String getTouser() {
+<b class="nc">&nbsp;        return touser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTouser(String touser) {
+<b class="nc">&nbsp;        this.touser = touser;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getMsgtype() {
+<b class="nc">&nbsp;        return msgtype;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMsgtype(String msgtype) {
+<b class="nc">&nbsp;        this.msgtype = msgtype;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getAgentid() {
+<b class="nc">&nbsp;        return agentid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAgentid(Integer agentid) {
+<b class="nc">&nbsp;        this.agentid = agentid;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; getText() {
+<b class="nc">&nbsp;        return text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setText(Map&lt;String, String&gt; text) {
+<b class="nc">&nbsp;        this.text = text;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getSafe() {
+<b class="nc">&nbsp;        return safe;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSafe(Integer safe) {
+<b class="nc">&nbsp;        this.safe = safe;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getEnable_id_trans() {
+<b class="nc">&nbsp;        return enable_id_trans;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEnable_id_trans(Integer enable_id_trans) {
+<b class="nc">&nbsp;        this.enable_id_trans = enable_id_trans;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getEnable_duplicate_check() {
+<b class="nc">&nbsp;        return enable_duplicate_check;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setEnable_duplicate_check(Integer enable_duplicate_check) {
+<b class="nc">&nbsp;        this.enable_duplicate_check = enable_duplicate_check;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; getMarkdown() {
+<b class="nc">&nbsp;        return markdown;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMarkdown(Map&lt;String, String&gt; markdown) {
+<b class="nc">&nbsp;        this.markdown = markdown;</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public WechatAppMessage() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public WechatAppMessage(String touser, String msgtype, Integer agentid, Map&lt;String, String&gt; contentMap,
+<b class="nc">&nbsp;                            Integer safe, Integer enableIdTrans, Integer enableDuplicateCheck) {</b>
+<b class="nc">&nbsp;        this.touser = touser;</b>
+<b class="nc">&nbsp;        this.msgtype = msgtype;</b>
+<b class="nc">&nbsp;        this.agentid = agentid;</b>
+<b class="nc">&nbsp;        if (msgtype.equals(ShowType.MARKDOWN.getDescp())) {</b>
+<b class="nc">&nbsp;            this.markdown = contentMap;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            this.text = contentMap;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        this.safe = safe;</b>
+<b class="nc">&nbsp;        this.enable_id_trans = enableIdTrans;</b>
+<b class="nc">&nbsp;        this.enable_duplicate_check = enableDuplicateCheck;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,380 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DmsTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.dms</a>
+</div>
+
+<h1>Coverage Summary for Class: DmsTask (org.apache.dolphinscheduler.plugin.task.dms)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DmsTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/81)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.dms;
+&nbsp;
+&nbsp;import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
+&nbsp;import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
+&nbsp;import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
+&nbsp;import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;
+&nbsp;import org.apache.commons.beanutils.BeanUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+&nbsp;import com.fasterxml.jackson.databind.json.JsonMapper;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class DmsTask extends AbstractRemoteTask {
+&nbsp;
+&nbsp;    private static final ObjectMapper objectMapper =
+<b class="nc">&nbsp;            JsonMapper.builder()</b>
+<b class="nc">&nbsp;                    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)</b>
+<b class="nc">&nbsp;                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)</b>
+<b class="nc">&nbsp;                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)</b>
+<b class="nc">&nbsp;                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true)</b>
+<b class="nc">&nbsp;                    .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())</b>
+<b class="nc">&nbsp;                    .build();</b>
+&nbsp;    /**
+&nbsp;     * taskExecutionContext
+&nbsp;     */
+&nbsp;    private final TaskExecutionContext taskExecutionContext;
+&nbsp;    public DmsHook dmsHook;
+&nbsp;    /**
+&nbsp;     * Dms parameters
+&nbsp;     */
+&nbsp;    private DmsParameters parameters;
+&nbsp;    private DmsHook.ApplicationIds appId;
+&nbsp;
+&nbsp;    public DmsTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() throws TaskException {
+<b class="nc">&nbsp;        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize Dms task params {}&quot;, JSONUtils.toPrettyJsonString(parameters));</b>
+<b class="nc">&nbsp;        initDmsHook();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getApplicationIds() throws TaskException {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void submitApplication() throws TaskException {
+<b class="nc">&nbsp;        exitStatusCode = checkCreateReplicationTask();</b>
+<b class="nc">&nbsp;        if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {</b>
+<b class="nc">&nbsp;            exitStatusCode = startReplicationTask();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new TaskException(&quot;Failed to create a ReplicationTask&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if the task is not running, the task will be deleted
+<b class="nc">&nbsp;        if (exitStatusCode == TaskConstants.EXIT_CODE_FAILURE &amp;&amp; !parameters.getIsRestartTask()) {</b>
+<b class="nc">&nbsp;            dmsHook.deleteReplicationTask();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            appId = dmsHook.getApplicationIds();</b>
+<b class="nc">&nbsp;            setAppIds(JSONUtils.toJsonString(appId));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void trackApplicationStatus() {
+<b class="nc">&nbsp;        initAppId();</b>
+<b class="nc">&nbsp;        dmsHook.setReplicationTaskArn(appId.getReplicationTaskArn());</b>
+&nbsp;        // if CdcStopPosition is not set, the task will not continue to check the running status
+<b class="nc">&nbsp;        if (isStopTaskWhenCdc()) {</b>
+<b class="nc">&nbsp;            log.info(</b>
+&nbsp;                    &quot;This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status&quot;);
+<b class="nc">&nbsp;            exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;            return;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Boolean isFinishedSuccessfully = dmsHook.checkFinishedReplicationTask();</b>
+<b class="nc">&nbsp;        if (isFinishedSuccessfully) {</b>
+<b class="nc">&nbsp;            exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            throw new TaskException(&quot;DMS task failed to track&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * init DMS remote AppId if null
+&nbsp;     */
+&nbsp;    private void initAppId() {
+<b class="nc">&nbsp;        if (appId == null) {</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(getAppIds())) {</b>
+<b class="nc">&nbsp;                appId = JSONUtils.parseObject(getAppIds(), DmsHook.ApplicationIds.class);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (appId == null) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;DMS applicationID is null&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int checkCreateReplicationTask() throws TaskException {
+&nbsp;
+&nbsp;        // if IsRestartTask, return success, do not create replication task
+<b class="nc">&nbsp;        if (parameters.getIsRestartTask()) {</b>
+<b class="nc">&nbsp;            return TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if not IsRestartTask, create replication task
+&nbsp;        Boolean isCreateSuccessfully;
+&nbsp;        try {
+<b class="nc">&nbsp;            isCreateSuccessfully = dmsHook.createReplicationTask();</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;DMS task create replication task error&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // if create replication task successfully, return EXIT_CODE_SUCCESS, else return EXIT_CODE_FAILURE
+<b class="nc">&nbsp;        if (isCreateSuccessfully) {</b>
+<b class="nc">&nbsp;            return TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return TaskConstants.EXIT_CODE_FAILURE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * start replication task
+&nbsp;     *
+&nbsp;     * @return
+&nbsp;     * @throws TaskException
+&nbsp;     */
+&nbsp;    public int startReplicationTask() {
+&nbsp;
+<b class="nc">&nbsp;        Boolean isStartSuccessfully = false;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            isStartSuccessfully = dmsHook.startReplicationTask();</b>
+<b class="nc">&nbsp;        } catch (InvalidResourceStateException e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Failed to start a task, error message: {}&quot;, e.getErrorMessage());</b>
+&nbsp;
+&nbsp;            // Only restart task when the error contains &quot;Test connection&quot;, means instance can not connect to source or
+&nbsp;            // target
+<b class="nc">&nbsp;            if (!e.getErrorMessage().contains(&quot;Test connection&quot;)) {</b>
+<b class="nc">&nbsp;                return TaskConstants.EXIT_CODE_FAILURE;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            log.info(&quot;restart replication task&quot;);</b>
+&nbsp;            // if only restart task, run dmsHook.describeReplicationTasks to get replication task arn
+<b class="nc">&nbsp;            if (parameters.getIsRestartTask()) {</b>
+<b class="nc">&nbsp;                dmsHook.describeReplicationTasks();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // test connection endpoint again and restart task if connection is ok
+<b class="nc">&nbsp;            if (dmsHook.testConnectionEndpoint()) {</b>
+<b class="nc">&nbsp;                isStartSuccessfully = dmsHook.startReplicationTask();</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // if start replication task failed, return EXIT_CODE_FAILURE
+<b class="nc">&nbsp;        if (!isStartSuccessfully) {</b>
+<b class="nc">&nbsp;            return TaskConstants.EXIT_CODE_FAILURE;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * check if stop task when cdc
+&nbsp;     *
+&nbsp;     * @return true if stop task when cdc type and cdcStopPosition is not set, else return false
+&nbsp;     */
+&nbsp;    public Boolean isStopTaskWhenCdc() {
+<b class="nc">&nbsp;        ReplicationTask replicationTask = dmsHook.describeReplicationTasks();</b>
+<b class="nc">&nbsp;        String migrationType = replicationTask.getMigrationType();</b>
+<b class="nc">&nbsp;        return migrationType.contains(&quot;cdc&quot;) &amp;&amp; parameters.getCdcStopPosition() == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * init dms hook
+&nbsp;     */
+&nbsp;    public void initDmsHook() throws TaskException {
+<b class="nc">&nbsp;        convertJsonParameters();</b>
+&nbsp;
+<b class="nc">&nbsp;        dmsHook = new DmsHook();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            BeanUtils.copyProperties(dmsHook, parameters);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;DMS task init error&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!StringUtils.isNotEmpty(parameters.getStartReplicationTaskType())) {</b>
+<b class="nc">&nbsp;            if (parameters.getIsRestartTask()) {</b>
+<b class="nc">&nbsp;                dmsHook.setStartReplicationTaskType(DmsHook.START_TYPE.RELOAD_TARGET);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                dmsHook.setStartReplicationTaskType(DmsHook.START_TYPE.START_REPLICATION);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * convert json parameters to dms parameters
+&nbsp;     */
+&nbsp;    public void convertJsonParameters() throws TaskException {
+&nbsp;        // create a new parameter object using the json data if the json data is not empty
+<b class="nc">&nbsp;        if (parameters.getIsJsonFormat() &amp;&amp; parameters.getJsonData() != null) {</b>
+<b class="nc">&nbsp;            String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),</b>
+<b class="nc">&nbsp;                    ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));</b>
+&nbsp;
+<b class="nc">&nbsp;            boolean isRestartTask = parameters.getIsRestartTask();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                parameters = objectMapper.readValue(jsonData, DmsParameters.class);</b>
+<b class="nc">&nbsp;                parameters.setIsRestartTask(isRestartTask);</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Failed to convert json data to DmsParameters object.&quot;, e);</b>
+<b class="nc">&nbsp;                throw new TaskException(e.getMessage());</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DmsParameters getParameters() {
+<b class="nc">&nbsp;        return parameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelApplication() {
+<b class="nc">&nbsp;        dmsHook.stopReplicationTask();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

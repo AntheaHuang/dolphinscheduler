@@ -1,0 +1,558 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > K8sTaskExecutor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.api.k8s.impl</a>
+</div>
+
+<h1>Coverage Summary for Class: K8sTaskExecutor (org.apache.dolphinscheduler.plugin.task.api.k8s.impl)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">K8sTaskExecutor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/54)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/192)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">K8sTaskExecutor$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/60)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/216)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.api.k8s.impl;
+&nbsp;
+&nbsp;import static java.util.Collections.singletonList;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JOB_TTL_SECONDS;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL_VALUE;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MEMORY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MI;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAME_LABEL;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESTART_POLICY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_INSTANCE_ID;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Locale;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.CountDownLatch;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.ExecutorService;
+&nbsp;import java.util.concurrent.Future;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import io.fabric8.kubernetes.api.model.Affinity;
+&nbsp;import io.fabric8.kubernetes.api.model.AffinityBuilder;
+&nbsp;import io.fabric8.kubernetes.api.model.EnvVar;
+&nbsp;import io.fabric8.kubernetes.api.model.LocalObjectReference;
+&nbsp;import io.fabric8.kubernetes.api.model.NodeSelectorTerm;
+&nbsp;import io.fabric8.kubernetes.api.model.Quantity;
+&nbsp;import io.fabric8.kubernetes.api.model.ResourceRequirements;
+&nbsp;import io.fabric8.kubernetes.api.model.batch.v1.Job;
+&nbsp;import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
+&nbsp;import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
+&nbsp;import io.fabric8.kubernetes.client.Watch;
+&nbsp;import io.fabric8.kubernetes.client.Watcher;
+&nbsp;import io.fabric8.kubernetes.client.WatcherException;
+&nbsp;import io.fabric8.kubernetes.client.dsl.LogWatch;
+&nbsp;
+&nbsp;/**
+&nbsp; * K8sTaskExecutor used to submit k8s task to K8S
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public class K8sTaskExecutor extends AbstractK8sTaskExecutor {</b>
+&nbsp;
+&nbsp;    private Job job;
+<b class="nc">&nbsp;    protected boolean podLogOutputIsFinished = false;</b>
+&nbsp;    protected Future&lt;?&gt; podLogOutputFuture;
+&nbsp;
+&nbsp;    public K8sTaskExecutor(TaskExecutionContext taskRequest) {
+<b class="nc">&nbsp;        super(taskRequest);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
+<b class="nc">&nbsp;        String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());</b>
+<b class="nc">&nbsp;        String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        String image = k8STaskMainParameters.getImage();</b>
+<b class="nc">&nbsp;        String pullSecret = k8STaskMainParameters.getPullSecret();</b>
+<b class="nc">&nbsp;        String namespaceName = k8STaskMainParameters.getNamespaceName();</b>
+<b class="nc">&nbsp;        String imagePullPolicy = k8STaskMainParameters.getImagePullPolicy();</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; otherParams = k8STaskMainParameters.getParamsMap();</b>
+<b class="nc">&nbsp;        Double podMem = k8STaskMainParameters.getMinMemorySpace();</b>
+<b class="nc">&nbsp;        Double podCpu = k8STaskMainParameters.getMinCpuCores();</b>
+<b class="nc">&nbsp;        Double limitPodMem = podMem * 2;</b>
+<b class="nc">&nbsp;        Double limitPodCpu = podCpu * 2;</b>
+<b class="nc">&nbsp;        int retryNum = 0;</b>
+<b class="nc">&nbsp;        String k8sJobName = String.format(&quot;%s-%s&quot;, taskName, taskInstanceId);</b>
+<b class="nc">&nbsp;        Map&lt;String, Quantity&gt; reqRes = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        reqRes.put(MEMORY, new Quantity(String.format(&quot;%s%s&quot;, podMem, MI)));</b>
+<b class="nc">&nbsp;        reqRes.put(CPU, new Quantity(String.valueOf(podCpu)));</b>
+<b class="nc">&nbsp;        Map&lt;String, Quantity&gt; limitRes = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        limitRes.put(MEMORY, new Quantity(String.format(&quot;%s%s&quot;, limitPodMem, MI)));</b>
+<b class="nc">&nbsp;        limitRes.put(CPU, new Quantity(String.valueOf(limitPodCpu)));</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; labelMap = k8STaskMainParameters.getLabelMap();</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; jobLabelMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        jobLabelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);</b>
+<b class="nc">&nbsp;        jobLabelMap.put(NAME_LABEL, k8sJobName);</b>
+<b class="nc">&nbsp;        jobLabelMap.putAll(labelMap);</b>
+&nbsp;
+<b class="nc">&nbsp;        Map&lt;String, String&gt; podLabelMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        podLabelMap.put(UNIQUE_LABEL_NAME, taskRequest.getTaskAppId());</b>
+<b class="nc">&nbsp;        podLabelMap.putAll(labelMap);</b>
+&nbsp;
+<b class="nc">&nbsp;        EnvVar taskInstanceIdVar = new EnvVar(TASK_INSTANCE_ID, taskInstanceId, null);</b>
+<b class="nc">&nbsp;        List&lt;EnvVar&gt; envVars = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        envVars.add(taskInstanceIdVar);</b>
+<b class="nc">&nbsp;        if (MapUtils.isNotEmpty(otherParams)) {</b>
+<b class="nc">&nbsp;            for (Map.Entry&lt;String, String&gt; entry : otherParams.entrySet()) {</b>
+<b class="nc">&nbsp;                String param = entry.getKey();</b>
+<b class="nc">&nbsp;                String paramValue = entry.getValue();</b>
+<b class="nc">&nbsp;                EnvVar envVar = new EnvVar(param, paramValue, null);</b>
+<b class="nc">&nbsp;                envVars.add(envVar);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        String commandString = k8STaskMainParameters.getCommand();</b>
+<b class="nc">&nbsp;        String argsString = k8STaskMainParameters.getArgs();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; commands = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            if (!StringUtils.isEmpty(commandString)) {</b>
+<b class="nc">&nbsp;                commands = yaml.load(commandString.trim());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!StringUtils.isEmpty(argsString)) {</b>
+<b class="nc">&nbsp;                args = yaml.load(argsString.trim());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Parse yaml-like commands and args failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        NodeSelectorTerm nodeSelectorTerm = new NodeSelectorTerm();</b>
+<b class="nc">&nbsp;        nodeSelectorTerm.setMatchExpressions(k8STaskMainParameters.getNodeSelectorRequirements());</b>
+&nbsp;
+<b class="nc">&nbsp;        Affinity affinity = k8STaskMainParameters.getNodeSelectorRequirements().size() == 0 ? null</b>
+&nbsp;                : new AffinityBuilder()
+<b class="nc">&nbsp;                        .withNewNodeAffinity()</b>
+<b class="nc">&nbsp;                        .withNewRequiredDuringSchedulingIgnoredDuringExecution()</b>
+<b class="nc">&nbsp;                        .addNewNodeSelectorTermLike(nodeSelectorTerm)</b>
+<b class="nc">&nbsp;                        .endNodeSelectorTerm()</b>
+<b class="nc">&nbsp;                        .endRequiredDuringSchedulingIgnoredDuringExecution()</b>
+<b class="nc">&nbsp;                        .endNodeAffinity().build();</b>
+&nbsp;
+<b class="nc">&nbsp;        job = new JobBuilder()</b>
+<b class="nc">&nbsp;                .withApiVersion(API_VERSION)</b>
+<b class="nc">&nbsp;                .withNewMetadata()</b>
+<b class="nc">&nbsp;                .withName(k8sJobName)</b>
+<b class="nc">&nbsp;                .withLabels(jobLabelMap)</b>
+<b class="nc">&nbsp;                .withNamespace(namespaceName)</b>
+<b class="nc">&nbsp;                .endMetadata()</b>
+<b class="nc">&nbsp;                .withNewSpec()</b>
+<b class="nc">&nbsp;                .withTtlSecondsAfterFinished(JOB_TTL_SECONDS)</b>
+<b class="nc">&nbsp;                .withNewTemplate()</b>
+<b class="nc">&nbsp;                .withNewMetadata()</b>
+<b class="nc">&nbsp;                .withLabels(podLabelMap)</b>
+<b class="nc">&nbsp;                .endMetadata()</b>
+<b class="nc">&nbsp;                .withNewSpec()</b>
+<b class="nc">&nbsp;                .addNewContainer()</b>
+<b class="nc">&nbsp;                .withName(k8sJobName)</b>
+<b class="nc">&nbsp;                .withImage(image)</b>
+<b class="nc">&nbsp;                .withCommand(commands.size() == 0 ? null : commands)</b>
+<b class="nc">&nbsp;                .withArgs(args.size() == 0 ? null : args)</b>
+<b class="nc">&nbsp;                .withImagePullPolicy(imagePullPolicy)</b>
+<b class="nc">&nbsp;                .withResources(new ResourceRequirements(limitRes, reqRes))</b>
+<b class="nc">&nbsp;                .withEnv(envVars)</b>
+<b class="nc">&nbsp;                .endContainer()</b>
+<b class="nc">&nbsp;                .withImagePullSecrets(</b>
+<b class="nc">&nbsp;                        StringUtils.isEmpty(pullSecret) ? null : singletonList(new LocalObjectReference(pullSecret)))</b>
+<b class="nc">&nbsp;                .withRestartPolicy(RESTART_POLICY)</b>
+<b class="nc">&nbsp;                .withAffinity(affinity)</b>
+<b class="nc">&nbsp;                .endSpec()</b>
+<b class="nc">&nbsp;                .endTemplate()</b>
+<b class="nc">&nbsp;                .withBackoffLimit(retryNum)</b>
+<b class="nc">&nbsp;                .endSpec()</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
+<b class="nc">&nbsp;        CountDownLatch countDownLatch = new CountDownLatch(1);</b>
+<b class="nc">&nbsp;        Watcher&lt;Job&gt; watcher = new Watcher&lt;Job&gt;() {</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void eventReceived(Action action, Job job) {
+&nbsp;                try {
+<b class="nc">&nbsp;                    LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),</b>
+<b class="nc">&nbsp;                            taskRequest.getTaskInstanceId());</b>
+<b class="nc">&nbsp;                    LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());</b>
+<b class="nc">&nbsp;                    log.info(&quot;event received : job:{} action:{}&quot;, job.getMetadata().getName(), action);</b>
+<b class="nc">&nbsp;                    if (action == Action.DELETED) {</b>
+<b class="nc">&nbsp;                        log.error(&quot;[K8sJobExecutor-{}] fail in k8s&quot;, job.getMetadata().getName());</b>
+<b class="nc">&nbsp;                        taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;                        countDownLatch.countDown();</b>
+<b class="nc">&nbsp;                    } else if (action != Action.ADDED) {</b>
+<b class="nc">&nbsp;                        int jobStatus = getK8sJobStatus(job);</b>
+<b class="nc">&nbsp;                        log.info(&quot;job {} status {}&quot;, job.getMetadata().getName(), jobStatus);</b>
+<b class="nc">&nbsp;                        if (jobStatus == TaskConstants.RUNNING_CODE) {</b>
+&nbsp;                            return;
+&nbsp;                        }
+<b class="nc">&nbsp;                        setTaskStatus(jobStatus, taskInstanceId, taskResponse);</b>
+<b class="nc">&nbsp;                        countDownLatch.countDown();</b>
+&nbsp;                    }
+&nbsp;                } finally {
+<b class="nc">&nbsp;                    LogUtils.removeTaskInstanceLogFullPathMDC();</b>
+<b class="nc">&nbsp;                    LogUtils.removeWorkflowAndTaskInstanceIdMDC();</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void onClose(WatcherException e) {
+<b class="nc">&nbsp;                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),</b>
+<b class="nc">&nbsp;                        taskRequest.getTaskInstanceId());</b>
+<b class="nc">&nbsp;                log.error(&quot;[K8sJobExecutor-{}] fail in k8s: {}&quot;, job.getMetadata().getName(), e.getMessage());</b>
+<b class="nc">&nbsp;                taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;                countDownLatch.countDown();</b>
+<b class="nc">&nbsp;                LogUtils.removeWorkflowAndTaskInstanceIdMDC();</b>
+&nbsp;            }
+&nbsp;        };
+<b class="nc">&nbsp;        try (Watch watch = k8sUtils.createBatchJobWatcher(job.getMetadata().getName(), watcher)) {</b>
+<b class="nc">&nbsp;            boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED</b>
+<b class="nc">&nbsp;                    || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;</b>
+<b class="nc">&nbsp;            if (timeoutFlag) {</b>
+<b class="nc">&nbsp;                Boolean timeout = !(countDownLatch.await(taskRequest.getTaskTimeout(), TimeUnit.SECONDS));</b>
+<b class="nc">&nbsp;                waitTimeout(timeout);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                countDownLatch.await();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;job failed in k8s: {}&quot;, e.getMessage(), e);</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;job failed in k8s: {}&quot;, e.getMessage(), e);</b>
+<b class="nc">&nbsp;            taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void parsePodLogOutput() {
+<b class="nc">&nbsp;        ExecutorService collectPodLogExecutorService = ThreadUtils</b>
+<b class="nc">&nbsp;                .newSingleDaemonScheduledExecutorService(&quot;CollectPodLogOutput-thread-&quot; + taskRequest.getTaskName());</b>
+&nbsp;
+<b class="nc">&nbsp;        String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());</b>
+<b class="nc">&nbsp;        String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        String containerName = String.format(&quot;%s-%s&quot;, taskName, taskInstanceId);</b>
+<b class="nc">&nbsp;        podLogOutputFuture = collectPodLogExecutorService.submit(() -&gt; {</b>
+<b class="nc">&nbsp;            TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();</b>
+<b class="nc">&nbsp;            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),</b>
+<b class="nc">&nbsp;                    taskRequest.getTaskInstanceId());</b>
+<b class="nc">&nbsp;            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());</b>
+<b class="nc">&nbsp;            try (</b>
+<b class="nc">&nbsp;                    LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),</b>
+<b class="nc">&nbsp;                            taskRequest.getTaskAppId(), containerName)) {</b>
+&nbsp;                String line;
+<b class="nc">&nbsp;                try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {</b>
+<b class="nc">&nbsp;                    while ((line = reader.readLine()) != null) {</b>
+<b class="nc">&nbsp;                        log.info(&quot;[K8S-pod-log] {}&quot;, line);</b>
+<b class="nc">&nbsp;                        taskOutputParameterParser.appendParseLog(line);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                LogUtils.removeTaskInstanceLogFullPathMDC();</b>
+<b class="nc">&nbsp;                podLogOutputIsFinished = true;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();</b>
+&nbsp;        });
+&nbsp;
+<b class="nc">&nbsp;        collectPodLogExecutorService.shutdown();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public TaskResponse run(String k8sParameterStr) throws Exception {
+<b class="nc">&nbsp;        TaskResponse result = new TaskResponse();</b>
+<b class="nc">&nbsp;        int taskInstanceId = taskRequest.getTaskInstanceId();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (StringUtils.isEmpty(k8sParameterStr)) {</b>
+<b class="nc">&nbsp;                return result;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();</b>
+<b class="nc">&nbsp;            String configYaml = k8sTaskExecutionContext.getConfigYaml();</b>
+<b class="nc">&nbsp;            k8sUtils.buildClient(configYaml);</b>
+<b class="nc">&nbsp;            submitJob2k8s(k8sParameterStr);</b>
+<b class="nc">&nbsp;            parsePodLogOutput();</b>
+<b class="nc">&nbsp;            registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (podLogOutputFuture != null) {</b>
+&nbsp;                try {
+&nbsp;                    // Wait kubernetes pod log collection finished
+<b class="nc">&nbsp;                    podLogOutputFuture.get();</b>
+<b class="nc">&nbsp;                } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;                    log.error(&quot;Handle pod log error&quot;, e);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            cancelApplication(k8sParameterStr);</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            result.setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw e;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            ProcessUtils.removeK8sClientCache(taskRequest.getTaskAppId());</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelApplication(String k8sParameterStr) {
+<b class="nc">&nbsp;        if (job != null) {</b>
+<b class="nc">&nbsp;            stopJobOnK8s(k8sParameterStr);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void submitJob2k8s(String k8sParameterStr) {
+<b class="nc">&nbsp;        int taskInstanceId = taskRequest.getTaskInstanceId();</b>
+<b class="nc">&nbsp;        String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);</b>
+<b class="nc">&nbsp;        K8sTaskMainParameters k8STaskMainParameters =</b>
+<b class="nc">&nbsp;                JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            log.info(&quot;[K8sJobExecutor-{}-{}] start to submit job&quot;, taskName, taskInstanceId);</b>
+<b class="nc">&nbsp;            buildK8sJob(k8STaskMainParameters);</b>
+<b class="nc">&nbsp;            stopJobOnK8s(k8sParameterStr);</b>
+<b class="nc">&nbsp;            String namespaceName = k8STaskMainParameters.getNamespaceName();</b>
+<b class="nc">&nbsp;            k8sUtils.createJob(namespaceName, job);</b>
+<b class="nc">&nbsp;            log.info(&quot;[K8sJobExecutor-{}-{}] submitted job successfully&quot;, taskName, taskInstanceId);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;[K8sJobExecutor-{}-{}] fail to submit job&quot;, taskName, taskInstanceId);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;K8sJobExecutor fail to submit job&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void stopJobOnK8s(String k8sParameterStr) {
+<b class="nc">&nbsp;        K8sTaskMainParameters k8STaskMainParameters =</b>
+<b class="nc">&nbsp;                JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);</b>
+<b class="nc">&nbsp;        String namespaceName = k8STaskMainParameters.getNamespaceName();</b>
+<b class="nc">&nbsp;        String jobName = job.getMetadata().getName();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (Boolean.TRUE.equals(k8sUtils.jobExist(jobName, namespaceName))) {</b>
+<b class="nc">&nbsp;                k8sUtils.deleteJob(jobName, namespaceName);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;[K8sJobExecutor-{}] fail to stop job&quot;, jobName);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;K8sJobExecutor fail to stop job&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getK8sJobStatus(Job job) {
+<b class="nc">&nbsp;        JobStatus jobStatus = job.getStatus();</b>
+<b class="nc">&nbsp;        if (jobStatus.getSucceeded() != null &amp;&amp; jobStatus.getSucceeded() == 1) {</b>
+<b class="nc">&nbsp;            return EXIT_CODE_SUCCESS;</b>
+<b class="nc">&nbsp;        } else if (jobStatus.getFailed() != null &amp;&amp; jobStatus.getFailed() == 1) {</b>
+<b class="nc">&nbsp;            return EXIT_CODE_FAILURE;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return TaskConstants.RUNNING_CODE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
+<b class="nc">&nbsp;        if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {</b>
+<b class="nc">&nbsp;            if (jobStatus == EXIT_CODE_SUCCESS) {</b>
+<b class="nc">&nbsp;                log.info(&quot;[K8sJobExecutor-{}] succeed in k8s&quot;, job.getMetadata().getName());</b>
+<b class="nc">&nbsp;                taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.error(&quot;[K8sJobExecutor-{}] fail in k8s&quot;, job.getMetadata().getName());</b>
+<b class="nc">&nbsp;                taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public Job getJob() {
+<b class="nc">&nbsp;        return job;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJob(Job job) {
+<b class="nc">&nbsp;        this.job = job;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

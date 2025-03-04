@@ -1,0 +1,178 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IJdbcRegistryServer</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.registry.jdbc.server</a>
+</div>
+
+<h1>Coverage Summary for Class: IJdbcRegistryServer (org.apache.dolphinscheduler.plugin.registry.jdbc.server)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">IJdbcRegistryServer</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.plugin.registry.jdbc.client.IJdbcRegistryClient;
+&nbsp;import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
+&nbsp;import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;/**
+&nbsp; * The JdbcRegistryServer is represent the server side of the jdbc registry, it can be thought as db server.
+&nbsp; */
+&nbsp;public interface IJdbcRegistryServer extends AutoCloseable {
+&nbsp;
+&nbsp;    void start();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Register a client to the server, once the client connect to the server then the server will refresh the client&#39;s term interval.
+&nbsp;     */
+&nbsp;    void registerClient(IJdbcRegistryClient jdbcRegistryClient);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deregister a client to the server, once the client id deregister, then the server will deleted the data related to the client and stop refresh the client&#39;s term.
+&nbsp;     */
+&nbsp;    void deregisterClient(IJdbcRegistryClient jdbcRegistryClient);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the {@link JdbcRegistryServerState}
+&nbsp;     */
+&nbsp;    JdbcRegistryServerState getServerState();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subscribe the jdbc registry connection state change
+&nbsp;     */
+&nbsp;    void subscribeConnectionStateChange(ConnectionStateListener connectionStateListener);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Subscribe the {@link org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryData} change.
+&nbsp;     */
+&nbsp;    void subscribeJdbcRegistryDataChange(JdbcRegistryDataChangeListener jdbcRegistryDataChangeListener);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check the jdbc registry data key is exist or not.
+&nbsp;     */
+&nbsp;    boolean existJdbcRegistryDataKey(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the {@link JdbcRegistryDataDTO} by key.
+&nbsp;     */
+&nbsp;    Optional&lt;JdbcRegistryDataDTO&gt; getJdbcRegistryDataByKey(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * List all the {@link JdbcRegistryDataDTO} children by key.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * e.g. key = &quot;/dolphinscheduler/master&quot;, and data exist in db is &quot;/dolphinscheduler/master/master1&quot;, &quot;/dolphinscheduler/master/master2&quot;
+&nbsp;     * &lt;p&gt;
+&nbsp;     * then the return value will be [&quot;master1&quot;, &quot;master2&quot;]
+&nbsp;     */
+&nbsp;    List&lt;JdbcRegistryDataDTO&gt; listJdbcRegistryDataChildren(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Put the {@link JdbcRegistryDataDTO} to the jdbc registry server.
+&nbsp;     * &lt;p&gt;
+&nbsp;     * If the key is already exist, then update the {@link JdbcRegistryDataDTO}. If the key is not exist, then insert a new {@link JdbcRegistryDataDTO}.
+&nbsp;     */
+&nbsp;    void putJdbcRegistryData(Long clientId, String key, String value, DataType dataType);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete the {@link JdbcRegistryDataDTO} by key.
+&nbsp;     */
+&nbsp;    void deleteJdbcRegistryDataByKey(String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Acquire the jdbc registry lock by key. this is a blocking method. if you want to stop the blocking, you can use interrupt the thread.
+&nbsp;     */
+&nbsp;    void acquireJdbcRegistryLock(Long clientId, String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Acquire the jdbc registry lock by key until timeout.
+&nbsp;     */
+&nbsp;    boolean acquireJdbcRegistryLock(Long clientId, String key, long timeout);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Release the jdbc registry lock by key, if the lockKey is not exist will do nothing.
+&nbsp;     */
+&nbsp;    void releaseJdbcRegistryLock(Long clientId, String key);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Close the server, once the server been closed, it cannot work anymore.
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    void close();
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

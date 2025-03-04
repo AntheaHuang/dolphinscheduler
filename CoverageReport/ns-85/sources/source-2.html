@@ -1,0 +1,588 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DinkyTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.dinky</a>
+</div>
+
+<h1>Coverage Summary for Class: DinkyTask (org.apache.dolphinscheduler.plugin.task.dinky)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DinkyTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/27)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/98)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/229)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.dinky;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.http.HttpResponse;
+&nbsp;import org.apache.http.HttpStatus;
+&nbsp;import org.apache.http.client.HttpClient;
+&nbsp;import org.apache.http.client.methods.HttpGet;
+&nbsp;import org.apache.http.client.methods.HttpPost;
+&nbsp;import org.apache.http.client.utils.URIBuilder;
+&nbsp;import org.apache.http.entity.StringEntity;
+&nbsp;import org.apache.http.impl.client.HttpClientBuilder;
+&nbsp;import org.apache.http.util.EntityUtils;
+&nbsp;
+&nbsp;import java.net.URI;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.core.JsonProcessingException;
+&nbsp;import com.fasterxml.jackson.databind.JsonNode;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;import com.fasterxml.jackson.databind.node.MissingNode;
+&nbsp;import com.fasterxml.jackson.databind.node.NullNode;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class DinkyTask extends AbstractRemoteTask {
+&nbsp;
+&nbsp;    private final TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    private DinkyParameters dinkyParameters;
+&nbsp;    private String jobInstanceId;
+&nbsp;    private boolean status;
+&nbsp;    private String dinkyVersion;
+&nbsp;
+&nbsp;    protected DinkyTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getApplicationIds() throws TaskException {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+<b class="nc">&nbsp;        final String taskParams = taskExecutionContext.getTaskParams();</b>
+<b class="nc">&nbsp;        this.dinkyParameters = JSONUtils.parseObject(taskParams, DinkyParameters.class);</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize dinky task params: {}&quot;, JSONUtils.toPrettyJsonString(dinkyParameters));</b>
+<b class="nc">&nbsp;        if (this.dinkyParameters == null || !this.dinkyParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new DinkyTaskException(&quot;dinky task params is not valid&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void handle(TaskCallBack taskCallBack) throws TaskException {
+&nbsp;        // Get dinky version
+<b class="nc">&nbsp;        dinkyVersion = getDinkyVersion(this.dinkyParameters.getAddress());</b>
+<b class="nc">&nbsp;        super.handle(taskCallBack);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void submitApplication() throws TaskException {
+<b class="nc">&nbsp;        if (dinkyVersion.startsWith(&quot;0&quot;)) {</b>
+<b class="nc">&nbsp;            submitApplicationV0();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            submitApplicationV1();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void trackApplicationStatus() throws TaskException {
+<b class="nc">&nbsp;        if (dinkyVersion.startsWith(&quot;0&quot;)) {</b>
+<b class="nc">&nbsp;            trackApplicationStatusV0();</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            trackApplicationStatusV1();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void submitApplicationV0() {
+&nbsp;        try {
+<b class="nc">&nbsp;            String address = this.dinkyParameters.getAddress();</b>
+<b class="nc">&nbsp;            String taskId = this.dinkyParameters.getTaskId();</b>
+<b class="nc">&nbsp;            boolean isOnline = this.dinkyParameters.isOnline();</b>
+&nbsp;            JsonNode result;
+<b class="nc">&nbsp;            String apiResultDatasKey = DinkyTaskConstants.API_RESULT_DATAS;</b>
+<b class="nc">&nbsp;            if (isOnline) {</b>
+&nbsp;                // Online dinky-0.6.5 task, and only one job is allowed to execute
+<b class="nc">&nbsp;                result = onlineTaskV0(address, taskId);</b>
+&nbsp;            } else {
+&nbsp;                // Submit dinky-0.6.5 task
+<b class="nc">&nbsp;                result = submitTaskV0(address, taskId);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (checkResultV0(result)) {</b>
+<b class="nc">&nbsp;                status = result.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean();</b>
+<b class="nc">&nbsp;                if (result.get(apiResultDatasKey).has(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID)</b>
+<b class="nc">&nbsp;                        &amp;&amp; !(result.get(apiResultDatasKey)</b>
+<b class="nc">&nbsp;                                .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {</b>
+<b class="nc">&nbsp;                    jobInstanceId =</b>
+<b class="nc">&nbsp;                            result.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception ex) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void submitApplicationV1() {
+&nbsp;        try {
+<b class="nc">&nbsp;            String address = this.dinkyParameters.getAddress();</b>
+<b class="nc">&nbsp;            String taskId = this.dinkyParameters.getTaskId();</b>
+<b class="nc">&nbsp;            boolean isOnline = this.dinkyParameters.isOnline();</b>
+&nbsp;            JsonNode result;
+<b class="nc">&nbsp;            String apiResultDataKey = DinkyTaskConstants.API_RESULT_DATA;</b>
+&nbsp;            // Submit dinky-1.0.0 task
+<b class="nc">&nbsp;            result = submitTaskV1(address, taskId, isOnline, generateVariables());</b>
+<b class="nc">&nbsp;            if (checkResultV1(result)) {</b>
+<b class="nc">&nbsp;                status = result.get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean();</b>
+<b class="nc">&nbsp;                if (result.get(apiResultDataKey).has(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID)</b>
+<b class="nc">&nbsp;                        &amp;&amp; !(result.get(apiResultDataKey)</b>
+<b class="nc">&nbsp;                                .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {</b>
+<b class="nc">&nbsp;                    jobInstanceId =</b>
+<b class="nc">&nbsp;                            result.get(apiResultDataKey).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG + &quot;{}&quot;, result.get(DinkyTaskConstants.API_RESULT_MSG));</b>
+<b class="nc">&nbsp;                setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;                throw new TaskException(</b>
+<b class="nc">&nbsp;                        DinkyTaskConstants.SUBMIT_FAILED_MSG + result.get(DinkyTaskConstants.API_RESULT_MSG));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception ex) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void trackApplicationStatusV0() throws TaskException {
+&nbsp;        try {
+<b class="nc">&nbsp;            String address = this.dinkyParameters.getAddress();</b>
+<b class="nc">&nbsp;            String taskId = this.dinkyParameters.getTaskId();</b>
+<b class="nc">&nbsp;            if (status &amp;&amp; jobInstanceId == null) {</b>
+&nbsp;                // Use address-taskId as app id
+<b class="nc">&nbsp;                setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));</b>
+<b class="nc">&nbsp;                setExitStatusCode(mapStatusToExitCode(true));</b>
+<b class="nc">&nbsp;                log.info(&quot;Dinky common sql task finished.&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            String apiResultDatasKey = DinkyTaskConstants.API_RESULT_DATAS;</b>
+<b class="nc">&nbsp;            boolean finishFlag = false;</b>
+<b class="nc">&nbsp;            while (!finishFlag) {</b>
+<b class="nc">&nbsp;                JsonNode jobInstanceInfoResult = getJobInstanceInfo(address, jobInstanceId);</b>
+<b class="nc">&nbsp;                if (!checkResultV0(jobInstanceInfoResult)) {</b>
+&nbsp;                    break;
+&nbsp;                }
+<b class="nc">&nbsp;                String jobInstanceStatus =</b>
+<b class="nc">&nbsp;                        jobInstanceInfoResult.get(apiResultDatasKey).get(&quot;status&quot;).asText();</b>
+<b class="nc">&nbsp;                switch (jobInstanceStatus) {</b>
+&nbsp;                    case DinkyTaskConstants.STATUS_FINISHED:
+<b class="nc">&nbsp;                        final int exitStatusCode = mapStatusToExitCode(status);</b>
+&nbsp;                        // Use address-taskId as app id
+<b class="nc">&nbsp;                        setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));</b>
+<b class="nc">&nbsp;                        setExitStatusCode(exitStatusCode);</b>
+<b class="nc">&nbsp;                        log.info(&quot;dinky task finished with results: {}&quot;,</b>
+<b class="nc">&nbsp;                                jobInstanceInfoResult.get(apiResultDatasKey));</b>
+<b class="nc">&nbsp;                        finishFlag = true;</b>
+&nbsp;                        break;
+&nbsp;                    case DinkyTaskConstants.STATUS_FAILED:
+&nbsp;                    case DinkyTaskConstants.STATUS_CANCELED:
+&nbsp;                    case DinkyTaskConstants.STATUS_UNKNOWN:
+<b class="nc">&nbsp;                        errorHandle(</b>
+<b class="nc">&nbsp;                                jobInstanceInfoResult.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_ERROR)</b>
+<b class="nc">&nbsp;                                        .asText());</b>
+<b class="nc">&nbsp;                        finishFlag = true;</b>
+&nbsp;                        break;
+&nbsp;                    default:
+<b class="nc">&nbsp;                        Thread.sleep(DinkyTaskConstants.SLEEP_MILLIS);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(DinkyTaskConstants.TRACK_FAILED_MSG, ex);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(DinkyTaskConstants.TRACK_FAILED_MSG, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public void trackApplicationStatusV1() throws TaskException {
+&nbsp;        try {
+&nbsp;
+<b class="nc">&nbsp;            String address = this.dinkyParameters.getAddress();</b>
+<b class="nc">&nbsp;            String taskId = this.dinkyParameters.getTaskId();</b>
+<b class="nc">&nbsp;            if (status &amp;&amp; jobInstanceId == null) {</b>
+&nbsp;                // Use address-taskId as app id
+<b class="nc">&nbsp;                setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));</b>
+<b class="nc">&nbsp;                setExitStatusCode(mapStatusToExitCode(true));</b>
+<b class="nc">&nbsp;                log.info(&quot;Dinky common sql task finished.&quot;);</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            String apiResultDataKey = DinkyTaskConstants.API_RESULT_DATA;</b>
+<b class="nc">&nbsp;            boolean finishFlag = false;</b>
+<b class="nc">&nbsp;            while (!finishFlag) {</b>
+<b class="nc">&nbsp;                JsonNode jobInstanceInfoResult = getJobInstanceInfo(address, jobInstanceId);</b>
+<b class="nc">&nbsp;                if (!checkResultV1(jobInstanceInfoResult)) {</b>
+&nbsp;                    break;
+&nbsp;                }
+<b class="nc">&nbsp;                String jobInstanceStatus =</b>
+<b class="nc">&nbsp;                        jobInstanceInfoResult.get(apiResultDataKey).get(&quot;status&quot;).asText();</b>
+<b class="nc">&nbsp;                switch (jobInstanceStatus) {</b>
+&nbsp;                    case DinkyTaskConstants.STATUS_FINISHED:
+<b class="nc">&nbsp;                        final int exitStatusCode = mapStatusToExitCode(status);</b>
+&nbsp;                        // Use address-taskId as app id
+<b class="nc">&nbsp;                        setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));</b>
+<b class="nc">&nbsp;                        setExitStatusCode(exitStatusCode);</b>
+<b class="nc">&nbsp;                        log.info(&quot;dinky task finished with results: {}&quot;,</b>
+<b class="nc">&nbsp;                                jobInstanceInfoResult.get(apiResultDataKey));</b>
+<b class="nc">&nbsp;                        finishFlag = true;</b>
+&nbsp;                        break;
+&nbsp;                    case DinkyTaskConstants.STATUS_FAILED:
+&nbsp;                    case DinkyTaskConstants.STATUS_CANCELED:
+&nbsp;                    case DinkyTaskConstants.STATUS_UNKNOWN:
+<b class="nc">&nbsp;                        errorHandle(jobInstanceInfoResult.get(apiResultDataKey).get(DinkyTaskConstants.API_RESULT_ERROR)</b>
+<b class="nc">&nbsp;                                .asText());</b>
+<b class="nc">&nbsp;                        finishFlag = true;</b>
+&nbsp;                        break;
+&nbsp;                    default:
+<b class="nc">&nbsp;                        Thread.sleep(DinkyTaskConstants.SLEEP_MILLIS);</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException ex) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(DinkyTaskConstants.TRACK_FAILED_MSG, ex);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(DinkyTaskConstants.TRACK_FAILED_MSG, ex);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;    /**
+&nbsp;     * map dinky task status to exitStatusCode
+&nbsp;     *
+&nbsp;     * @param status dinky job status
+&nbsp;     * @return exitStatusCode
+&nbsp;     */
+&nbsp;    private int mapStatusToExitCode(boolean status) {
+<b class="nc">&nbsp;        if (status) {</b>
+<b class="nc">&nbsp;            return TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return TaskConstants.EXIT_CODE_FAILURE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean checkResultV0(JsonNode result) {
+<b class="nc">&nbsp;        boolean isCorrect = true;</b>
+<b class="nc">&nbsp;        if (result instanceof MissingNode || result instanceof NullNode) {</b>
+<b class="nc">&nbsp;            errorHandle(DinkyTaskConstants.API_VERSION_ERROR_TIPS);</b>
+<b class="nc">&nbsp;            isCorrect = false;</b>
+<b class="nc">&nbsp;        } else if (result.get(DinkyTaskConstants.API_RESULT_CODE).asInt() == DinkyTaskConstants.API_ERROR) {</b>
+<b class="nc">&nbsp;            errorHandle(result.get(DinkyTaskConstants.API_RESULT_MSG));</b>
+<b class="nc">&nbsp;            isCorrect = false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return isCorrect;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean checkResultV1(JsonNode result) {
+<b class="nc">&nbsp;        boolean isCorrect = true;</b>
+<b class="nc">&nbsp;        if (result instanceof MissingNode || result instanceof NullNode) {</b>
+<b class="nc">&nbsp;            errorHandle(DinkyTaskConstants.API_VERSION_ERROR_TIPS);</b>
+<b class="nc">&nbsp;            isCorrect = false;</b>
+<b class="nc">&nbsp;        } else if (!result.get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean()) {</b>
+<b class="nc">&nbsp;            errorHandle(result.get(DinkyTaskConstants.API_RESULT_MSG));</b>
+<b class="nc">&nbsp;            isCorrect = false;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return isCorrect;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void errorHandle(Object msg) {
+<b class="nc">&nbsp;        setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;        log.error(&quot;dinky task submit failed with error: {}&quot;, msg);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return dinkyParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelApplication() throws TaskException {
+<b class="nc">&nbsp;        String address = this.dinkyParameters.getAddress();</b>
+<b class="nc">&nbsp;        String taskId = this.dinkyParameters.getTaskId();</b>
+<b class="nc">&nbsp;        log.info(&quot;trying terminate dinky task, taskId: {}, address: {}, taskId: {}&quot;,</b>
+<b class="nc">&nbsp;                this.taskExecutionContext.getTaskInstanceId(),</b>
+&nbsp;                address,
+&nbsp;                taskId);
+<b class="nc">&nbsp;        cancelTask(address, taskId);</b>
+<b class="nc">&nbsp;        log.warn(&quot;dinky task terminated, taskId: {}, address: {}, taskId: {}&quot;,</b>
+<b class="nc">&nbsp;                this.taskExecutionContext.getTaskInstanceId(),</b>
+&nbsp;                address,
+&nbsp;                taskId);
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt; generateVariables() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; variables = new ConcurrentHashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;Property&gt; propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);</b>
+<b class="nc">&nbsp;        if (propertyList != null &amp;&amp; !propertyList.isEmpty()) {</b>
+<b class="nc">&nbsp;            for (Property property : propertyList) {</b>
+<b class="nc">&nbsp;                variables.put(property.getProp(), property.getValue());</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        List&lt;Property&gt; localParams = this.dinkyParameters.getLocalParams();</b>
+<b class="nc">&nbsp;        Map&lt;String, Property&gt; prepareParamsMap = taskExecutionContext.getPrepareParamsMap();</b>
+<b class="nc">&nbsp;        if (localParams == null || localParams.isEmpty()) {</b>
+<b class="nc">&nbsp;            return variables;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        Map&lt;String, String&gt; convertMap = ParameterUtils.convert(prepareParamsMap);</b>
+<b class="nc">&nbsp;        for (Property property : localParams) {</b>
+<b class="nc">&nbsp;            String propertyValue = property.getValue();</b>
+<b class="nc">&nbsp;            String value = PlaceholderUtils.replacePlaceholders(propertyValue, convertMap, true);</b>
+<b class="nc">&nbsp;            variables.put(property.getProp(), value);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return variables;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getDinkyVersion(String address) {
+<b class="nc">&nbsp;        JsonNode versionJsonNode = parse(doGet(address + DinkyTaskConstants.GET_VERSION, new HashMap&lt;&gt;()));</b>
+<b class="nc">&nbsp;        if (versionJsonNode instanceof MissingNode || versionJsonNode == null</b>
+<b class="nc">&nbsp;                || versionJsonNode.get(DinkyTaskConstants.API_RESULT_CODE).asInt() == DinkyTaskConstants.API_ERROR) {</b>
+<b class="nc">&nbsp;            return &quot;0&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return versionJsonNode.get(DinkyTaskConstants.API_RESULT_DATA).asText();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonNode submitTaskV0(String address, String taskId) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_TASK_ID, taskId);</b>
+<b class="nc">&nbsp;        return parse(doGet(address + DinkyTaskConstants.SUBMIT_TASK, params));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonNode onlineTaskV0(String address, String taskId) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_TASK_ID, taskId);</b>
+<b class="nc">&nbsp;        return parse(doGet(address + DinkyTaskConstants.ONLINE_TASK, params));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonNode submitTaskV1(String address, String taskId, boolean isOnline, Map&lt;String, String&gt; variables) {
+<b class="nc">&nbsp;        Map&lt;String, Object&gt; params = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_TASK_ID, taskId);</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_TASK_IS_ONLINE, isOnline);</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_TASK_VARIABLES, variables);</b>
+<b class="nc">&nbsp;        return parse(sendJsonStr(address + DinkyTaskConstants.SUBMIT_TASK, JSONUtils.toJsonString(params)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonNode cancelTask(String address, String taskId) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_JSON_TASK_ID, taskId);</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_SAVEPOINT_TYPE, DinkyTaskConstants.SAVEPOINT_CANCEL);</b>
+<b class="nc">&nbsp;        return parse(sendJsonStr(address + DinkyTaskConstants.SAVEPOINT_TASK, JSONUtils.toJsonString(params)));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonNode getJobInstanceInfo(String address, String taskId) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; params = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        params.put(DinkyTaskConstants.PARAM_JOB_INSTANCE_ID, taskId);</b>
+<b class="nc">&nbsp;        return parse(doGet(address + DinkyTaskConstants.GET_JOB_INFO, params));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private JsonNode parse(String res) {
+<b class="nc">&nbsp;        ObjectMapper mapper = new ObjectMapper();</b>
+<b class="nc">&nbsp;        JsonNode result = null;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            result = mapper.readTree(res);</b>
+<b class="nc">&nbsp;        } catch (JsonProcessingException e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;dinky task submit failed with error&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String doGet(String url, Map&lt;String, String&gt; params) {
+<b class="nc">&nbsp;        String result = &quot;&quot;;</b>
+<b class="nc">&nbsp;        HttpClient httpClient = HttpClientBuilder.create().build();</b>
+<b class="nc">&nbsp;        HttpGet httpGet = null;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            URIBuilder uriBuilder = new URIBuilder(url);</b>
+<b class="nc">&nbsp;            if (null != params &amp;&amp; !params.isEmpty()) {</b>
+<b class="nc">&nbsp;                for (Map.Entry&lt;String, String&gt; entry : params.entrySet()) {</b>
+<b class="nc">&nbsp;                    uriBuilder.addParameter(entry.getKey(), entry.getValue());</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            URI uri = uriBuilder.build();</b>
+<b class="nc">&nbsp;            httpGet = new HttpGet(uri);</b>
+<b class="nc">&nbsp;            log.info(&quot;access url: {}&quot;, uri);</b>
+<b class="nc">&nbsp;            HttpResponse response = httpClient.execute(httpGet);</b>
+<b class="nc">&nbsp;            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {</b>
+<b class="nc">&nbsp;                result = EntityUtils.toString(response.getEntity());</b>
+<b class="nc">&nbsp;                log.info(&quot;dinky task succeed with results: {}&quot;, result);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.error(&quot;dinky task terminated,response: {}&quot;, response);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IllegalArgumentException ie) {</b>
+<b class="nc">&nbsp;            log.error(&quot;dinky task terminated: {}&quot;, ie.getMessage());</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;dinky task terminated: &quot;, e);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if (null != httpGet) {</b>
+<b class="nc">&nbsp;                httpGet.releaseConnection();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String sendJsonStr(String url, String params) {
+<b class="nc">&nbsp;        String result = &quot;&quot;;</b>
+<b class="nc">&nbsp;        HttpClient httpClient = HttpClientBuilder.create().build();</b>
+<b class="nc">&nbsp;        HttpPost httpPost = new HttpPost(url);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            httpPost.addHeader(&quot;Content-type&quot;, &quot;application/json; charset=utf-8&quot;);</b>
+<b class="nc">&nbsp;            httpPost.setHeader(&quot;Accept&quot;, &quot;application/json&quot;);</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotBlank(params)) {</b>
+<b class="nc">&nbsp;                httpPost.setEntity(new StringEntity(params, StandardCharsets.UTF_8));</b>
+&nbsp;            }
+<b class="nc">&nbsp;            HttpResponse response = httpClient.execute(httpPost);</b>
+<b class="nc">&nbsp;            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {</b>
+<b class="nc">&nbsp;                result = EntityUtils.toString(response.getEntity());</b>
+<b class="nc">&nbsp;                log.info(&quot;dinky task succeed with results: {}&quot;, result);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.error(&quot;dinky task terminated,response: {}&quot;, response);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (IllegalArgumentException ie) {</b>
+<b class="nc">&nbsp;            log.error(&quot;dinky task terminated: {}&quot;, ie.getMessage());</b>
+<b class="nc">&nbsp;        } catch (Exception he) {</b>
+<b class="nc">&nbsp;            log.error(&quot;dinky task terminated: &quot;, he);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

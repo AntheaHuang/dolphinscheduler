@@ -1,0 +1,467 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > S3StorageOperator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.storage.s3</a>
+</div>
+
+<h1>Coverage Summary for Class: S3StorageOperator (org.apache.dolphinscheduler.plugin.storage.s3)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">S3StorageOperator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/161)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.storage.s3;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.authentication.aws.AmazonS3ClientFactory;
+&nbsp;import org.apache.dolphinscheduler.common.utils.FileUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
+&nbsp;import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
+&nbsp;import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
+&nbsp;import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+&nbsp;import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.ByteArrayInputStream;
+&nbsp;import java.io.Closeable;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileOutputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.nio.file.FileAlreadyExistsException;
+&nbsp;import java.nio.file.Files;
+&nbsp;import java.nio.file.Paths;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.HashSet;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import lombok.SneakyThrows;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.amazonaws.services.s3.AmazonS3;
+&nbsp;import com.amazonaws.services.s3.model.ListObjectsV2Request;
+&nbsp;import com.amazonaws.services.s3.model.ListObjectsV2Result;
+&nbsp;import com.amazonaws.services.s3.model.ObjectMetadata;
+&nbsp;import com.amazonaws.services.s3.model.PutObjectRequest;
+&nbsp;import com.amazonaws.services.s3.model.S3Object;
+&nbsp;import com.amazonaws.services.s3.model.S3ObjectInputStream;
+&nbsp;import com.amazonaws.services.s3.model.S3ObjectSummary;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class S3StorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
+&nbsp;
+&nbsp;    private final String bucketName;
+&nbsp;
+&nbsp;    private final AmazonS3 s3Client;
+&nbsp;
+&nbsp;    public S3StorageOperator(S3StorageProperties s3StorageProperties) {
+<b class="nc">&nbsp;        super(s3StorageProperties.getResourceUploadPath());</b>
+<b class="nc">&nbsp;        bucketName = s3StorageProperties.getBucketName();</b>
+<b class="nc">&nbsp;        s3Client = AmazonS3ClientFactory.createAmazonS3Client(s3StorageProperties.getS3Configuration());</b>
+<b class="nc">&nbsp;        exceptionWhenBucketNameNotExists(bucketName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getStorageBaseDirectory() {
+&nbsp;        // All directory should end with File.separator
+<b class="nc">&nbsp;        if (resourceBaseAbsolutePath.startsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;{} -&gt; {} should not start with / in s3&quot;, StorageConstants.RESOURCE_UPLOAD_PATH,</b>
+&nbsp;                    resourceBaseAbsolutePath);
+<b class="nc">&nbsp;            return resourceBaseAbsolutePath.substring(1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return resourceBaseAbsolutePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+<b class="nc">&nbsp;        s3Client.shutdown();</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    @Override
+&nbsp;    public void createStorageDir(String directoryAbsolutePath) {
+<b class="nc">&nbsp;        directoryAbsolutePath = transformAbsolutePathToS3Key(directoryAbsolutePath);</b>
+<b class="nc">&nbsp;        if (s3Client.doesObjectExist(bucketName, directoryAbsolutePath)) {</b>
+<b class="nc">&nbsp;            throw new FileAlreadyExistsException(</b>
+&nbsp;                    &quot;The directory &quot; + directoryAbsolutePath + &quot; already exists in the bucket &quot; + bucketName);
+&nbsp;        }
+<b class="nc">&nbsp;        ObjectMetadata metadata = new ObjectMetadata();</b>
+<b class="nc">&nbsp;        metadata.setContentLength(0);</b>
+<b class="nc">&nbsp;        InputStream emptyContent = new ByteArrayInputStream(new byte[0]);</b>
+<b class="nc">&nbsp;        PutObjectRequest putObjectRequest =</b>
+&nbsp;                new PutObjectRequest(bucketName, directoryAbsolutePath, emptyContent, metadata);
+<b class="nc">&nbsp;        s3Client.putObject(putObjectRequest);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    @Override
+&nbsp;    public void download(String srcFilePath,
+&nbsp;                         String dstFilePath,
+&nbsp;                         boolean overwrite) {
+<b class="nc">&nbsp;        srcFilePath = transformAbsolutePathToS3Key(srcFilePath);</b>
+<b class="nc">&nbsp;        File dstFile = new File(dstFilePath);</b>
+<b class="nc">&nbsp;        if (dstFile.isDirectory()) {</b>
+<b class="nc">&nbsp;            Files.delete(dstFile.toPath());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        S3Object o = s3Client.getObject(bucketName, srcFilePath);</b>
+<b class="nc">&nbsp;        try (</b>
+<b class="nc">&nbsp;                S3ObjectInputStream s3is = o.getObjectContent();</b>
+<b class="nc">&nbsp;                FileOutputStream fos = new FileOutputStream(dstFilePath)) {</b>
+<b class="nc">&nbsp;            byte[] readBuf = new byte[1024];</b>
+&nbsp;            int readLen;
+<b class="nc">&nbsp;            while ((readLen = s3is.read(readBuf)) &gt; 0) {</b>
+<b class="nc">&nbsp;                fos.write(readBuf, 0, readLen);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean exists(String fullName) {
+<b class="nc">&nbsp;        fullName = transformAbsolutePathToS3Key(fullName);</b>
+<b class="nc">&nbsp;        return s3Client.doesObjectExist(bucketName, fullName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void delete(String absolutePath, boolean recursive) {
+<b class="nc">&nbsp;        absolutePath = transformAbsolutePathToS3Key(absolutePath);</b>
+<b class="nc">&nbsp;        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);</b>
+<b class="nc">&nbsp;        if (!resourceMetaData.isDirectory()) {</b>
+<b class="nc">&nbsp;            s3Client.deleteObject(bucketName, absolutePath);</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        if (recursive) {</b>
+<b class="nc">&nbsp;            List&lt;StorageEntity&gt; storageEntities = listStorageEntityRecursively(absolutePath);</b>
+<b class="nc">&nbsp;            for (StorageEntity storageEntity : storageEntities) {</b>
+<b class="nc">&nbsp;                s3Client.deleteObject(bucketName, transformAbsolutePathToS3Key(storageEntity.getFullName()));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        s3Client.deleteObject(bucketName, absolutePath);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) {
+<b class="nc">&nbsp;        srcPath = transformAbsolutePathToS3Key(srcPath);</b>
+<b class="nc">&nbsp;        dstPath = transformAbsolutePathToS3Key(dstPath);</b>
+&nbsp;
+<b class="nc">&nbsp;        ResourceMetadata resourceMetaData = getResourceMetaData(srcPath);</b>
+<b class="nc">&nbsp;        if (resourceMetaData.isDirectory()) {</b>
+<b class="nc">&nbsp;            throw new UnsupportedOperationException(&quot;S3 does not support copying directories.&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        s3Client.copyObject(bucketName, srcPath, bucketName, dstPath);</b>
+<b class="nc">&nbsp;        if (deleteSource) {</b>
+<b class="nc">&nbsp;            s3Client.deleteObject(bucketName, srcPath);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    @Override
+&nbsp;    public void upload(String srcFile, String dstPath, boolean deleteSource, boolean overwrite) {
+<b class="nc">&nbsp;        dstPath = transformAbsolutePathToS3Key(dstPath);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (s3Client.doesObjectExist(bucketName, dstPath)) {</b>
+<b class="nc">&nbsp;            if (overwrite) {</b>
+<b class="nc">&nbsp;                s3Client.deleteObject(bucketName, dstPath);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                throw new FileAlreadyExistsException(&quot;The file &quot; + dstPath + &quot; already exists in the bucket &quot;</b>
+&nbsp;                        + bucketName + &quot; and overwrite is not allowed.&quot;);
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        s3Client.putObject(bucketName, dstPath, new File(srcFile));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (deleteSource) {</b>
+<b class="nc">&nbsp;            Files.delete(Paths.get(srcFile));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    @SneakyThrows</b>
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; fetchFileContent(String filePath, int skipLineNums, int limit) {
+<b class="nc">&nbsp;        filePath = transformAbsolutePathToS3Key(filePath);</b>
+<b class="nc">&nbsp;        S3Object s3Object = s3Client.getObject(bucketName, filePath);</b>
+<b class="nc">&nbsp;        try (</b>
+<b class="nc">&nbsp;                InputStreamReader inputStreamReader = new InputStreamReader(s3Object.getObjectContent());</b>
+<b class="nc">&nbsp;                BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {</b>
+<b class="nc">&nbsp;            return bufferedReader.lines()</b>
+<b class="nc">&nbsp;                    .skip(skipLineNums)</b>
+<b class="nc">&nbsp;                    .limit(limit)</b>
+<b class="nc">&nbsp;                    .collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    void exceptionWhenBucketNameNotExists(String bucketName) {
+<b class="nc">&nbsp;        if (StringUtils.isBlank(bucketName)) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;resource.aws.s3.bucket.name is blank&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        boolean existsBucket = s3Client.doesBucketExistV2(bucketName);</b>
+<b class="nc">&nbsp;        if (!existsBucket) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(</b>
+&nbsp;                    &quot;bucketName: &quot; + bucketName + &quot; is not exists, you need to create them by yourself&quot;);
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;bucketName: {} has been found, the current regionName is {}&quot;, bucketName,</b>
+<b class="nc">&nbsp;                s3Client.getRegionName());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;StorageEntity&gt; listStorageEntity(String resourceAbsolutePath) {
+<b class="nc">&nbsp;        final String s3ResourceAbsolutePath = transformAbsolutePathToS3Key(resourceAbsolutePath);</b>
+<b class="nc">&nbsp;        ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request()</b>
+<b class="nc">&nbsp;                .withBucketName(bucketName)</b>
+<b class="nc">&nbsp;                .withDelimiter(&quot;/&quot;)</b>
+<b class="nc">&nbsp;                .withPrefix(s3ResourceAbsolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        ListObjectsV2Result listObjectsV2Result = s3Client.listObjectsV2(listObjectsV2Request);</b>
+<b class="nc">&nbsp;        List&lt;StorageEntity&gt; storageEntities = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(this::transformCommonPrefixToStorageEntity)</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList()));</b>
+<b class="nc">&nbsp;        storageEntities.addAll(</b>
+<b class="nc">&nbsp;                listObjectsV2Result.getObjectSummaries().stream()</b>
+<b class="nc">&nbsp;                        .filter(s3ObjectSummary -&gt; !s3ObjectSummary.getKey().equals(s3ResourceAbsolutePath))</b>
+<b class="nc">&nbsp;                        .map(this::transformS3ObjectToStorageEntity)</b>
+<b class="nc">&nbsp;                        .collect(Collectors.toList()));</b>
+&nbsp;
+<b class="nc">&nbsp;        return storageEntities;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;StorageEntity&gt; listFileStorageEntityRecursively(String resourceAbsolutePath) {
+<b class="nc">&nbsp;        return listStorageEntityRecursively(resourceAbsolutePath)</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(storageEntity -&gt; !storageEntity.isDirectory())</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public StorageEntity getStorageEntity(String resourceAbsolutePath) {
+<b class="nc">&nbsp;        resourceAbsolutePath = transformAbsolutePathToS3Key(resourceAbsolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        S3Object object = s3Client.getObject(bucketName, resourceAbsolutePath);</b>
+<b class="nc">&nbsp;        return transformS3ObjectToStorageEntity(object);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private List&lt;StorageEntity&gt; listStorageEntityRecursively(String resourceAbsolutePath) {
+<b class="nc">&nbsp;        resourceAbsolutePath = transformAbsolutePathToS3Key(resourceAbsolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        Set&lt;String&gt; visited = new HashSet&lt;&gt;();</b>
+<b class="nc">&nbsp;        List&lt;StorageEntity&gt; storageEntityList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        LinkedList&lt;String&gt; foldersToFetch = new LinkedList&lt;&gt;();</b>
+<b class="nc">&nbsp;        foldersToFetch.addLast(resourceAbsolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        while (!foldersToFetch.isEmpty()) {</b>
+<b class="nc">&nbsp;            String pathToExplore = foldersToFetch.pop();</b>
+<b class="nc">&nbsp;            visited.add(pathToExplore);</b>
+<b class="nc">&nbsp;            List&lt;StorageEntity&gt; tempList = listStorageEntity(pathToExplore);</b>
+<b class="nc">&nbsp;            for (StorageEntity temp : tempList) {</b>
+<b class="nc">&nbsp;                if (temp.isDirectory()) {</b>
+<b class="nc">&nbsp;                    if (visited.contains(temp.getFullName())) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    foldersToFetch.add(temp.getFullName());</b>
+&nbsp;                }
+&nbsp;            }
+<b class="nc">&nbsp;            storageEntityList.addAll(tempList);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return storageEntityList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StorageEntity transformS3ObjectToStorageEntity(S3Object object) {
+&nbsp;
+<b class="nc">&nbsp;        String s3Key = object.getKey();</b>
+<b class="nc">&nbsp;        String absolutePath = transformS3KeyToAbsolutePath(s3Key);</b>
+&nbsp;
+<b class="nc">&nbsp;        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        StorageEntity entity = new StorageEntity();</b>
+<b class="nc">&nbsp;        entity.setFileName(new File(absolutePath).getName());</b>
+<b class="nc">&nbsp;        entity.setFullName(absolutePath);</b>
+<b class="nc">&nbsp;        entity.setDirectory(resourceMetaData.isDirectory());</b>
+<b class="nc">&nbsp;        entity.setType(resourceMetaData.getResourceType());</b>
+<b class="nc">&nbsp;        entity.setSize(object.getObjectMetadata().getContentLength());</b>
+<b class="nc">&nbsp;        entity.setRelativePath(resourceMetaData.getResourceRelativePath());</b>
+<b class="nc">&nbsp;        entity.setCreateTime(object.getObjectMetadata().getLastModified());</b>
+<b class="nc">&nbsp;        entity.setUpdateTime(object.getObjectMetadata().getLastModified());</b>
+<b class="nc">&nbsp;        return entity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StorageEntity transformCommonPrefixToStorageEntity(String commonPrefix) {
+<b class="nc">&nbsp;        String absolutePath = transformS3KeyToAbsolutePath(commonPrefix);</b>
+&nbsp;
+<b class="nc">&nbsp;        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        StorageEntity entity = new StorageEntity();</b>
+<b class="nc">&nbsp;        entity.setFileName(new File(absolutePath).getName());</b>
+<b class="nc">&nbsp;        entity.setFullName(absolutePath);</b>
+<b class="nc">&nbsp;        entity.setDirectory(resourceMetaData.isDirectory());</b>
+<b class="nc">&nbsp;        entity.setType(resourceMetaData.getResourceType());</b>
+<b class="nc">&nbsp;        entity.setSize(0L);</b>
+<b class="nc">&nbsp;        entity.setCreateTime(null);</b>
+<b class="nc">&nbsp;        entity.setUpdateTime(null);</b>
+<b class="nc">&nbsp;        return entity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private StorageEntity transformS3ObjectToStorageEntity(S3ObjectSummary s3ObjectSummary) {
+<b class="nc">&nbsp;        String absolutePath = transformS3KeyToAbsolutePath(s3ObjectSummary.getKey());</b>
+&nbsp;
+<b class="nc">&nbsp;        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);</b>
+&nbsp;
+<b class="nc">&nbsp;        StorageEntity entity = new StorageEntity();</b>
+<b class="nc">&nbsp;        entity.setFileName(new File(absolutePath).getName());</b>
+<b class="nc">&nbsp;        entity.setFullName(absolutePath);</b>
+<b class="nc">&nbsp;        entity.setPfullName(resourceMetaData.getResourceParentAbsolutePath());</b>
+<b class="nc">&nbsp;        entity.setDirectory(resourceMetaData.isDirectory());</b>
+<b class="nc">&nbsp;        entity.setType(resourceMetaData.getResourceType());</b>
+<b class="nc">&nbsp;        entity.setSize(s3ObjectSummary.getSize());</b>
+<b class="nc">&nbsp;        entity.setCreateTime(s3ObjectSummary.getLastModified());</b>
+<b class="nc">&nbsp;        entity.setUpdateTime(s3ObjectSummary.getLastModified());</b>
+<b class="nc">&nbsp;        return entity;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String transformAbsolutePathToS3Key(String absolutePath) {
+<b class="nc">&nbsp;        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);</b>
+<b class="nc">&nbsp;        if (resourceMetaData.isDirectory()) {</b>
+<b class="nc">&nbsp;            return FileUtils.concatFilePath(absolutePath, &quot;/&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return absolutePath;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String transformS3KeyToAbsolutePath(String s3Key) {
+<b class="nc">&nbsp;        if (s3Key.endsWith(&quot;/&quot;)) {</b>
+<b class="nc">&nbsp;            return s3Key.substring(0, s3Key.length() - 1);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return s3Key;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

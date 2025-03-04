@@ -1,0 +1,263 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SQLServerDataSourceProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.datasource.sqlserver.param</a>
+</div>
+
+<h1>Coverage Summary for Class: SQLServerDataSourceProcessor (org.apache.dolphinscheduler.plugin.datasource.sqlserver.param)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SQLServerDataSourceProcessor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/50)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.constants.Constants;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
+&nbsp;import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.DbType;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.MapUtils;
+&nbsp;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.DriverManager;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import com.alibaba.druid.sql.parser.SQLParserUtils;
+&nbsp;import com.google.auto.service.AutoService;
+&nbsp;
+&nbsp;@AutoService(DataSourceProcessor.class)
+<b class="nc">&nbsp;public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
+<b class="nc">&nbsp;        return JSONUtils.parseObject(paramJson, SQLServerDataSourceParamDTO.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+<b class="nc">&nbsp;        SQLServerConnectionParam connectionParams = (SQLServerConnectionParam) createConnectionParams(connectionJson);</b>
+<b class="nc">&nbsp;        String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);</b>
+<b class="nc">&nbsp;        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        SQLServerDataSourceParamDTO sqlServerDatasourceParamDTO = new SQLServerDataSourceParamDTO();</b>
+<b class="nc">&nbsp;        sqlServerDatasourceParamDTO.setDatabase(connectionParams.getDatabase());</b>
+<b class="nc">&nbsp;        sqlServerDatasourceParamDTO.setUserName(connectionParams.getUser());</b>
+<b class="nc">&nbsp;        sqlServerDatasourceParamDTO.setOther(connectionParams.getOther());</b>
+<b class="nc">&nbsp;        sqlServerDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));</b>
+<b class="nc">&nbsp;        sqlServerDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);</b>
+<b class="nc">&nbsp;        return sqlServerDatasourceParamDTO;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
+<b class="nc">&nbsp;        SQLServerDataSourceParamDTO sqlServerParam = (SQLServerDataSourceParamDTO) datasourceParam;</b>
+<b class="nc">&nbsp;        String address =</b>
+<b class="nc">&nbsp;                String.format(&quot;%s%s:%s&quot;, DataSourceConstants.JDBC_SQLSERVER, sqlServerParam.getHost(),</b>
+<b class="nc">&nbsp;                        sqlServerParam.getPort());</b>
+<b class="nc">&nbsp;        String jdbcUrl = address + &quot;;databaseName=&quot; + sqlServerParam.getDatabase();</b>
+&nbsp;
+<b class="nc">&nbsp;        SQLServerConnectionParam sqlServerConnectionParam = new SQLServerConnectionParam();</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setAddress(address);</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setDatabase(sqlServerParam.getDatabase());</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setJdbcUrl(jdbcUrl);</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setOther(sqlServerParam.getOther());</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setUser(sqlServerParam.getUserName());</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setPassword(PasswordUtils.encodePassword(sqlServerParam.getPassword()));</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setDriverClassName(getDatasourceDriver());</b>
+<b class="nc">&nbsp;        sqlServerConnectionParam.setValidationQuery(getValidationQuery());</b>
+<b class="nc">&nbsp;        return sqlServerConnectionParam;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public BaseConnectionParam createConnectionParams(String connectionJson) {
+<b class="nc">&nbsp;        return JSONUtils.parseObject(connectionJson, SQLServerConnectionParam.class);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getDatasourceDriver() {
+<b class="nc">&nbsp;        return DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getValidationQuery() {
+<b class="nc">&nbsp;        return DataSourceConstants.SQLSERVER_VALIDATION_QUERY;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String getJdbcUrl(ConnectionParam connectionParam) {
+<b class="nc">&nbsp;        SQLServerConnectionParam sqlServerConnectionParam = (SQLServerConnectionParam) connectionParam;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (MapUtils.isNotEmpty(sqlServerConnectionParam.getOther())) {</b>
+<b class="nc">&nbsp;            return String.format(&quot;%s;%s&quot;, sqlServerConnectionParam.getJdbcUrl(),</b>
+<b class="nc">&nbsp;                    transformOther(sqlServerConnectionParam.getOther()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sqlServerConnectionParam.getJdbcUrl();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+<b class="nc">&nbsp;        SQLServerConnectionParam sqlServerConnectionParam = (SQLServerConnectionParam) connectionParam;</b>
+<b class="nc">&nbsp;        Class.forName(getDatasourceDriver());</b>
+<b class="nc">&nbsp;        return DriverManager.getConnection(getJdbcUrl(connectionParam), sqlServerConnectionParam.getUser(),</b>
+<b class="nc">&nbsp;                PasswordUtils.decodePassword(sqlServerConnectionParam.getPassword()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DbType getDbType() {
+<b class="nc">&nbsp;        return DbType.SQLSERVER;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public DataSourceProcessor create() {
+<b class="nc">&nbsp;        return new SQLServerDataSourceProcessor();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; splitAndRemoveComment(String sql) {
+<b class="nc">&nbsp;        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.sqlserver)</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(subSql -&gt; subSql.concat(&quot;;&quot;))</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String transformOther(Map&lt;String, String&gt; otherMap) {
+<b class="nc">&nbsp;        if (MapUtils.isEmpty(otherMap)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        StringBuilder stringBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;        otherMap.forEach((key, value) -&gt; stringBuilder.append(String.format(&quot;%s=%s;&quot;, key, value)));</b>
+<b class="nc">&nbsp;        return stringBuilder.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

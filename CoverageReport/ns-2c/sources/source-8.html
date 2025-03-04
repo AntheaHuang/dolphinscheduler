@@ -1,0 +1,133 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ICommandParam</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.extract.master.command</a>
+</div>
+
+<h1>Coverage Summary for Class: ICommandParam (org.apache.dolphinscheduler.extract.master.command)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">ICommandParam</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.extract.master.command;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.enums.CommandType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonSubTypes;
+&nbsp;import com.fasterxml.jackson.annotation.JsonTypeInfo;
+&nbsp;
+&nbsp;@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = &quot;commandType&quot;)
+&nbsp;@JsonSubTypes({
+&nbsp;        @JsonSubTypes.Type(value = ScheduleWorkflowCommandParam.class, name = &quot;SCHEDULER&quot;),
+&nbsp;        @JsonSubTypes.Type(value = RunWorkflowCommandParam.class, name = &quot;START_PROCESS&quot;),
+&nbsp;        @JsonSubTypes.Type(value = BackfillWorkflowCommandParam.class, name = &quot;COMPLEMENT_DATA&quot;),
+&nbsp;        @JsonSubTypes.Type(value = ReRunWorkflowCommandParam.class, name = &quot;REPEAT_RUNNING&quot;),
+&nbsp;        @JsonSubTypes.Type(value = RecoverFailureTaskCommandParam.class, name = &quot;START_FAILURE_TASK_PROCESS&quot;),
+&nbsp;        @JsonSubTypes.Type(value = WorkflowFailoverCommandParam.class, name = &quot;RECOVER_TOLERANCE_FAULT&quot;),
+&nbsp;})
+&nbsp;public interface ICommandParam {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The task which need to be as the beginning of the workflow.
+&nbsp;     */
+&nbsp;    List&lt;Long&gt; getStartNodes();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * The command params.
+&nbsp;     */
+&nbsp;    List&lt;Property&gt; getCommandParams();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the time zone.
+&nbsp;     * todo: we should remove this field.
+&nbsp;     */
+&nbsp;    String getTimeZone();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether the command is used to trigger a sub workflow instance.
+&nbsp;     */
+&nbsp;    boolean isSubWorkflowInstance();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the command type.
+&nbsp;     */
+&nbsp;    CommandType getCommandType();
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

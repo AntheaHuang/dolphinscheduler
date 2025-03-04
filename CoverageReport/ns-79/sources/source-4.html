@@ -1,0 +1,816 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TimePlaceholderUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.api.parser</a>
+</div>
+
+<h1>Coverage Summary for Class: TimePlaceholderUtils (org.apache.dolphinscheduler.plugin.task.api.parser)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TimePlaceholderUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/186)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/268)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.api.parser;
+&nbsp;
+&nbsp;import static org.apache.commons.lang3.time.DateUtils.addWeeks;
+&nbsp;import static org.apache.dolphinscheduler.common.utils.DateUtils.addDays;
+&nbsp;import static org.apache.dolphinscheduler.common.utils.DateUtils.addMinutes;
+&nbsp;import static org.apache.dolphinscheduler.common.utils.DateUtils.addMonths;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_CHAR;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_MONTHS;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.ADD_STRING;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_CHAR;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DIVISION_STRING;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HYPHEN;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAST_DAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_CHAR;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LEFT_BRACE_STRING;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_BEGIN;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_END;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_FIRST_DAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MONTH_LAST_DAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_CHAR;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.MULTIPLY_STRING;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.N;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.P;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_FORMAT_TIME;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RIGHT_BRACE_CHAR;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_CHAR;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SUBTRACT_STRING;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.THIS_DAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TIMESTAMP;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_BEGIN;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_END;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_FIRST_DAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_LAST_DAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.YEAR_WEEK;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.DateUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.AbstractMap;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Calendar;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Stack;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;/**
+&nbsp; * time place holder utils
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public class TimePlaceholderUtils {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * calculate expression&#39;s value
+&nbsp;     *
+&nbsp;     * @param expression expression
+&nbsp;     * @return expression&#39;s value
+&nbsp;     */
+&nbsp;    public static Integer calculate(String expression) {
+<b class="nc">&nbsp;        expression = StringUtils.trim(expression);</b>
+<b class="nc">&nbsp;        expression = convert(expression);</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; result = string2List(expression);</b>
+<b class="nc">&nbsp;        result = convert2SuffixList(result);</b>
+&nbsp;
+<b class="nc">&nbsp;        return calculate(result);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Change the sign in the expression to P (positive) N (negative)
+&nbsp;     *
+&nbsp;     * @param expression
+&nbsp;     * @return eg. &quot;-3+-6*(+8)-(-5) -&gt; S3+S6*(P8)-(S5)&quot;
+&nbsp;     */
+&nbsp;    private static String convert(String expression) {
+<b class="nc">&nbsp;        char[] arr = expression.toCharArray();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; arr.length; i++) {</b>
+<b class="nc">&nbsp;            if (arr[i] == SUBTRACT_CHAR) {</b>
+<b class="nc">&nbsp;                if (i == 0) {</b>
+<b class="nc">&nbsp;                    arr[i] = N;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    char c = arr[i - 1];</b>
+<b class="nc">&nbsp;                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR</b>
+&nbsp;                            || c == LEFT_BRACE_CHAR) {
+<b class="nc">&nbsp;                        arr[i] = N;</b>
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;            } else if (arr[i] == ADD_CHAR) {</b>
+<b class="nc">&nbsp;                if (i == 0) {</b>
+<b class="nc">&nbsp;                    arr[i] = P;</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    char c = arr[i - 1];</b>
+<b class="nc">&nbsp;                    if (c == ADD_CHAR || c == SUBTRACT_CHAR || c == MULTIPLY_CHAR || c == DIVISION_CHAR</b>
+&nbsp;                            || c == LEFT_BRACE_CHAR) {
+<b class="nc">&nbsp;                        arr[i] = P;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new String(arr);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * to suffix expression
+&nbsp;     *
+&nbsp;     * @param srcList
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; convert2SuffixList(List&lt;String&gt; srcList) {
+<b class="nc">&nbsp;        List&lt;String&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Stack&lt;String&gt; stack = new Stack&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        for (int i = 0; i &lt; srcList.size(); i++) {</b>
+<b class="nc">&nbsp;            if (Character.isDigit(srcList.get(i).charAt(0))) {</b>
+<b class="nc">&nbsp;                result.add(srcList.get(i));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                switch (srcList.get(i).charAt(0)) {</b>
+&nbsp;                    case LEFT_BRACE_CHAR:
+<b class="nc">&nbsp;                        stack.push(srcList.get(i));</b>
+&nbsp;                        break;
+&nbsp;                    case RIGHT_BRACE_CHAR:
+<b class="nc">&nbsp;                        while (!LEFT_BRACE_STRING.equals(stack.peek())) {</b>
+<b class="nc">&nbsp;                            result.add(stack.pop());</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        stack.pop();</b>
+&nbsp;                        break;
+&nbsp;                    default:
+<b class="nc">&nbsp;                        while (!stack.isEmpty() &amp;&amp; compare(stack.peek(), srcList.get(i))) {</b>
+<b class="nc">&nbsp;                            result.add(stack.pop());</b>
+&nbsp;                        }
+<b class="nc">&nbsp;                        stack.push(srcList.get(i));</b>
+&nbsp;                        break;
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        while (!stack.isEmpty()) {</b>
+<b class="nc">&nbsp;            result.add(stack.pop());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Calculate the suffix expression
+&nbsp;     *
+&nbsp;     * @param result
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    private static Integer calculate(List&lt;String&gt; result) {
+<b class="nc">&nbsp;        Stack&lt;Integer&gt; stack = new Stack&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; result.size(); i++) {</b>
+<b class="nc">&nbsp;            if (Character.isDigit(result.get(i).charAt(0))) {</b>
+<b class="nc">&nbsp;                stack.push(Integer.parseInt(result.get(i)));</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                Integer backInt = stack.pop();</b>
+<b class="nc">&nbsp;                Integer frontInt = 0;</b>
+<b class="nc">&nbsp;                char op = result.get(i).charAt(0);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (!(op == P || op == N)) {</b>
+<b class="nc">&nbsp;                    frontInt = stack.pop();</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                Integer res = 0;</b>
+<b class="nc">&nbsp;                switch (result.get(i).charAt(0)) {</b>
+&nbsp;                    case P:
+<b class="nc">&nbsp;                        res = frontInt + backInt;</b>
+&nbsp;                        break;
+&nbsp;                    case N:
+<b class="nc">&nbsp;                        res = frontInt - backInt;</b>
+&nbsp;                        break;
+&nbsp;                    case ADD_CHAR:
+<b class="nc">&nbsp;                        res = frontInt + backInt;</b>
+&nbsp;                        break;
+&nbsp;                    case SUBTRACT_CHAR:
+<b class="nc">&nbsp;                        res = frontInt - backInt;</b>
+&nbsp;                        break;
+&nbsp;                    case MULTIPLY_CHAR:
+<b class="nc">&nbsp;                        res = frontInt * backInt;</b>
+&nbsp;                        break;
+&nbsp;                    case DIVISION_CHAR:
+<b class="nc">&nbsp;                        res = frontInt / backInt;</b>
+&nbsp;                        break;
+&nbsp;                    default:
+&nbsp;                        break;
+&nbsp;                }
+<b class="nc">&nbsp;                stack.push(res);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return stack.pop();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * string to list
+&nbsp;     *
+&nbsp;     * @param expression
+&nbsp;     * @return list
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; string2List(String expression) {
+<b class="nc">&nbsp;        List&lt;String&gt; result = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        String num = &quot;&quot;;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; expression.length(); i++) {</b>
+<b class="nc">&nbsp;            if (Character.isDigit(expression.charAt(i))) {</b>
+<b class="nc">&nbsp;                num = num + expression.charAt(i);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                if (!StringUtils.isEmpty(num)) {</b>
+<b class="nc">&nbsp;                    result.add(num);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                result.add(expression.charAt(i) + &quot;&quot;);</b>
+<b class="nc">&nbsp;                num = &quot;&quot;;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!num.isEmpty()) {</b>
+<b class="nc">&nbsp;            result.add(num);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return result;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * compare loginUser level
+&nbsp;     *
+&nbsp;     * @param peek
+&nbsp;     * @param cur
+&nbsp;     * @return true or false
+&nbsp;     */
+&nbsp;    private static boolean compare(String peek, String cur) {
+<b class="nc">&nbsp;        if (MULTIPLY_STRING.equals(peek) &amp;&amp; (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur)</b>
+<b class="nc">&nbsp;                || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } else if (DIVISION_STRING.equals(peek) &amp;&amp; (DIVISION_STRING.equals(cur) || MULTIPLY_STRING.equals(cur)</b>
+<b class="nc">&nbsp;                || ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } else if (ADD_STRING.equals(peek) &amp;&amp; (ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur))) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return SUBTRACT_STRING.equals(peek) &amp;&amp; (ADD_STRING.equals(cur) || SUBTRACT_STRING.equals(cur));</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Format time expression with given date, the date cannot be null.
+&nbsp;     * &lt;p&gt; If the expression is not a time expression, return the original expression.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public static String formatTimeExpression(final String timeExpression, final Date date,
+&nbsp;                                              final boolean ignoreInvalidExpression) {
+&nbsp;        // After N years: $[add_months(yyyyMMdd,12*N)], the first N months: $[add_months(yyyyMMdd,-N)], etc
+<b class="nc">&nbsp;        if (date == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Cannot parse the expression: &quot; + timeExpression + &quot;, date is null&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(timeExpression)) {</b>
+<b class="nc">&nbsp;            if (ignoreInvalidExpression) {</b>
+<b class="nc">&nbsp;                return timeExpression;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Cannot format the date&quot; + date + &quot; with null timeExpression&quot;);</b>
+&nbsp;        }
+&nbsp;        try {
+<b class="nc">&nbsp;            if (timeExpression.startsWith(TIMESTAMP)) {</b>
+<b class="nc">&nbsp;                return calculateTimeStamp(timeExpression, date);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (timeExpression.startsWith(YEAR_WEEK)) {</b>
+<b class="nc">&nbsp;                return calculateYearWeek(timeExpression, date);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return calcTimeExpression(timeExpression, date);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            if (ignoreInvalidExpression) {</b>
+<b class="nc">&nbsp;                return timeExpression;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Unsupported placeholder expression: &quot; + timeExpression, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get week of year
+&nbsp;     * @param expression expression
+&nbsp;     * @param date       date
+&nbsp;     * @return week of year
+&nbsp;     */
+&nbsp;    private static String calculateYearWeek(final String expression, final Date date) {
+&nbsp;
+<b class="nc">&nbsp;        String dataFormat = expression.substring(YEAR_WEEK.length() + 1, expression.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;        String targetDate = &quot;&quot;;</b>
+&nbsp;        try {
+&nbsp;
+<b class="nc">&nbsp;            if (dataFormat.contains(COMMA)) {</b>
+<b class="nc">&nbsp;                String param1 = dataFormat.split(COMMA)[0];</b>
+<b class="nc">&nbsp;                String param2 = dataFormat.split(COMMA)[1];</b>
+<b class="nc">&nbsp;                dataFormat = param1;</b>
+&nbsp;
+<b class="nc">&nbsp;                targetDate = transformYearWeek(date, dataFormat, calculate(param2));</b>
+&nbsp;
+&nbsp;            } else {
+<b class="nc">&nbsp;                targetDate = transformYearWeek(date, dataFormat, 1);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;expression not valid&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return targetDate;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * transform week of year
+&nbsp;     * @param date date
+&nbsp;     * @param format date_format,for example: yyyy-MM-dd / yyyyMMdd
+&nbsp;     * @param weekDay day of week
+&nbsp;     * @return date_string
+&nbsp;     */
+&nbsp;    private static String transformYearWeek(Date date, String format, int weekDay) {
+<b class="nc">&nbsp;        Calendar calendar = Calendar.getInstance();</b>
+&nbsp;        // Minimum number of days required for the first week of the year
+<b class="nc">&nbsp;        calendar.setMinimalDaysInFirstWeek(4);</b>
+&nbsp;
+&nbsp;        // By default ,Set Monday as the first day of the week
+<b class="nc">&nbsp;        switch (weekDay) {</b>
+&nbsp;            case 2:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.TUESDAY);</b>
+&nbsp;                break;
+&nbsp;            case 3:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.WEDNESDAY);</b>
+&nbsp;                break;
+&nbsp;            case 4:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.THURSDAY);</b>
+&nbsp;                break;
+&nbsp;            case 5:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.FRIDAY);</b>
+&nbsp;                break;
+&nbsp;            case 6:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.SATURDAY);</b>
+&nbsp;                break;
+&nbsp;            case 7:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.SUNDAY);</b>
+&nbsp;                break;
+&nbsp;            default:
+<b class="nc">&nbsp;                calendar.setFirstDayOfWeek(Calendar.MONDAY);</b>
+&nbsp;                break;
+&nbsp;        }
+<b class="nc">&nbsp;        calendar.setTimeInMillis(date.getTime());</b>
+&nbsp;
+<b class="nc">&nbsp;        int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);</b>
+&nbsp;
+<b class="nc">&nbsp;        int year = calendar.get(Calendar.YEAR);</b>
+&nbsp;
+<b class="nc">&nbsp;        String weekYearStr = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (weekOfYear &lt; 10 &amp;&amp; format.contains(HYPHEN)) {</b>
+<b class="nc">&nbsp;            weekYearStr = String.format(&quot;%d%s0%d&quot;, year, HYPHEN, weekOfYear);</b>
+<b class="nc">&nbsp;        } else if (weekOfYear &gt;= 10 &amp;&amp; format.contains(HYPHEN)) {</b>
+<b class="nc">&nbsp;            weekYearStr = String.format(&quot;%d%s%d&quot;, year, HYPHEN, weekOfYear);</b>
+<b class="nc">&nbsp;        } else if (weekOfYear &lt; 10) {</b>
+<b class="nc">&nbsp;            weekYearStr = String.format(&quot;%d0%d&quot;, year, weekOfYear);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            weekYearStr = String.format(&quot;%d%d&quot;, year, weekOfYear);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return weekYearStr;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String calculateTimeStamp(final String expression, final Date date) {
+<b class="nc">&nbsp;        final String timeExpression = expression.substring(TIMESTAMP.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;        final String calculatedTimeExpression = calcTimeExpression(timeExpression, date);</b>
+<b class="nc">&nbsp;        if (StringUtils.equals(expression, calculatedTimeExpression)) {</b>
+<b class="nc">&nbsp;            return expression;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        final Date timestamp = DateUtils.parse(calculatedTimeExpression, PARAMETER_FORMAT_TIME);</b>
+<b class="nc">&nbsp;        if (timestamp == null) {</b>
+<b class="nc">&nbsp;            throw new IllegalArgumentException(&quot;Cannot parse the expression: &quot; + expression + &quot; with date: &quot; + date);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return String.valueOf(timestamp.getTime() / 1000);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * calculate time expresstion
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return map with date, date format
+&nbsp;     */
+&nbsp;    private static String calcTimeExpression(final String expression, final Date date) {
+&nbsp;        final Map.Entry&lt;Date, String&gt; resultEntry;
+&nbsp;
+<b class="nc">&nbsp;        if (expression.startsWith(ADD_MONTHS)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcMonths(expression, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(MONTH_BEGIN)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcMonthBegin(expression, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(MONTH_END)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcMonthEnd(expression, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(WEEK_BEGIN)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcWeekStart(expression, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(WEEK_END)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcWeekEnd(expression, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(MONTH_FIRST_DAY)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcCustomDay(expression, MONTH_FIRST_DAY, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(MONTH_LAST_DAY)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcCustomDay(expression, MONTH_LAST_DAY, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(THIS_DAY)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcCustomDay(expression, THIS_DAY, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(LAST_DAY)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcCustomDay(expression, LAST_DAY, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(WEEK_FIRST_DAY)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcCustomDay(expression, WEEK_FIRST_DAY, date);</b>
+<b class="nc">&nbsp;        } else if (expression.startsWith(WEEK_LAST_DAY)) {</b>
+<b class="nc">&nbsp;            resultEntry = calcCustomDay(expression, WEEK_LAST_DAY, date);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            resultEntry = calcMinutes(expression, date);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        final Date finalDate = resultEntry.getKey();</b>
+<b class="nc">&nbsp;        final String finalFormat = resultEntry.getValue();</b>
+<b class="nc">&nbsp;        return DateUtils.format(finalDate, finalFormat);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get first day of month
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return first day of month
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcMonthBegin(String expression, Date date) {
+<b class="nc">&nbsp;        String addMonthExpr = expression.substring(MONTH_BEGIN.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;        String[] params = addMonthExpr.split(COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (params.length == 2) {</b>
+<b class="nc">&nbsp;            String dateFormat = params[0];</b>
+<b class="nc">&nbsp;            String dayExpr = params[1];</b>
+<b class="nc">&nbsp;            Integer day = calculate(dayExpr);</b>
+<b class="nc">&nbsp;            Date targetDate = DateUtils.getFirstDayOfMonth(date);</b>
+<b class="nc">&nbsp;            targetDate = addDays(targetDate, day);</b>
+&nbsp;
+<b class="nc">&nbsp;            return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new RuntimeException(&quot;expression not valid&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get last day of month
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return last day of month
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcMonthEnd(String expression, Date date) {
+<b class="nc">&nbsp;        String addMonthExpr = expression.substring(MONTH_END.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;        String[] params = addMonthExpr.split(COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (params.length == 2) {</b>
+<b class="nc">&nbsp;            String dateFormat = params[0];</b>
+<b class="nc">&nbsp;            String dayExpr = params[1];</b>
+<b class="nc">&nbsp;            Integer day = calculate(dayExpr);</b>
+<b class="nc">&nbsp;            Date targetDate = DateUtils.getLastDayOfMonth(date);</b>
+<b class="nc">&nbsp;            targetDate = addDays(targetDate, day);</b>
+&nbsp;
+<b class="nc">&nbsp;            return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new RuntimeException(&quot;expression not valid&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * calculate time expression
+&nbsp;     * month first day month last day
+&nbsp;     * @param expression expression
+&nbsp;     * @param date       date
+&nbsp;     * @return calculate time expression with date,format
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcCustomDay(String expression, String keyDate, Date date) {
+<b class="nc">&nbsp;        String dataFormat = &quot;yyyy-MM-dd&quot;;</b>
+<b class="nc">&nbsp;        Date targetDate = new Date();</b>
+&nbsp;
+<b class="nc">&nbsp;        switch (keyDate) {</b>
+&nbsp;            case MONTH_FIRST_DAY:
+<b class="nc">&nbsp;                dataFormat = expression.substring(MONTH_FIRST_DAY.length() + 1, expression.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (dataFormat.contains(COMMA)) {</b>
+<b class="nc">&nbsp;                    String param1 = dataFormat.split(COMMA)[0];</b>
+<b class="nc">&nbsp;                    String param2 = dataFormat.split(COMMA)[1];</b>
+<b class="nc">&nbsp;                    dataFormat = param1;</b>
+&nbsp;
+<b class="nc">&nbsp;                    targetDate = addMonths(DateUtils.getFirstDayOfMonth(date), calculate(param2));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    targetDate = DateUtils.getFirstDayOfMonth(date);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;                break;
+&nbsp;            case MONTH_LAST_DAY:
+<b class="nc">&nbsp;                dataFormat = expression.substring(MONTH_LAST_DAY.length() + 1, expression.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (dataFormat.contains(COMMA)) {</b>
+<b class="nc">&nbsp;                    String param1 = dataFormat.split(COMMA)[0];</b>
+<b class="nc">&nbsp;                    String param2 = dataFormat.split(COMMA)[1];</b>
+<b class="nc">&nbsp;                    dataFormat = param1;</b>
+&nbsp;
+<b class="nc">&nbsp;                    Date lastMonthDay = addMonths(date, calculate(param2));</b>
+&nbsp;
+<b class="nc">&nbsp;                    targetDate = DateUtils.getLastDayOfMonth(lastMonthDay);</b>
+&nbsp;
+&nbsp;                } else {
+<b class="nc">&nbsp;                    targetDate = DateUtils.getLastDayOfMonth(date);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case THIS_DAY:
+<b class="nc">&nbsp;                dataFormat = expression.substring(THIS_DAY.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;                targetDate = addDays(date, 0);</b>
+&nbsp;                break;
+&nbsp;            case LAST_DAY:
+<b class="nc">&nbsp;                dataFormat = expression.substring(LAST_DAY.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;                targetDate = addDays(date, -1);</b>
+&nbsp;                break;
+&nbsp;            case WEEK_FIRST_DAY:
+<b class="nc">&nbsp;                dataFormat = expression.substring(WEEK_FIRST_DAY.length() + 1, expression.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (dataFormat.contains(COMMA)) {</b>
+<b class="nc">&nbsp;                    String param1 = dataFormat.split(COMMA)[0];</b>
+<b class="nc">&nbsp;                    String param2 = dataFormat.split(COMMA)[1];</b>
+<b class="nc">&nbsp;                    dataFormat = param1;</b>
+&nbsp;
+<b class="nc">&nbsp;                    targetDate = addWeeks(DateUtils.getMonday(date), calculate(param2));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    targetDate = addWeeks(DateUtils.getMonday(date), 0);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            case WEEK_LAST_DAY:
+<b class="nc">&nbsp;                dataFormat = expression.substring(WEEK_LAST_DAY.length() + 1, expression.length() - 1);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (dataFormat.contains(COMMA)) {</b>
+<b class="nc">&nbsp;                    String param1 = dataFormat.split(COMMA)[0];</b>
+<b class="nc">&nbsp;                    String param2 = dataFormat.split(COMMA)[1];</b>
+<b class="nc">&nbsp;                    dataFormat = param1;</b>
+&nbsp;
+<b class="nc">&nbsp;                    targetDate = addWeeks(DateUtils.getSunday(date), calculate(param2));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    targetDate = addWeeks(DateUtils.getSunday(date), 0);</b>
+&nbsp;                }
+&nbsp;                break;
+&nbsp;            default:
+&nbsp;                break;
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dataFormat);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get first day of week
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return monday
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcWeekStart(String expression, Date date) {
+<b class="nc">&nbsp;        String addMonthExpr = expression.substring(WEEK_BEGIN.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;        String[] params = addMonthExpr.split(COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (params.length == 2) {</b>
+<b class="nc">&nbsp;            String dateFormat = params[0];</b>
+<b class="nc">&nbsp;            String dayExpr = params[1];</b>
+<b class="nc">&nbsp;            Integer day = calculate(dayExpr);</b>
+<b class="nc">&nbsp;            Date targetDate = DateUtils.getMonday(date);</b>
+<b class="nc">&nbsp;            targetDate = addDays(targetDate, day);</b>
+<b class="nc">&nbsp;            return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new RuntimeException(&quot;expression not valid&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get last day of week
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return last day of week
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcWeekEnd(String expression, Date date) {
+<b class="nc">&nbsp;        String addMonthExpr = expression.substring(WEEK_END.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;        String[] params = addMonthExpr.split(COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (params.length == 2) {</b>
+<b class="nc">&nbsp;            String dateFormat = params[0];</b>
+<b class="nc">&nbsp;            String dayExpr = params[1];</b>
+<b class="nc">&nbsp;            Integer day = calculate(dayExpr);</b>
+<b class="nc">&nbsp;            Date targetDate = DateUtils.getSunday(date);</b>
+<b class="nc">&nbsp;            targetDate = addDays(targetDate, day);</b>
+&nbsp;
+<b class="nc">&nbsp;            return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new RuntimeException(&quot;Expression not valid&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * calc months expression
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return calc months
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcMonths(String expression, Date date) {
+<b class="nc">&nbsp;        String addMonthExpr = expression.substring(ADD_MONTHS.length() + 1, expression.length() - 1);</b>
+<b class="nc">&nbsp;        String[] params = addMonthExpr.split(COMMA);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (params.length == 2) {</b>
+<b class="nc">&nbsp;            String dateFormat = params[0];</b>
+<b class="nc">&nbsp;            String monthExpr = params[1];</b>
+<b class="nc">&nbsp;            Integer addMonth = calculate(monthExpr);</b>
+<b class="nc">&nbsp;            Date targetDate = addMonths(date, addMonth);</b>
+&nbsp;
+<b class="nc">&nbsp;            return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        throw new RuntimeException(&quot;expression not valid&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * calculate time expression
+&nbsp;     *
+&nbsp;     * @param expression expresstion
+&nbsp;     * @param date       date
+&nbsp;     * @return calculate time expression with date,format
+&nbsp;     */
+&nbsp;    public static Map.Entry&lt;Date, String&gt; calcMinutes(String expression, Date date) {
+<b class="nc">&nbsp;        if (expression.contains(&quot;+&quot;)) {</b>
+<b class="nc">&nbsp;            int index = expression.lastIndexOf(&#39;+&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (Character.isDigit(expression.charAt(index + 1))) {</b>
+<b class="nc">&nbsp;                String addMinuteExpr = expression.substring(index + 1);</b>
+<b class="nc">&nbsp;                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));</b>
+<b class="nc">&nbsp;                String dateFormat = expression.substring(0, index);</b>
+&nbsp;
+<b class="nc">&nbsp;                return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (expression.contains(&quot;-&quot;)) {</b>
+<b class="nc">&nbsp;            int index = expression.lastIndexOf(&#39;-&#39;);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (Character.isDigit(expression.charAt(index + 1))) {</b>
+<b class="nc">&nbsp;                String addMinuteExpr = expression.substring(index + 1);</b>
+<b class="nc">&nbsp;                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));</b>
+<b class="nc">&nbsp;                String dateFormat = expression.substring(0, index);</b>
+&nbsp;
+<b class="nc">&nbsp;                return new AbstractMap.SimpleImmutableEntry&lt;&gt;(targetDate, dateFormat);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // yyyy-MM-dd/HH:mm:ss
+<b class="nc">&nbsp;            return new AbstractMap.SimpleImmutableEntry&lt;&gt;(date, expression);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // $[HHmmss]
+<b class="nc">&nbsp;        return new AbstractMap.SimpleImmutableEntry&lt;&gt;(date, expression);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * calculate need minutes
+&nbsp;     *
+&nbsp;     * @param minuteExpression minute expression
+&nbsp;     * @return calculate need minutes
+&nbsp;     */
+&nbsp;    public static Integer calcMinutes(String minuteExpression) {
+<b class="nc">&nbsp;        int index = minuteExpression.indexOf(&#39;/&#39;);</b>
+&nbsp;
+&nbsp;        String calcExpression;
+&nbsp;
+<b class="nc">&nbsp;        if (index == -1) {</b>
+<b class="nc">&nbsp;            calcExpression = String.format(&quot;60*24*(%s)&quot;, minuteExpression);</b>
+&nbsp;        } else {
+&nbsp;
+<b class="nc">&nbsp;            calcExpression = String.format(&quot;60*24*(%s)%s&quot;, minuteExpression.substring(0, index),</b>
+<b class="nc">&nbsp;                    minuteExpression.substring(index));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return calculate(calcExpression);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

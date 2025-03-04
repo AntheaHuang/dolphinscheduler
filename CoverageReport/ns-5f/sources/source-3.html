@@ -1,0 +1,579 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > EtcdRegistry</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.registry.etcd</a>
+</div>
+
+<h1>Coverage Summary for Class: EtcdRegistry (org.apache.dolphinscheduler.plugin.registry.etcd)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">EtcdRegistry</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/22)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/38)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/152)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">EtcdRegistry$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">EtcdRegistry$EventAdaptor</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/164)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.registry.etcd;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.registry.api.ConnectionListener;
+&nbsp;import org.apache.dolphinscheduler.registry.api.Event;
+&nbsp;import org.apache.dolphinscheduler.registry.api.Registry;
+&nbsp;import org.apache.dolphinscheduler.registry.api.RegistryException;
+&nbsp;import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.time.Duration;
+&nbsp;import java.time.temporal.ChronoUnit;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.TimeoutException;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import javax.net.ssl.SSLException;
+&nbsp;
+&nbsp;import lombok.NonNull;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import org.springframework.util.StringUtils;
+&nbsp;
+&nbsp;import com.google.common.base.Splitter;
+&nbsp;
+&nbsp;import io.etcd.jetcd.ByteSequence;
+&nbsp;import io.etcd.jetcd.Client;
+&nbsp;import io.etcd.jetcd.ClientBuilder;
+&nbsp;import io.etcd.jetcd.KeyValue;
+&nbsp;import io.etcd.jetcd.Lease;
+&nbsp;import io.etcd.jetcd.Lock;
+&nbsp;import io.etcd.jetcd.Util;
+&nbsp;import io.etcd.jetcd.Watch;
+&nbsp;import io.etcd.jetcd.options.DeleteOption;
+&nbsp;import io.etcd.jetcd.options.GetOption;
+&nbsp;import io.etcd.jetcd.options.PutOption;
+&nbsp;import io.etcd.jetcd.options.WatchOption;
+&nbsp;import io.etcd.jetcd.support.Observers;
+&nbsp;import io.etcd.jetcd.watch.WatchEvent;
+&nbsp;import io.grpc.netty.GrpcSslContexts;
+&nbsp;import io.netty.handler.ssl.SslContext;
+&nbsp;
+&nbsp;/**
+&nbsp; * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd cluster to
+&nbsp; * store the DolphinScheduler master/worker&#39;s metadata and do the server registry/unRegistry.
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class EtcdRegistry implements Registry {
+&nbsp;
+&nbsp;    private final EtcdRegistryProperties etcdRegistryProperties;
+&nbsp;    private final Client client;
+&nbsp;    private EtcdConnectionStateListener etcdConnectionStateListener;
+&nbsp;
+&nbsp;    private EtcdKeepAliveLeaseManager etcdKeepAliveLeaseManager;
+&nbsp;
+&nbsp;    public static final String FOLDER_SEPARATOR = &quot;/&quot;;
+&nbsp;    // save the lock info for thread
+&nbsp;    // key:lockKey Value:leaseId
+<b class="nc">&nbsp;    private static final ThreadLocal&lt;Map&lt;String, Long&gt;&gt; threadLocalLockMap = new ThreadLocal&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;String, Watch.Watcher&gt; watcherMap = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;    public EtcdRegistry(EtcdRegistryProperties registryProperties) throws SSLException {</b>
+<b class="nc">&nbsp;        this.etcdRegistryProperties = registryProperties;</b>
+<b class="nc">&nbsp;        ClientBuilder clientBuilder = Client.builder()</b>
+<b class="nc">&nbsp;                .endpoints(Util.toURIs(Splitter.on(&quot;,&quot;).trimResults().splitToList(registryProperties.getEndpoints())))</b>
+<b class="nc">&nbsp;                .namespace(byteSequence(registryProperties.getNamespace()))</b>
+<b class="nc">&nbsp;                .connectTimeout(registryProperties.getConnectionTimeout())</b>
+<b class="nc">&nbsp;                .retryChronoUnit(ChronoUnit.MILLIS)</b>
+<b class="nc">&nbsp;                .retryDelay(registryProperties.getRetryDelay().toMillis())</b>
+<b class="nc">&nbsp;                .retryMaxDelay(registryProperties.getRetryMaxDelay().toMillis())</b>
+<b class="nc">&nbsp;                .retryMaxDuration(registryProperties.getRetryMaxDuration());</b>
+<b class="nc">&nbsp;        if (StringUtils.hasLength(registryProperties.getUser())</b>
+<b class="nc">&nbsp;                &amp;&amp; StringUtils.hasLength(registryProperties.getPassword())) {</b>
+<b class="nc">&nbsp;            clientBuilder.user(byteSequence(registryProperties.getUser()));</b>
+<b class="nc">&nbsp;            clientBuilder.password(byteSequence(registryProperties.getPassword()));</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (StringUtils.hasLength(registryProperties.getLoadBalancerPolicy())) {</b>
+<b class="nc">&nbsp;            clientBuilder.loadBalancerPolicy(registryProperties.getLoadBalancerPolicy());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (StringUtils.hasLength(registryProperties.getAuthority())) {</b>
+<b class="nc">&nbsp;            clientBuilder.authority(registryProperties.getAuthority());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (StringUtils.hasLength(registryProperties.getCertFile())</b>
+<b class="nc">&nbsp;                &amp;&amp; StringUtils.hasLength(registryProperties.getKeyCertChainFile())</b>
+<b class="nc">&nbsp;                &amp;&amp; StringUtils.hasLength(registryProperties.getKeyFile())) {</b>
+<b class="nc">&nbsp;            String userDir = System.getProperty(&quot;user.dir&quot;) + &quot;/&quot;;</b>
+<b class="nc">&nbsp;            File certFile = new File(userDir + registryProperties.getCertFile());</b>
+<b class="nc">&nbsp;            File keyCertChainFile = new File(userDir + registryProperties.getKeyCertChainFile());</b>
+<b class="nc">&nbsp;            File keyFile = new File(userDir + registryProperties.getKeyFile());</b>
+<b class="nc">&nbsp;            SslContext context = GrpcSslContexts.forClient()</b>
+<b class="nc">&nbsp;                    .trustManager(certFile)</b>
+<b class="nc">&nbsp;                    .keyManager(keyCertChainFile, keyFile)</b>
+<b class="nc">&nbsp;                    .build();</b>
+<b class="nc">&nbsp;            clientBuilder.sslContext(context);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        client = clientBuilder.build();</b>
+<b class="nc">&nbsp;        log.info(&quot;Started Etcd Registry...&quot;);</b>
+<b class="nc">&nbsp;        etcdConnectionStateListener = new EtcdConnectionStateListener(client);</b>
+<b class="nc">&nbsp;        etcdKeepAliveLeaseManager = new EtcdKeepAliveLeaseManager(client);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Starting Etcd ConnectionListener...&quot;);</b>
+<b class="nc">&nbsp;        etcdConnectionStateListener.start();</b>
+<b class="nc">&nbsp;        log.info(&quot;Started Etcd ConnectionListener...&quot;);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void start() {
+&nbsp;        // The start has been set in the constructor
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean isConnected() {
+<b class="nc">&nbsp;        return client.getKVClient().get(byteSequence(&quot;/&quot;)).join() != null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+<b class="nc">&nbsp;    public void connectUntilTimeout(@NonNull Duration timeout) throws RegistryException {</b>
+&nbsp;        // The connectTimeout has been set in the constructor
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param path     The prefix of the key being listened to
+&nbsp;     * @param listener
+&nbsp;     * @return if subcribe Returns true if no exception was thrown
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void subscribe(String path, SubscribeListener listener) {
+&nbsp;        try {
+<b class="nc">&nbsp;            ByteSequence watchKey = byteSequence(path);</b>
+&nbsp;            WatchOption watchOption =
+<b class="nc">&nbsp;                    WatchOption.newBuilder().withPrevKV(true).isPrefix(true).build();</b>
+<b class="nc">&nbsp;            watcherMap.computeIfAbsent(path,</b>
+<b class="nc">&nbsp;                    $ -&gt; client.getWatchClient().watch(watchKey, watchOption, watchResponse -&gt; {</b>
+<b class="nc">&nbsp;                        for (WatchEvent event : watchResponse.getEvents()) {</b>
+<b class="nc">&nbsp;                            listener.notify(new EventAdaptor(event, path));</b>
+&nbsp;                        }
+&nbsp;                    }));
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;Failed to subscribe listener for key: &quot; + path, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void addConnectionStateListener(ConnectionListener listener) {
+<b class="nc">&nbsp;        etcdConnectionStateListener.addConnectionListener(listener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return Returns the value corresponding to the key
+&nbsp;     * @throws throws an exception if the key does not exist
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public String get(String key) {
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;KeyValue&gt; keyValues = client.getKVClient().get(byteSequence(key)).get().getKvs();</b>
+<b class="nc">&nbsp;            return keyValues.iterator().next().getValue().toString(StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get data error&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get data error, key = &quot; + key, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param deleteOnDisconnect Does the put data disappear when the client disconnects
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void put(String key, String value, boolean deleteOnDisconnect) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (deleteOnDisconnect) {</b>
+&nbsp;                // keep the key by lease, if disconnected, the lease will expire and the key will delete
+<b class="nc">&nbsp;                long leaseId = etcdKeepAliveLeaseManager.getOrCreateKeepAliveLease(key,</b>
+<b class="nc">&nbsp;                        etcdRegistryProperties.getTtl().get(ChronoUnit.SECONDS));</b>
+<b class="nc">&nbsp;                PutOption putOption = PutOption.newBuilder().withLeaseId(leaseId).build();</b>
+<b class="nc">&nbsp;                client.getKVClient().put(byteSequence(key), byteSequence(value), putOption).get();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                client.getKVClient().put(byteSequence(key), byteSequence(value)).get();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;Failed to put registry key: &quot; + key, e);</b>
+<b class="nc">&nbsp;        } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;Failed to put registry key: &quot; + key, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * delete all keys that contain the prefix {@Code key}
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public void delete(String key) {
+&nbsp;        try {
+<b class="nc">&nbsp;            DeleteOption deleteOption = DeleteOption.newBuilder().isPrefix(true).build();</b>
+<b class="nc">&nbsp;            client.getKVClient().delete(byteSequence(key), deleteOption).get();</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;Failed to delete registry key: &quot; + key, e);</b>
+<b class="nc">&nbsp;        } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;Failed to delete registry key: &quot; + key, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all child objects, split by &quot;/&quot;
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public Collection&lt;String&gt; children(String key) {
+&nbsp;        // Make sure the string end with &#39;/&#39;
+&nbsp;        // eg:change key = /nodes to /nodes/
+<b class="nc">&nbsp;        String prefix = key.endsWith(FOLDER_SEPARATOR) ? key : key + FOLDER_SEPARATOR;</b>
+<b class="nc">&nbsp;        GetOption getOption = GetOption.newBuilder().isPrefix(true).withSortField(GetOption.SortTarget.KEY)</b>
+<b class="nc">&nbsp;                .withSortOrder(GetOption.SortOrder.ASCEND).build();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;KeyValue&gt; keyValues = client.getKVClient().get(byteSequence(prefix), getOption).get().getKvs();</b>
+<b class="nc">&nbsp;            return keyValues.stream().map(e -&gt; getSubNodeKeyName(prefix, e.getKey().toString(StandardCharsets.UTF_8)))</b>
+<b class="nc">&nbsp;                    .distinct().collect(Collectors.toList());</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get children error&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get children error, key: &quot; + key, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If &quot;/&quot; exists in the child object, get the string prefixed with &quot;/&quot;
+&nbsp;     */
+&nbsp;    private String getSubNodeKeyName(final String prefix, final String fullPath) {
+<b class="nc">&nbsp;        String pathWithoutPrefix = fullPath.substring(prefix.length());</b>
+<b class="nc">&nbsp;        return pathWithoutPrefix.contains(FOLDER_SEPARATOR)</b>
+<b class="nc">&nbsp;                ? pathWithoutPrefix.substring(0, pathWithoutPrefix.indexOf(FOLDER_SEPARATOR))</b>
+<b class="nc">&nbsp;                : pathWithoutPrefix;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean exists(String key) {
+<b class="nc">&nbsp;        GetOption getOption = GetOption.newBuilder().withCountOnly(true).build();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            if (client.getKVClient().get(byteSequence(key), getOption).get().getCount() &gt;= 1) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd check key is existed error&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (ExecutionException e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd check key is existed error, key: &quot; + key, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get the lock with a lease
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean acquireLock(String key) {
+<b class="nc">&nbsp;        Map&lt;String, Long&gt; leaseIdMap = threadLocalLockMap.get();</b>
+<b class="nc">&nbsp;        if (null == leaseIdMap) {</b>
+<b class="nc">&nbsp;            leaseIdMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            threadLocalLockMap.set(leaseIdMap);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (leaseIdMap.containsKey(key)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Lock lockClient = client.getLockClient();</b>
+<b class="nc">&nbsp;        Lease leaseClient = client.getLeaseClient();</b>
+&nbsp;        // get the lock with a lease
+&nbsp;        try {
+<b class="nc">&nbsp;            long leaseId = leaseClient.grant(etcdRegistryProperties.getTtl().get(ChronoUnit.SECONDS)).get().getID();</b>
+&nbsp;            // keep the lease
+<b class="nc">&nbsp;            client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -&gt; {</b>
+<b class="nc">&nbsp;            }));</b>
+<b class="nc">&nbsp;            lockClient.lock(byteSequence(key), leaseId).get();</b>
+&nbsp;
+&nbsp;            // save the leaseId for release Lock
+<b class="nc">&nbsp;            leaseIdMap.put(key, leaseId);</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get lock error&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get lock error, lockKey: &quot; + key, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean acquireLock(String key, long timeout) {
+<b class="nc">&nbsp;        Map&lt;String, Long&gt; leaseIdMap = threadLocalLockMap.get();</b>
+<b class="nc">&nbsp;        if (null == leaseIdMap) {</b>
+<b class="nc">&nbsp;            leaseIdMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            threadLocalLockMap.set(leaseIdMap);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (leaseIdMap.containsKey(key)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        Lock lockClient = client.getLockClient();</b>
+<b class="nc">&nbsp;        Lease leaseClient = client.getLeaseClient();</b>
+&nbsp;        // get the lock with a lease
+&nbsp;        try {
+<b class="nc">&nbsp;            long leaseId = leaseClient.grant(etcdRegistryProperties.getTtl().get(ChronoUnit.SECONDS)).get().getID();</b>
+&nbsp;            // keep the lease
+<b class="nc">&nbsp;            lockClient.lock(byteSequence(key), leaseId).get(timeout, TimeUnit.MILLISECONDS);</b>
+<b class="nc">&nbsp;            client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -&gt; {</b>
+<b class="nc">&nbsp;            }));</b>
+&nbsp;
+&nbsp;            // save the leaseId for release Lock
+<b class="nc">&nbsp;            leaseIdMap.put(key, leaseId);</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (TimeoutException timeoutException) {</b>
+<b class="nc">&nbsp;            log.debug(&quot;Acquire lock: {} in {}/ms timeout&quot;, key, timeout);</b>
+<b class="nc">&nbsp;            return false;</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get lock error&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd get lock error, lockKey: &quot; + key, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * release the lock by revoking the leaseId
+&nbsp;     */
+&nbsp;    @Override
+&nbsp;    public boolean releaseLock(String key) {
+&nbsp;        try {
+<b class="nc">&nbsp;            Long leaseId = threadLocalLockMap.get().get(key);</b>
+<b class="nc">&nbsp;            client.getLeaseClient().revoke(leaseId);</b>
+<b class="nc">&nbsp;            threadLocalLockMap.get().remove(key);</b>
+<b class="nc">&nbsp;            if (threadLocalLockMap.get().isEmpty()) {</b>
+<b class="nc">&nbsp;                threadLocalLockMap.remove();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RegistryException(&quot;etcd release lock error, lockKey: &quot; + key, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() throws IOException {
+&nbsp;        // When the client closes, the watch also closes.
+<b class="nc">&nbsp;        client.close();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static ByteSequence byteSequence(String val) {
+<b class="nc">&nbsp;        return ByteSequence.from(val, StandardCharsets.UTF_8);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static final class EventAdaptor extends Event {
+&nbsp;
+<b class="nc">&nbsp;        public EventAdaptor(WatchEvent event, String key) {</b>
+<b class="nc">&nbsp;            key(key);</b>
+&nbsp;
+<b class="nc">&nbsp;            switch (event.getEventType()) {</b>
+&nbsp;                case PUT:
+<b class="nc">&nbsp;                    if (event.getPrevKV().getKey().isEmpty()) {</b>
+<b class="nc">&nbsp;                        type(Type.ADD);</b>
+&nbsp;                    } else {
+<b class="nc">&nbsp;                        type(Type.UPDATE);</b>
+&nbsp;                    }
+&nbsp;                    break;
+&nbsp;                case DELETE:
+<b class="nc">&nbsp;                    type(Type.REMOVE);</b>
+&nbsp;                    break;
+&nbsp;                default:
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;            KeyValue keyValue = event.getKeyValue();</b>
+<b class="nc">&nbsp;            if (keyValue != null) {</b>
+<b class="nc">&nbsp;                path(keyValue.getKey().toString(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;                data(keyValue.getValue().toString(StandardCharsets.UTF_8));</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

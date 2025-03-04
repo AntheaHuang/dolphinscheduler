@@ -72,6 +72,22 @@ public final class VoiceSender {
         }
         return alertResult;
     }
+    /**
+     * New 'dummy' or 'refactored' method demonstrating Dependency Injection with VoiceService.
+     * This does not break the existing code but shows how to make a more testable design.
+     *
+     * @param service a VoiceService interface, which can be a real or mock implementation.
+     * @return AlertResult, can be tested using a mock service in a unit test.
+     */
+    public AlertResult sendViaService(VoiceService service) {
+        // All we do here is delegate to the service, which can be mocked in tests
+        return service.sendVoiceAlert(this.voiceParam);
+    }
+
+    /**
+     * Existing method that creates a real Aliyun client.
+     * Hard to mock in the original design.
+     */
 
     /**
      * create Client

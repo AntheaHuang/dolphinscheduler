@@ -1,0 +1,538 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DingTalkSender</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.alert.dingtalk</a>
+</div>
+
+<h1>Coverage Summary for Class: DingTalkSender (org.apache.dolphinscheduler.plugin.alert.dingtalk)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DingTalkSender</td>
+<td class="coverageStat">
+  <span class="percent">
+    62.5%
+  </span>
+  <span class="absValue">
+    (10/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.3%
+  </span>
+  <span class="absValue">
+    (13/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    51.9%
+  </span>
+  <span class="absValue">
+    (68/131)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DingTalkSender$DingTalkSendMsgResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    47.6%
+  </span>
+  <span class="absValue">
+    (10/21)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    26%
+  </span>
+  <span class="absValue">
+    (13/50)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    43.6%
+  </span>
+  <span class="absValue">
+    (68/156)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.alert.dingtalk;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.alert.api.AlertResult;
+&nbsp;import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;
+&nbsp;import org.apache.commons.codec.binary.Base64;
+&nbsp;import org.apache.commons.codec.binary.StringUtils;
+&nbsp;import org.apache.http.HttpEntity;
+&nbsp;import org.apache.http.HttpHost;
+&nbsp;import org.apache.http.auth.AuthScope;
+&nbsp;import org.apache.http.auth.UsernamePasswordCredentials;
+&nbsp;import org.apache.http.client.CredentialsProvider;
+&nbsp;import org.apache.http.client.config.RequestConfig;
+&nbsp;import org.apache.http.client.methods.CloseableHttpResponse;
+&nbsp;import org.apache.http.client.methods.HttpPost;
+&nbsp;import org.apache.http.entity.StringEntity;
+&nbsp;import org.apache.http.impl.client.BasicCredentialsProvider;
+&nbsp;import org.apache.http.impl.client.CloseableHttpClient;
+&nbsp;import org.apache.http.impl.client.HttpClients;
+&nbsp;import org.apache.http.util.EntityUtils;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.net.URLEncoder;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;import javax.crypto.Mac;
+&nbsp;import javax.crypto.spec.SecretKeySpec;
+&nbsp;
+&nbsp;import lombok.Getter;
+&nbsp;import lombok.Setter;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;/**
+&nbsp; * &lt;p&gt;
+&nbsp; *     https://open.dingtalk.com/document/robots/custom-robot-access
+&nbsp; *     https://open.dingtalk.com/document/robots/customize-robot-security-settings
+&nbsp; * &lt;/p&gt;
+&nbsp; */
+<b class="fc">&nbsp;@Slf4j</b>
+&nbsp;public final class DingTalkSender {
+&nbsp;
+&nbsp;    private final String url;
+&nbsp;    private final String keyword;
+&nbsp;    private final String secret;
+&nbsp;    private String msgType;
+&nbsp;
+&nbsp;    private final String atMobiles;
+&nbsp;    private final String atDingtalkIds;
+&nbsp;    private final Boolean atAll;
+&nbsp;
+&nbsp;    private final Boolean enableProxy;
+&nbsp;
+&nbsp;    private String proxy;
+&nbsp;
+&nbsp;    private Integer port;
+&nbsp;
+&nbsp;    private String user;
+&nbsp;
+&nbsp;    private String password;
+&nbsp;
+<b class="fc">&nbsp;    DingTalkSender(Map&lt;String, String&gt; config) {</b>
+<b class="fc">&nbsp;        url = config.get(DingTalkParamsConstants.NAME_DING_TALK_WEB_HOOK);</b>
+<b class="fc">&nbsp;        keyword = config.get(DingTalkParamsConstants.NAME_DING_TALK_KEYWORD);</b>
+<b class="fc">&nbsp;        secret = config.get(DingTalkParamsConstants.NAME_DING_TALK_SECRET);</b>
+<b class="fc">&nbsp;        msgType = config.get(DingTalkParamsConstants.NAME_DING_TALK_MSG_TYPE);</b>
+&nbsp;
+<b class="fc">&nbsp;        atMobiles = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES);</b>
+<b class="fc">&nbsp;        atDingtalkIds = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS);</b>
+<b class="fc">&nbsp;        atAll = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_ALL));</b>
+&nbsp;
+<b class="fc">&nbsp;        enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));</b>
+<b class="fc">&nbsp;        if (Boolean.TRUE.equals(enableProxy)) {</b>
+<b class="fc">&nbsp;            port = Integer.parseInt(config.get(DingTalkParamsConstants.NAME_DING_TALK_PORT));</b>
+<b class="fc">&nbsp;            proxy = config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY);</b>
+<b class="fc">&nbsp;            user = config.get(DingTalkParamsConstants.NAME_DING_TALK_USER);</b>
+<b class="fc">&nbsp;            password = config.get(DingTalkParamsConstants.NAME_DING_TALK_PASSWORD);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private static HttpPost constructHttpPost(String url, String msg) {
+<b class="fc">&nbsp;        HttpPost post = new HttpPost(url);</b>
+<b class="fc">&nbsp;        StringEntity entity = new StringEntity(msg, StandardCharsets.UTF_8);</b>
+<b class="fc">&nbsp;        post.setEntity(entity);</b>
+<b class="fc">&nbsp;        post.addHeader(&quot;Content-Type&quot;, &quot;application/json; charset=utf-8&quot;);</b>
+<b class="fc">&nbsp;        return post;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static CloseableHttpClient getProxyClient(String proxy, int port, String user, String password) {
+<b class="fc">&nbsp;        HttpHost httpProxy = new HttpHost(proxy, port);</b>
+<b class="nc">&nbsp;        CredentialsProvider provider = new BasicCredentialsProvider();</b>
+<b class="nc">&nbsp;        provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));</b>
+<b class="nc">&nbsp;        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy)</b>
+<b class="nc">&nbsp;                .setDefaultCredentialsProvider(provider).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static CloseableHttpClient getDefaultClient() {
+<b class="fc">&nbsp;        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static RequestConfig getProxyConfig(String proxy, int port) {
+<b class="nc">&nbsp;        HttpHost httpProxy = new HttpHost(proxy, port);</b>
+<b class="nc">&nbsp;        return RequestConfig.custom().setProxy(httpProxy).build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private AlertResult checkSendDingTalkSendMsgResult(String result) {
+<b class="nc">&nbsp;        AlertResult alertResult = new AlertResult();</b>
+<b class="nc">&nbsp;        alertResult.setSuccess(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (null == result) {</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;send ding talk msg error&quot;);</b>
+<b class="nc">&nbsp;            log.info(&quot;send ding talk msg error,ding talk server resp is null&quot;);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        DingTalkSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, DingTalkSendMsgResponse.class);</b>
+<b class="nc">&nbsp;        if (null == sendMsgResponse) {</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;send ding talk msg fail&quot;);</b>
+<b class="nc">&nbsp;            log.info(&quot;send ding talk msg error,resp error&quot;);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (sendMsgResponse.errcode == 0) {</b>
+<b class="nc">&nbsp;            alertResult.setSuccess(true);</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;send ding talk msg success&quot;);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        alertResult.setMessage(String.format(&quot;alert send ding talk msg error : %s&quot;, sendMsgResponse.getErrmsg()));</b>
+<b class="nc">&nbsp;        log.info(&quot;alert send ding talk msg error : {}&quot;, sendMsgResponse.getErrmsg());</b>
+<b class="nc">&nbsp;        return alertResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * send dingtalk msg handler
+&nbsp;     *
+&nbsp;     * @param title title
+&nbsp;     * @param content content
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public AlertResult sendDingTalkMsg(String title, String content) {
+&nbsp;        AlertResult alertResult;
+&nbsp;        try {
+<b class="fc">&nbsp;            String resp = sendMsg(title, content);</b>
+<b class="nc">&nbsp;            return checkSendDingTalkSendMsgResult(resp);</b>
+<b class="fc">&nbsp;        } catch (Exception e) {</b>
+<b class="fc">&nbsp;            log.info(&quot;send ding talk alert msg  exception : {}&quot;, e.getMessage());</b>
+<b class="fc">&nbsp;            alertResult = new AlertResult();</b>
+<b class="fc">&nbsp;            alertResult.setSuccess(false);</b>
+<b class="fc">&nbsp;            alertResult.setMessage(&quot;send ding talk alert fail.&quot;);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return alertResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String sendMsg(String title, String content) throws IOException {
+&nbsp;
+<b class="fc">&nbsp;        String msg = generateMsgJson(title, content);</b>
+&nbsp;
+<b class="fc">&nbsp;        HttpPost httpPost = constructHttpPost(</b>
+<b class="pc">&nbsp;                org.apache.commons.lang3.StringUtils.isBlank(secret) ? url : generateSignedUrl(), msg);</b>
+&nbsp;
+&nbsp;        CloseableHttpClient httpClient;
+<b class="fc">&nbsp;        if (Boolean.TRUE.equals(enableProxy)) {</b>
+<b class="fc">&nbsp;            httpClient = getProxyClient(proxy, port, user, password);</b>
+<b class="nc">&nbsp;            RequestConfig rcf = getProxyConfig(proxy, port);</b>
+<b class="nc">&nbsp;            httpPost.setConfig(rcf);</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            httpClient = getDefaultClient();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="fc">&nbsp;            CloseableHttpResponse response = httpClient.execute(httpPost);</b>
+&nbsp;            String resp;
+&nbsp;            try {
+<b class="nc">&nbsp;                HttpEntity entity = response.getEntity();</b>
+<b class="nc">&nbsp;                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                EntityUtils.consume(entity);</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                response.close();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            log.info(&quot;Ding Talk send msg :{}, resp: {}&quot;, msg, resp);</b>
+<b class="nc">&nbsp;            return resp;</b>
+&nbsp;        } finally {
+<b class="fc">&nbsp;            httpClient.close();</b>
+<b class="fc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * generate msg json
+&nbsp;     *
+&nbsp;     * @param title title
+&nbsp;     * @param content content
+&nbsp;     * @return msg
+&nbsp;     */
+&nbsp;    private String generateMsgJson(String title, String content) {
+<b class="pc">&nbsp;        if (org.apache.commons.lang3.StringUtils.isBlank(msgType)) {</b>
+<b class="nc">&nbsp;            msgType = DingTalkParamsConstants.DING_TALK_MSG_TYPE_TEXT;</b>
+&nbsp;        }
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; items = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        items.put(&quot;msgtype&quot;, msgType);</b>
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; text = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        items.put(msgType, text);</b>
+&nbsp;
+<b class="pc">&nbsp;        if (DingTalkParamsConstants.DING_TALK_MSG_TYPE_MARKDOWN.equals(msgType)) {</b>
+<b class="fc">&nbsp;            generateMarkdownMsg(title, content, text);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            generateTextMsg(title, content, text);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        setMsgAt(items);</b>
+<b class="fc">&nbsp;        return JSONUtils.toJsonString(items);</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * generate text msg
+&nbsp;     *
+&nbsp;     * @param title title
+&nbsp;     * @param content content
+&nbsp;     * @param text text
+&nbsp;     */
+&nbsp;    private void generateTextMsg(String title, String content, Map&lt;String, Object&gt; text) {
+<b class="nc">&nbsp;        StringBuilder builder = new StringBuilder(title);</b>
+<b class="nc">&nbsp;        builder.append(&quot;\n&quot;);</b>
+<b class="nc">&nbsp;        builder.append(content);</b>
+<b class="nc">&nbsp;        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {</b>
+<b class="nc">&nbsp;            builder.append(&quot; &quot;);</b>
+<b class="nc">&nbsp;            builder.append(keyword);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        byte[] byt = StringUtils.getBytesUtf8(builder.toString());</b>
+<b class="nc">&nbsp;        String txt = StringUtils.newStringUtf8(byt);</b>
+<b class="nc">&nbsp;        text.put(&quot;content&quot;, txt);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * generate markdown msg
+&nbsp;     *
+&nbsp;     * @param title title
+&nbsp;     * @param content content
+&nbsp;     * @param text text
+&nbsp;     */
+&nbsp;    private void generateMarkdownMsg(String title, String content, Map&lt;String, Object&gt; text) {
+<b class="fc">&nbsp;        StringBuilder builder = new StringBuilder(content);</b>
+<b class="pc">&nbsp;        if (org.apache.commons.lang3.StringUtils.isNotBlank(keyword)) {</b>
+<b class="fc">&nbsp;            builder.append(&quot; &quot;);</b>
+<b class="fc">&nbsp;            builder.append(keyword);</b>
+&nbsp;        }
+<b class="fc">&nbsp;        builder.append(&quot;\n\n&quot;);</b>
+<b class="pc">&nbsp;        if (org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles)) {</b>
+<b class="nc">&nbsp;            Arrays.stream(atMobiles.split(&quot;,&quot;)).forEach(value -&gt; {</b>
+<b class="nc">&nbsp;                builder.append(&quot;@&quot;);</b>
+<b class="nc">&nbsp;                builder.append(value);</b>
+<b class="nc">&nbsp;                builder.append(&quot; &quot;);</b>
+&nbsp;            });
+&nbsp;        }
+<b class="pc">&nbsp;        if (org.apache.commons.lang3.StringUtils.isNotBlank(atDingtalkIds)) {</b>
+<b class="nc">&nbsp;            Arrays.stream(atDingtalkIds.split(&quot;,&quot;)).forEach(value -&gt; {</b>
+<b class="nc">&nbsp;                builder.append(&quot;@&quot;);</b>
+<b class="nc">&nbsp;                builder.append(value);</b>
+<b class="nc">&nbsp;                builder.append(&quot; &quot;);</b>
+&nbsp;            });
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        byte[] byt = StringUtils.getBytesUtf8(builder.toString());</b>
+<b class="fc">&nbsp;        String txt = StringUtils.newStringUtf8(byt);</b>
+<b class="fc">&nbsp;        text.put(&quot;title&quot;, title);</b>
+<b class="fc">&nbsp;        text.put(&quot;text&quot;, txt);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * configure msg @person
+&nbsp;     *
+&nbsp;     * @param items items
+&nbsp;     */
+&nbsp;    private void setMsgAt(Map&lt;String, Object&gt; items) {
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; at = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        String[] atMobileArray =
+<b class="pc">&nbsp;                org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(&quot;,&quot;)</b>
+<b class="fc">&nbsp;                        : new String[0];</b>
+&nbsp;        String[] atUserArray =
+<b class="pc">&nbsp;                org.apache.commons.lang3.StringUtils.isNotBlank(atDingtalkIds) ? atDingtalkIds.split(&quot;,&quot;)</b>
+<b class="fc">&nbsp;                        : new String[0];</b>
+<b class="pc">&nbsp;        boolean isAtAll = Objects.isNull(atAll) ? false : atAll;</b>
+&nbsp;
+<b class="fc">&nbsp;        at.put(&quot;atMobiles&quot;, atMobileArray);</b>
+<b class="fc">&nbsp;        at.put(&quot;atDingtalkIds&quot;, atUserArray);</b>
+<b class="fc">&nbsp;        at.put(&quot;isAtAll&quot;, isAtAll);</b>
+&nbsp;
+<b class="fc">&nbsp;        items.put(&quot;at&quot;, at);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * generate sign url
+&nbsp;     *
+&nbsp;     * @return sign url
+&nbsp;     */
+&nbsp;    private String generateSignedUrl() {
+<b class="nc">&nbsp;        Long timestamp = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        String stringToSign = timestamp + &quot;\n&quot; + secret;</b>
+<b class="nc">&nbsp;        String sign = org.apache.commons.lang3.StringUtils.EMPTY;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Mac mac = Mac.getInstance(&quot;HmacSHA256&quot;);</b>
+<b class="nc">&nbsp;            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), &quot;HmacSHA256&quot;));</b>
+<b class="nc">&nbsp;            byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), StandardCharsets.UTF_8.name());</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;generate sign error, message:{}&quot;, e);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return url + &quot;&amp;timestamp=&quot; + timestamp + &quot;&amp;sign=&quot; + sign;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Getter
+&nbsp;    @Setter
+<b class="nc">&nbsp;    static final class DingTalkSendMsgResponse {</b>
+&nbsp;
+&nbsp;        private Integer errcode;
+&nbsp;        private String errmsg;
+&nbsp;
+<b class="nc">&nbsp;        public DingTalkSendMsgResponse() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public boolean equals(final Object o) {
+<b class="nc">&nbsp;            if (o == this) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!(o instanceof DingTalkSendMsgResponse)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            final DingTalkSendMsgResponse other = (DingTalkSendMsgResponse) o;</b>
+<b class="nc">&nbsp;            final Object this$errcode = this.getErrcode();</b>
+<b class="nc">&nbsp;            final Object other$errcode = other.getErrcode();</b>
+<b class="nc">&nbsp;            if (this$errcode == null ? other$errcode != null : !this$errcode.equals(other$errcode)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            final Object this$errmsg = this.getErrmsg();</b>
+<b class="nc">&nbsp;            final Object other$errmsg = other.getErrmsg();</b>
+<b class="nc">&nbsp;            if (this$errmsg == null ? other$errmsg != null : !this$errmsg.equals(other$errmsg)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            final int PRIME = 59;</b>
+<b class="nc">&nbsp;            int result = 1;</b>
+<b class="nc">&nbsp;            final Object $errcode = this.getErrcode();</b>
+<b class="nc">&nbsp;            result = result * PRIME + ($errcode == null ? 43 : $errcode.hashCode());</b>
+<b class="nc">&nbsp;            final Object $errmsg = this.getErrmsg();</b>
+<b class="nc">&nbsp;            result = result * PRIME + ($errmsg == null ? 43 : $errmsg.hashCode());</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;DingTalkSender.DingTalkSendMsgResponse(errcode=&quot; + this.getErrcode() + &quot;, errmsg=&quot;</b>
+<b class="nc">&nbsp;                    + this.getErrmsg() + &quot;)&quot;;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

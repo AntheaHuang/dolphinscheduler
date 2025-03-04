@@ -1,0 +1,470 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OSUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: OSUtils (org.apache.dolphinscheduler.common.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OSUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/117)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.utils;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.constants.Constants;
+&nbsp;import org.apache.dolphinscheduler.common.shell.ShellExecutor;
+&nbsp;
+&nbsp;import oshi.SystemInfo;
+&nbsp;import oshi.hardware.HardwareAbstractionLayer;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.SystemUtils;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.lang.management.ManagementFactory;
+&nbsp;import java.lang.management.RuntimeMXBean;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.StringTokenizer;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import lombok.experimental.UtilityClass;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;// todo: Split to WindowsOSUtils/LinuxOSUtils/MacOSOSUtils/K8sOSUtils...
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;@UtilityClass
+&nbsp;public class OSUtils {
+&nbsp;
+<b class="nc">&nbsp;    private static final SystemInfo SI = new SystemInfo();</b>
+&nbsp;
+<b class="nc">&nbsp;    private static final HardwareAbstractionLayer hal = SI.getHardware();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialization regularization, solve the problem of pre-compilation performance,
+&nbsp;     * avoid the thread safety problem of multi-thread operation
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern PATTERN = Pattern.compile(&quot;\\s+&quot;);</b>
+&nbsp;
+&nbsp;    public static long getTotalSystemMemory() {
+<b class="nc">&nbsp;        return hal.getMemory().getTotal();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static long getSystemAvailableMemoryUsed() {
+<b class="nc">&nbsp;        return hal.getMemory().getAvailable();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static List&lt;String&gt; getUserList() {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (SystemUtils.IS_OS_MAC) {</b>
+<b class="nc">&nbsp;                return getUserListFromMac();</b>
+<b class="nc">&nbsp;            } else if (SystemUtils.IS_OS_WINDOWS) {</b>
+<b class="nc">&nbsp;                return getUserListFromWindows();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return getUserListFromLinux();</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(e.getMessage(), e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get user list from linux
+&nbsp;     *
+&nbsp;     * @return user list
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; getUserListFromLinux() throws IOException {
+<b class="nc">&nbsp;        List&lt;String&gt; userList = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        try (</b>
+<b class="nc">&nbsp;                BufferedReader bufferedReader = new BufferedReader(</b>
+&nbsp;                        new InputStreamReader(new FileInputStream(&quot;/etc/passwd&quot;)))) {
+&nbsp;            String line;
+&nbsp;
+<b class="nc">&nbsp;            while ((line = bufferedReader.readLine()) != null) {</b>
+<b class="nc">&nbsp;                if (line.contains(&quot;:&quot;)) {</b>
+<b class="nc">&nbsp;                    String[] userInfo = line.split(&quot;:&quot;);</b>
+<b class="nc">&nbsp;                    userList.add(userInfo[0]);</b>
+<b class="nc">&nbsp;                }</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return userList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get user list from mac
+&nbsp;     *
+&nbsp;     * @return user list
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; getUserListFromMac() throws IOException {
+<b class="nc">&nbsp;        String result = exeCmd(&quot;dscl . list /users&quot;);</b>
+<b class="nc">&nbsp;        if (!StringUtils.isEmpty(result)) {</b>
+<b class="nc">&nbsp;            return Arrays.asList(result.split(&quot;\n&quot;));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get user list from windows
+&nbsp;     *
+&nbsp;     * @return user list
+&nbsp;     */
+&nbsp;    private static List&lt;String&gt; getUserListFromWindows() throws IOException {
+<b class="nc">&nbsp;        String result = exeCmd(&quot;net user&quot;);</b>
+<b class="nc">&nbsp;        String[] lines = result.split(&quot;\n&quot;);</b>
+&nbsp;
+<b class="nc">&nbsp;        int startPos = 0;</b>
+<b class="nc">&nbsp;        int endPos = lines.length - 2;</b>
+<b class="nc">&nbsp;        for (int i = 0; i &lt; lines.length; i++) {</b>
+<b class="nc">&nbsp;            if (StringUtils.isEmpty(lines[i])) {</b>
+<b class="nc">&nbsp;                continue;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            int count = 0;</b>
+<b class="nc">&nbsp;            if (lines[i].charAt(0) == &#39;-&#39;) {</b>
+<b class="nc">&nbsp;                for (int j = 0; j &lt; lines[i].length(); j++) {</b>
+<b class="nc">&nbsp;                    if (lines[i].charAt(i) == &#39;-&#39;) {</b>
+<b class="nc">&nbsp;                        count++;</b>
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (count == lines[i].length()) {</b>
+<b class="nc">&nbsp;                startPos = i + 1;</b>
+<b class="nc">&nbsp;                break;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; users = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        while (startPos &lt;= endPos) {</b>
+<b class="nc">&nbsp;            users.addAll(Arrays.asList(PATTERN.split(lines[startPos])));</b>
+<b class="nc">&nbsp;            startPos++;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return users;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether the user exists in linux
+&nbsp;     *
+&nbsp;     * @return boolean
+&nbsp;     */
+&nbsp;    public static boolean existTenantCodeInLinux(String tenantCode) {
+&nbsp;        try {
+<b class="nc">&nbsp;            String result = exeCmd(&quot;id &quot; + tenantCode);</b>
+<b class="nc">&nbsp;            if (!StringUtils.isEmpty(result)) {</b>
+<b class="nc">&nbsp;                return result.contains(&quot;uid=&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;            // because ShellExecutor method throws exception to the linux return status is not 0
+&nbsp;            // not exist user return status is 1
+<b class="nc">&nbsp;            log.error(e.getMessage(), e);</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create user
+&nbsp;     *
+&nbsp;     * @param userName user name
+&nbsp;     */
+&nbsp;    public static synchronized void createUserIfAbsent(String userName) {
+&nbsp;        // if not exists this user, then create
+<b class="nc">&nbsp;        if (!getUserList().contains(userName)) {</b>
+<b class="nc">&nbsp;            createUser(userName);</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create user
+&nbsp;     *
+&nbsp;     * @param userName user name
+&nbsp;     * @return true if creation was successful, otherwise false
+&nbsp;     */
+&nbsp;    public static void createUser(String userName) {
+&nbsp;        try {
+<b class="nc">&nbsp;            String userGroup = getGroup();</b>
+<b class="nc">&nbsp;            if (StringUtils.isEmpty(userGroup)) {</b>
+<b class="nc">&nbsp;                throw new UnsupportedOperationException(</b>
+&nbsp;                        &quot;There is no userGroup exist cannot create tenant, please create userGroupFirst&quot;);
+&nbsp;            }
+<b class="nc">&nbsp;            if (SystemUtils.IS_OS_MAC) {</b>
+<b class="nc">&nbsp;                createMacUser(userName, userGroup);</b>
+<b class="nc">&nbsp;            } else if (SystemUtils.IS_OS_WINDOWS) {</b>
+<b class="nc">&nbsp;                createWindowsUser(userName, userGroup);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                createLinuxUser(userName, userGroup);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            log.info(&quot;Create tenant {} under userGroup: {} success&quot;, userName, userGroup);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Create tenant: {} failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create linux user
+&nbsp;     *
+&nbsp;     * @param userName  user name
+&nbsp;     * @param userGroup user group
+&nbsp;     * @throws IOException in case of an I/O error
+&nbsp;     */
+&nbsp;    private static void createLinuxUser(String userName, String userGroup) throws IOException {
+<b class="nc">&nbsp;        log.info(&quot;create linux os user: {}&quot;, userName);</b>
+<b class="nc">&nbsp;        String cmd = String.format(&quot;sudo useradd -m -g %s %s&quot;, userGroup, userName);</b>
+<b class="nc">&nbsp;        log.info(&quot;execute cmd: {}&quot;, cmd);</b>
+<b class="nc">&nbsp;        exeCmd(cmd);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create mac user (Supports Mac OSX 10.10+)
+&nbsp;     *
+&nbsp;     * @param userName  user name
+&nbsp;     * @param userGroup user group
+&nbsp;     * @throws IOException in case of an I/O error
+&nbsp;     */
+&nbsp;    private static void createMacUser(String userName, String userGroup) throws IOException {
+<b class="nc">&nbsp;        log.info(&quot;create mac os user: {}&quot;, userName);</b>
+&nbsp;
+<b class="nc">&nbsp;        String createUserCmd = String.format(&quot;sudo sysadminctl -addUser %s -password %s&quot;, userName, userName);</b>
+<b class="nc">&nbsp;        log.info(&quot;create user command: {}&quot;, createUserCmd);</b>
+<b class="nc">&nbsp;        exeCmd(createUserCmd);</b>
+&nbsp;
+<b class="nc">&nbsp;        String appendGroupCmd = String.format(&quot;sudo dseditgroup -o edit -a %s -t user %s&quot;, userName, userGroup);</b>
+<b class="nc">&nbsp;        log.info(&quot;append user to group: {}&quot;, appendGroupCmd);</b>
+<b class="nc">&nbsp;        exeCmd(appendGroupCmd);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create windows user
+&nbsp;     *
+&nbsp;     * @param userName  user name
+&nbsp;     * @param userGroup user group
+&nbsp;     * @throws IOException in case of an I/O error
+&nbsp;     */
+&nbsp;    private static void createWindowsUser(String userName, String userGroup) throws IOException {
+<b class="nc">&nbsp;        log.info(&quot;create windows os user: {}&quot;, userName);</b>
+&nbsp;
+<b class="nc">&nbsp;        String userCreateCmd = String.format(&quot;net user \&quot;%s\&quot; /add&quot;, userName);</b>
+<b class="nc">&nbsp;        log.info(&quot;execute create user command: {}&quot;, userCreateCmd);</b>
+<b class="nc">&nbsp;        exeCmd(userCreateCmd);</b>
+&nbsp;
+<b class="nc">&nbsp;        String appendGroupCmd = String.format(&quot;net localgroup \&quot;%s\&quot; \&quot;%s\&quot; /add&quot;, userGroup, userName);</b>
+<b class="nc">&nbsp;        log.info(&quot;execute append user to group: {}&quot;, appendGroupCmd);</b>
+<b class="nc">&nbsp;        exeCmd(appendGroupCmd);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get system group information
+&nbsp;     *
+&nbsp;     * @return system group info
+&nbsp;     * @throws IOException errors
+&nbsp;     */
+&nbsp;    public static String getGroup() throws IOException {
+<b class="nc">&nbsp;        if (SystemUtils.IS_OS_WINDOWS) {</b>
+<b class="nc">&nbsp;            String currentProcUserName = System.getProperty(&quot;user.name&quot;);</b>
+<b class="nc">&nbsp;            String result = exeCmd(String.format(&quot;net user \&quot;%s\&quot;&quot;, currentProcUserName));</b>
+<b class="nc">&nbsp;            String line = result.split(&quot;\n&quot;)[22];</b>
+<b class="nc">&nbsp;            String group = PATTERN.split(line)[1];</b>
+<b class="nc">&nbsp;            if (group.charAt(0) == &#39;*&#39;) {</b>
+<b class="nc">&nbsp;                return group.substring(1);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return group;</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            String result = exeCmd(&quot;groups&quot;);</b>
+<b class="nc">&nbsp;            if (!StringUtils.isEmpty(result)) {</b>
+<b class="nc">&nbsp;                String[] groupInfo = result.split(&quot; &quot;);</b>
+<b class="nc">&nbsp;                return groupInfo[0];</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get sudo command
+&nbsp;     *
+&nbsp;     * @param tenantCode tenantCode
+&nbsp;     * @param command    command
+&nbsp;     * @return result of sudo execute command
+&nbsp;     */
+&nbsp;    public static String getSudoCmd(String tenantCode, String command) {
+<b class="nc">&nbsp;        if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {</b>
+<b class="nc">&nbsp;            return command;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return String.format(&quot;sudo -u %s %s&quot;, tenantCode, command);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static boolean isSudoEnable() {
+<b class="nc">&nbsp;        return PropertyUtils.getBoolean(Constants.SUDO_ENABLE, true);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Execute the corresponding command of Linux or Windows
+&nbsp;     *
+&nbsp;     * @param command command
+&nbsp;     * @return result of execute command
+&nbsp;     * @throws IOException errors
+&nbsp;     */
+&nbsp;    public static String exeCmd(String command) throws IOException {
+<b class="nc">&nbsp;        StringTokenizer st = new StringTokenizer(command);</b>
+<b class="nc">&nbsp;        String[] cmdArray = new String[st.countTokens()];</b>
+<b class="nc">&nbsp;        for (int i = 0; st.hasMoreTokens(); i++) {</b>
+<b class="nc">&nbsp;            cmdArray[i] = st.nextToken();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return exeShell(cmdArray);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Execute the shell
+&nbsp;     *
+&nbsp;     * @param command command
+&nbsp;     * @return result of execute the shell
+&nbsp;     * @throws IOException errors
+&nbsp;     */
+&nbsp;    public static String exeShell(String[] command) throws IOException {
+<b class="nc">&nbsp;        return ShellExecutor.execCommand(command);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static int getProcessID() {
+<b class="nc">&nbsp;        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();</b>
+<b class="nc">&nbsp;        return Integer.parseInt(runtimeMXBean.getName().split(&quot;@&quot;)[0]);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Boolean isWindows() {
+<b class="nc">&nbsp;        return System.getProperty(&quot;os.name&quot;).startsWith(&quot;Windows&quot;);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

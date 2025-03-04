@@ -1,0 +1,368 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ProcessUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.api.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: ProcessUtils (org.apache.dolphinscheduler.plugin.task.api.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ProcessUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/40)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/84)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.api.utils;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.APPID_COLLECT;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_COLLECT_WAY;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.OSUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManager;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManagerContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.am.YarnApplicationManagerContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.commons.lang3.SystemUtils;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Objects;
+&nbsp;import java.util.ServiceLoader;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import lombok.NonNull;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import io.fabric8.kubernetes.client.dsl.LogWatch;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public final class ProcessUtils {
+&nbsp;
+<b class="nc">&nbsp;    private ProcessUtils() {</b>
+<b class="nc">&nbsp;        throw new IllegalStateException(&quot;Utility class&quot;);</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    private static final Map&lt;ResourceManagerType, ApplicationManager&gt; applicationManagerMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    static {
+<b class="nc">&nbsp;        ServiceLoader.load(ApplicationManager.class)</b>
+<b class="nc">&nbsp;                .forEach(applicationManager -&gt; applicationManagerMap.put(applicationManager.getResourceManagerType(),</b>
+&nbsp;                        applicationManager));
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Initialization regularization, solve the problem of pre-compilation performance,
+&nbsp;     * avoid the thread safety problem of multi-thread operation
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern MACPATTERN = Pattern.compile(&quot;-[+|-][-|=]\\s(\\d+)&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expression of PID recognition in Windows scene
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern WINDOWSPATTERN = Pattern.compile(&quot;(\\d+)&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Expression of PID recognition in Linux scene
+&nbsp;     */
+<b class="nc">&nbsp;    private static final Pattern LINUXPATTERN = Pattern.compile(&quot;\\((\\d+)\\)&quot;);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * kill tasks according to different task types.
+&nbsp;     */
+&nbsp;    @Deprecated
+<b class="nc">&nbsp;    public static boolean kill(@NonNull TaskExecutionContext request) {</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            log.info(&quot;Begin kill task instance, processId: {}&quot;, request.getProcessId());</b>
+<b class="nc">&nbsp;            int processId = request.getProcessId();</b>
+<b class="nc">&nbsp;            if (processId == 0) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Task instance kill failed, processId is not exist&quot;);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            String cmd = String.format(&quot;kill -9 %s&quot;, getPidsStr(processId));</b>
+<b class="nc">&nbsp;            cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);</b>
+<b class="nc">&nbsp;            log.info(&quot;process id:{}, cmd:{}&quot;, processId, cmd);</b>
+&nbsp;
+<b class="nc">&nbsp;            OSUtils.exeCmd(cmd);</b>
+<b class="nc">&nbsp;            log.info(&quot;Success kill task instance, processId: {}&quot;, request.getProcessId());</b>
+<b class="nc">&nbsp;            return true;</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Kill task instance error, processId: {}&quot;, request.getProcessId(), e);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get pids str.
+&nbsp;     *
+&nbsp;     * @param processId process id
+&nbsp;     * @return pids pid String
+&nbsp;     * @throws Exception exception
+&nbsp;     */
+&nbsp;    public static String getPidsStr(int processId) throws Exception {
+&nbsp;
+&nbsp;        String rawPidStr;
+&nbsp;
+&nbsp;        // pstree pid get sub pids
+<b class="nc">&nbsp;        if (SystemUtils.IS_OS_MAC) {</b>
+<b class="nc">&nbsp;            rawPidStr = OSUtils.exeCmd(String.format(&quot;%s -sp %d&quot;, TaskConstants.PSTREE, processId));</b>
+<b class="nc">&nbsp;        } else if (SystemUtils.IS_OS_LINUX) {</b>
+<b class="nc">&nbsp;            rawPidStr = OSUtils.exeCmd(String.format(&quot;%s -p %d&quot;, TaskConstants.PSTREE, processId));</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            rawPidStr = OSUtils.exeCmd(String.format(&quot;%s -p %d&quot;, TaskConstants.PSTREE, processId));</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return parsePidStr(rawPidStr);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String parsePidStr(String rawPidStr) {
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;prepare to parse pid, raw pid string: {}&quot;, rawPidStr);</b>
+<b class="nc">&nbsp;        ArrayList&lt;String&gt; allPidList = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        Matcher mat = null;</b>
+<b class="nc">&nbsp;        if (SystemUtils.IS_OS_MAC) {</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(rawPidStr)) {</b>
+<b class="nc">&nbsp;                mat = MACPATTERN.matcher(rawPidStr);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } else if (SystemUtils.IS_OS_LINUX) {</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(rawPidStr)) {</b>
+<b class="nc">&nbsp;                mat = LINUXPATTERN.matcher(rawPidStr);</b>
+&nbsp;            }
+&nbsp;        } else {
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(rawPidStr)) {</b>
+<b class="nc">&nbsp;                mat = WINDOWSPATTERN.matcher(rawPidStr);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (null != mat) {</b>
+<b class="nc">&nbsp;            while (mat.find()) {</b>
+<b class="nc">&nbsp;                allPidList.add(mat.group(1));</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return String.join(&quot; &quot;, allPidList).trim();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * cancel k8s / yarn application
+&nbsp;     *
+&nbsp;     * @param taskExecutionContext
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
+&nbsp;        try {
+<b class="nc">&nbsp;            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext())) {</b>
+<b class="nc">&nbsp;                if (!TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {</b>
+&nbsp;                    // Set empty container name for Spark on K8S task
+<b class="nc">&nbsp;                    applicationManagerMap.get(ResourceManagerType.KUBERNETES)</b>
+<b class="nc">&nbsp;                            .killApplication(new KubernetesApplicationManagerContext(</b>
+<b class="nc">&nbsp;                                    taskExecutionContext.getK8sTaskExecutionContext(),</b>
+<b class="nc">&nbsp;                                    taskExecutionContext.getTaskAppId(), &quot;&quot;));</b>
+&nbsp;                }
+&nbsp;            } else {
+<b class="nc">&nbsp;                String host = taskExecutionContext.getHost();</b>
+<b class="nc">&nbsp;                String executePath = taskExecutionContext.getExecutePath();</b>
+<b class="nc">&nbsp;                String tenantCode = taskExecutionContext.getTenantCode();</b>
+&nbsp;                List&lt;String&gt; appIds;
+<b class="nc">&nbsp;                if (StringUtils.isNotEmpty(taskExecutionContext.getAppIds())) {</b>
+&nbsp;                    // is failover
+<b class="nc">&nbsp;                    appIds = Arrays.asList(taskExecutionContext.getAppIds().split(COMMA));</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    String logPath = taskExecutionContext.getLogPath();</b>
+<b class="nc">&nbsp;                    String appInfoPath = taskExecutionContext.getAppInfoPath();</b>
+<b class="nc">&nbsp;                    if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {</b>
+<b class="nc">&nbsp;                        log.error(</b>
+&nbsp;                                &quot;Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}&quot;,
+&nbsp;                                host, logPath, appInfoPath, executePath, tenantCode);
+<b class="nc">&nbsp;                        throw new TaskException(&quot;Cancel application failed!&quot;);</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                    log.info(&quot;Get appIds from worker {}, taskLogPath: {}&quot;, host, logPath);</b>
+<b class="nc">&nbsp;                    appIds = LogUtils.getAppIds(logPath, appInfoPath,</b>
+<b class="nc">&nbsp;                            PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));</b>
+<b class="nc">&nbsp;                    taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (CollectionUtils.isEmpty(appIds)) {</b>
+<b class="nc">&nbsp;                    log.info(&quot;The appId is empty&quot;);</b>
+&nbsp;                    return;
+&nbsp;                }
+<b class="nc">&nbsp;                ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);</b>
+<b class="nc">&nbsp;                applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Cancel application failed: {}&quot;, e.getMessage());</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get k8s application status
+&nbsp;     *
+&nbsp;     * @param k8sTaskExecutionContext
+&nbsp;     * @param taskAppId
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public static TaskExecutionStatus getApplicationStatus(K8sTaskExecutionContext k8sTaskExecutionContext,
+&nbsp;                                                           String taskAppId) {
+<b class="nc">&nbsp;        if (Objects.isNull(k8sTaskExecutionContext)) {</b>
+<b class="nc">&nbsp;            return TaskExecutionStatus.SUCCESS;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        KubernetesApplicationManager applicationManager =</b>
+<b class="nc">&nbsp;                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);</b>
+<b class="nc">&nbsp;        return applicationManager</b>
+<b class="nc">&nbsp;                .getApplicationStatus(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, &quot;&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get driver pod logs
+&nbsp;     *
+&nbsp;     * @param k8sTaskExecutionContext
+&nbsp;     * @param taskAppId
+&nbsp;     * @return
+&nbsp;     */
+&nbsp;    public static LogWatch getPodLogWatcher(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId,
+&nbsp;                                            String containerName) {
+<b class="nc">&nbsp;        KubernetesApplicationManager applicationManager =</b>
+<b class="nc">&nbsp;                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);</b>
+&nbsp;
+<b class="nc">&nbsp;        return applicationManager</b>
+<b class="nc">&nbsp;                .getPodLogWatcher(</b>
+&nbsp;                        new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, containerName));
+&nbsp;    }
+&nbsp;
+&nbsp;    public static void removeK8sClientCache(String taskAppId) {
+<b class="nc">&nbsp;        KubernetesApplicationManager applicationManager =</b>
+<b class="nc">&nbsp;                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);</b>
+<b class="nc">&nbsp;        applicationManager.removeCache(taskAppId);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceConstants</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.constants</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceConstants (org.apache.dolphinscheduler.common.constants)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataSourceConstants</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.constants;
+&nbsp;
+<b class="nc">&nbsp;public class DataSourceConstants {</b>
+&nbsp;
+&nbsp;    public static final String DATASOURCE = &quot;datasource&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * driver
+&nbsp;     */
+&nbsp;    public static final String ORG_POSTGRESQL_DRIVER = &quot;org.postgresql.Driver&quot;;
+&nbsp;    public static final String COM_MYSQL_CJ_JDBC_DRIVER = &quot;com.mysql.cj.jdbc.Driver&quot;;
+&nbsp;    public static final String COM_MYSQL_JDBC_DRIVER = &quot;com.mysql.jdbc.Driver&quot;;
+&nbsp;    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = &quot;org.apache.hive.jdbc.HiveDriver&quot;;
+&nbsp;    public static final String COM_CLICKHOUSE_JDBC_DRIVER = &quot;com.clickhouse.jdbc.ClickHouseDriver&quot;;
+&nbsp;    public static final String COM_DATABEND_JDBC_DRIVER = &quot;com.databend.jdbc.DatabendDriver&quot;;
+&nbsp;    public static final String COM_ORACLE_JDBC_DRIVER = &quot;oracle.jdbc.OracleDriver&quot;;
+&nbsp;    public static final String COM_SQLSERVER_JDBC_DRIVER = &quot;com.microsoft.sqlserver.jdbc.SQLServerDriver&quot;;
+&nbsp;    public static final String COM_DB2_JDBC_DRIVER = &quot;com.ibm.db2.jcc.DB2Driver&quot;;
+&nbsp;    public static final String COM_PRESTO_JDBC_DRIVER = &quot;com.facebook.presto.jdbc.PrestoDriver&quot;;
+&nbsp;    public static final String COM_REDSHIFT_JDBC_DRIVER = &quot;com.amazon.redshift.jdbc42.Driver&quot;;
+&nbsp;    public static final String COM_ATHENA_JDBC_DRIVER = &quot;com.simba.athena.jdbc.Driver&quot;;
+&nbsp;    public static final String COM_TRINO_JDBC_DRIVER = &quot;io.trino.jdbc.TrinoDriver&quot;;
+&nbsp;    public static final String COM_DAMENG_JDBC_DRIVER = &quot;dm.jdbc.driver.DmDriver&quot;;
+&nbsp;    public static final String ORG_APACHE_KYUUBI_JDBC_DRIVER = &quot;org.apache.kyuubi.jdbc.KyuubiHiveDriver&quot;;
+&nbsp;    public static final String COM_OCEANBASE_JDBC_DRIVER = &quot;com.oceanbase.jdbc.Driver&quot;;
+&nbsp;    public static final String NET_SNOWFLAKE_JDBC_DRIVER = &quot;net.snowflake.client.jdbc.SnowflakeDriver&quot;;
+&nbsp;    public static final String COM_VERTICA_JDBC_DRIVER = &quot;com.vertica.jdbc.Driver&quot;;
+&nbsp;    public static final String COM_HANA_DB_JDBC_DRIVER = &quot;com.sap.db.jdbc.Driver&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * validation Query
+&nbsp;     */
+&nbsp;    public static final String POSTGRESQL_VALIDATION_QUERY = &quot;select version()&quot;;
+&nbsp;    public static final String MYSQL_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String HIVE_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String CLICKHOUSE_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String DATABEND_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String ORACLE_VALIDATION_QUERY = &quot;select 1 from dual&quot;;
+&nbsp;    public static final String SQLSERVER_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String DB2_VALIDATION_QUERY = &quot;select 1 from sysibm.sysdummy1&quot;;
+&nbsp;    public static final String PRESTO_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String REDHIFT_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String ATHENA_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String TRINO_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String DAMENG_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String SNOWFLAKE_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;
+&nbsp;    public static final String KYUUBI_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;    public static final String VERTICA_VALIDATION_QUERY = &quot;select 1&quot;;
+&nbsp;
+&nbsp;    public static final String HANA_VALIDATION_QUERY = &quot;select 1 from DUMMY&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * jdbc url
+&nbsp;     */
+&nbsp;    public static final String JDBC_MYSQL = &quot;jdbc:mysql://&quot;;
+&nbsp;    public static final String JDBC_MYSQL_LOADBALANCE = &quot;jdbc:mysql:loadbalance://&quot;;
+&nbsp;    public static final String JDBC_POSTGRESQL = &quot;jdbc:postgresql://&quot;;
+&nbsp;    public static final String JDBC_HIVE_2 = &quot;jdbc:hive2://&quot;;
+&nbsp;    public static final String JDBC_KYUUBI = &quot;jdbc:kyuubi://&quot;;
+&nbsp;    public static final String JDBC_CLICKHOUSE = &quot;jdbc:clickhouse://&quot;;
+&nbsp;    public static final String JDBC_DATABEND = &quot;jdbc:databend://&quot;;
+&nbsp;    public static final String JDBC_ORACLE_SID = &quot;jdbc:oracle:thin:@&quot;;
+&nbsp;    public static final String JDBC_ORACLE_SERVICE_NAME = &quot;jdbc:oracle:thin:@//&quot;;
+&nbsp;    public static final String JDBC_SQLSERVER = &quot;jdbc:sqlserver://&quot;;
+&nbsp;    public static final String JDBC_DB2 = &quot;jdbc:db2://&quot;;
+&nbsp;    public static final String JDBC_PRESTO = &quot;jdbc:presto://&quot;;
+&nbsp;    public static final String JDBC_REDSHIFT = &quot;jdbc:redshift://&quot;;
+&nbsp;    public static final String JDBC_REDSHIFT_IAM = &quot;jdbc:redshift:iam://&quot;;
+&nbsp;    public static final String JDBC_ATHENA = &quot;jdbc:awsathena://&quot;;
+&nbsp;    public static final String JDBC_TRINO = &quot;jdbc:trino://&quot;;
+&nbsp;    public static final String JDBC_DAMENG = &quot;jdbc:dm://&quot;;
+&nbsp;    public static final String JDBC_OCEANBASE = &quot;jdbc:oceanbase://&quot;;
+&nbsp;    public static final String JDBC_SNOWFLAKE = &quot;jdbc:snowflake://&quot;;
+&nbsp;    public static final String JDBC_VERTICA = &quot;jdbc:vertica://&quot;;
+&nbsp;    public static final String JDBC_HANA = &quot;jdbc:sap://&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * database type
+&nbsp;     */
+&nbsp;    public static final String MYSQL = &quot;MYSQL&quot;;
+&nbsp;    public static final String HIVE = &quot;HIVE&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * dataSource sensitive param
+&nbsp;     */
+&nbsp;    public static final String DATASOURCE_PASSWORD_REGEX =
+&nbsp;            &quot;(?&lt;=((?i)password((\&quot; : \&quot;)|(\&quot;:\&quot;)|(\\\\\&quot;:\\\\\&quot;)|(=&#39;)))).*?(?=((\&quot;)|(\\\\\&quot;)|(&#39;)))&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * datasource encryption salt
+&nbsp;     */
+&nbsp;    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = &quot;!@#$%^&amp;*&quot;;
+&nbsp;    public static final String DATASOURCE_ENCRYPTION_ENABLE = &quot;datasource.encryption.enable&quot;;
+&nbsp;    public static final String DATASOURCE_ENCRYPTION_SALT = &quot;datasource.encryption.salt&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * datasource config
+&nbsp;     */
+&nbsp;    public static final String SPRING_DATASOURCE_MIN_IDLE = &quot;spring.datasource.minIdle&quot;;
+&nbsp;
+&nbsp;    public static final String SPRING_DATASOURCE_MAX_ACTIVE = &quot;spring.datasource.maxActive&quot;;
+&nbsp;
+&nbsp;    public static final String SPRING_DATASOURCE_TEST_ON_BORROW = &quot;spring.datasource.testOnBorrow&quot;;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * azure static websites
+&nbsp;     */
+&nbsp;    public static final String AZURE_SQL_DATABASE_SPN = &quot;https://database.windows.net/&quot;;
+&nbsp;    public static final String AZURE_SQL_DATABASE_TOKEN_SCOPE = &quot;/.default&quot;;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

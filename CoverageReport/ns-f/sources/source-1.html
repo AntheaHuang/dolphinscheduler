@@ -1,0 +1,605 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AbstractShell</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.shell</a>
+</div>
+
+<h1>Coverage Summary for Class: AbstractShell (org.apache.dolphinscheduler.common.shell)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AbstractShell</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/77)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">AbstractShell$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractShell$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractShell$ExitCodeException</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractShell$ProcessContainer</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">AbstractShell$ShellTimeoutTimerTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/127)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.shell;
+&nbsp;
+&nbsp;import java.io.BufferedReader;
+&nbsp;import java.io.File;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStreamReader;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.Timer;
+&nbsp;import java.util.TimerTask;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.atomic.AtomicBoolean;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;/**
+&nbsp; * A base class for running a Unix command.
+&nbsp; * 
+&nbsp; * &lt;code&gt;AbstractShell&lt;/code&gt; can be used to run unix commands like &lt;code&gt;du&lt;/code&gt; or
+&nbsp; * &lt;code&gt;df&lt;/code&gt;. It also offers facilities to gate commands by 
+&nbsp; * time-intervals.
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+<b class="nc">&nbsp;public abstract class AbstractShell {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Time after which the executing script would be timedout
+&nbsp;     */
+<b class="nc">&nbsp;    protected long timeOutInterval = 0L;</b>
+&nbsp;    /**
+&nbsp;     * If or not script timed out
+&nbsp;     */
+&nbsp;    private AtomicBoolean timedOut;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * refresh interval in msec
+&nbsp;      */
+&nbsp;    private long interval;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * last time the command was performed
+&nbsp;     */
+&nbsp;    private long lastTime;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * env for the command execution
+&nbsp;     */
+&nbsp;    private Map&lt;String, String&gt; environment;
+&nbsp;    private File dir;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sub process used to execute the command
+&nbsp;     */
+&nbsp;    private Process process;
+&nbsp;    private int exitCode;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * If or not script finished executing
+&nbsp;     */
+&nbsp;    private AtomicBoolean completed;
+&nbsp;
+&nbsp;    public AbstractShell() {
+<b class="nc">&nbsp;        this(0L);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @param interval the minimum duration to wait before re-executing the
+&nbsp;     *        command.
+&nbsp;     */
+<b class="nc">&nbsp;    public AbstractShell(long interval) {</b>
+<b class="nc">&nbsp;        this.interval = interval;</b>
+<b class="nc">&nbsp;        this.lastTime = (interval &lt; 0) ? 0 : -interval;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * set the environment for the command
+&nbsp;     * @param env Mapping of environment variables
+&nbsp;     */
+&nbsp;    protected void setEnvironment(Map&lt;String, String&gt; env) {
+<b class="nc">&nbsp;        this.environment = env;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * set the working directory
+&nbsp;     * @param dir The directory where the command would be executed
+&nbsp;     */
+&nbsp;    protected void setWorkingDirectory(File dir) {
+<b class="nc">&nbsp;        this.dir = dir;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * check to see if a command needs to be executed and execute if needed
+&nbsp;     * @throws IOException errors
+&nbsp;     */
+&nbsp;    protected void run() throws IOException {
+<b class="nc">&nbsp;        if (lastTime + interval &gt; System.currentTimeMillis()) {</b>
+<b class="nc">&nbsp;            return;</b>
+&nbsp;        }
+&nbsp;        // reset for next run
+<b class="nc">&nbsp;        exitCode = 0;</b>
+<b class="nc">&nbsp;        runCommand();</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Run a command   actual work
+&nbsp;     */
+&nbsp;    private void runCommand() throws IOException {
+<b class="nc">&nbsp;        ProcessBuilder builder = new ProcessBuilder(getExecString());</b>
+<b class="nc">&nbsp;        Timer timeOutTimer = null;</b>
+<b class="nc">&nbsp;        ShellTimeoutTimerTask timeoutTimerTask = null;</b>
+<b class="nc">&nbsp;        timedOut = new AtomicBoolean(false);</b>
+<b class="nc">&nbsp;        completed = new AtomicBoolean(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (environment != null) {</b>
+<b class="nc">&nbsp;            builder.environment().putAll(this.environment);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (dir != null) {</b>
+<b class="nc">&nbsp;            builder.directory(this.dir);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        process = builder.start();</b>
+<b class="nc">&nbsp;        ProcessContainer.putProcess(process);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (timeOutInterval &gt; 0) {</b>
+<b class="nc">&nbsp;            timeOutTimer = new Timer();</b>
+<b class="nc">&nbsp;            timeoutTimerTask = new ShellTimeoutTimerTask(this);</b>
+&nbsp;            // One time scheduling.
+<b class="nc">&nbsp;            timeOutTimer.schedule(timeoutTimerTask, timeOutInterval);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        final BufferedReader errReader =</b>
+&nbsp;                new BufferedReader(
+<b class="nc">&nbsp;                        new InputStreamReader(process.getErrorStream()));</b>
+<b class="nc">&nbsp;        BufferedReader inReader =</b>
+&nbsp;                new BufferedReader(
+<b class="nc">&nbsp;                        new InputStreamReader(process.getInputStream()));</b>
+<b class="nc">&nbsp;        final StringBuilder errMsg = new StringBuilder();</b>
+&nbsp;
+&nbsp;        // read error and input streams as this would free up the buffers
+&nbsp;        // free the error stream buffer
+<b class="nc">&nbsp;        Thread errThread = new Thread() {</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void run() {
+&nbsp;                try {
+<b class="nc">&nbsp;                    String line = errReader.readLine();</b>
+<b class="nc">&nbsp;                    while ((line != null) &amp;&amp; !isInterrupted()) {</b>
+<b class="nc">&nbsp;                        errMsg.append(line);</b>
+<b class="nc">&nbsp;                        errMsg.append(System.getProperty(&quot;line.separator&quot;));</b>
+<b class="nc">&nbsp;                        line = errReader.readLine();</b>
+&nbsp;                    }
+<b class="nc">&nbsp;                } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                    log.warn(&quot;Error reading the error stream&quot;, ioe);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        };
+<b class="nc">&nbsp;        Thread inThread = new Thread() {</b>
+&nbsp;
+&nbsp;            @Override
+&nbsp;            public void run() {
+&nbsp;                try {
+<b class="nc">&nbsp;                    parseExecResult(inReader);</b>
+<b class="nc">&nbsp;                } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                    log.warn(&quot;Error reading the in stream&quot;, ioe);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;                super.run();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        };
+&nbsp;        try {
+<b class="nc">&nbsp;            errThread.start();</b>
+<b class="nc">&nbsp;            inThread.start();</b>
+<b class="nc">&nbsp;        } catch (IllegalStateException ise) {</b>
+<b class="nc">&nbsp;            log.warn(&quot;Illegal while starting the error and in thread&quot;, ise);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;        try {
+&nbsp;            // parse the output
+<b class="nc">&nbsp;            exitCode = process.waitFor();</b>
+&nbsp;            try {
+&nbsp;                // make sure that the error and in thread exits
+<b class="nc">&nbsp;                errThread.join();</b>
+<b class="nc">&nbsp;                inThread.join();</b>
+<b class="nc">&nbsp;            } catch (InterruptedException ie) {</b>
+<b class="nc">&nbsp;                log.warn(&quot;Interrupted while reading the error and in stream&quot;, ie);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            completed.compareAndSet(false, true);</b>
+&nbsp;            // the timeout thread handling
+&nbsp;            // taken care in finally block
+<b class="nc">&nbsp;            if (exitCode != 0 || errMsg.length() &gt; 0) {</b>
+<b class="nc">&nbsp;                throw new ExitCodeException(exitCode, errMsg.toString());</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException ie) {</b>
+<b class="nc">&nbsp;            throw new IOException(ie.toString());</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            if ((timeOutTimer != null) &amp;&amp; !timedOut.get()) {</b>
+<b class="nc">&nbsp;                timeOutTimer.cancel();</b>
+&nbsp;            }
+&nbsp;            // close the input stream
+&nbsp;            try {
+<b class="nc">&nbsp;                inReader.close();</b>
+<b class="nc">&nbsp;            } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                log.warn(&quot;Error while closing the input stream&quot;, ioe);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            if (!completed.get()) {</b>
+<b class="nc">&nbsp;                errThread.interrupt();</b>
+&nbsp;            }
+&nbsp;            try {
+<b class="nc">&nbsp;                errReader.close();</b>
+<b class="nc">&nbsp;            } catch (IOException ioe) {</b>
+<b class="nc">&nbsp;                log.warn(&quot;Error while closing the error stream&quot;, ioe);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            ProcessContainer.removeProcess(process);</b>
+<b class="nc">&nbsp;            process.destroy();</b>
+<b class="nc">&nbsp;            lastTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     *
+&nbsp;     * @return an array containing the command name and its parameters
+&nbsp;     */
+&nbsp;    protected abstract String[] getExecString();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Parse the execution result
+&nbsp;     * @param lines lines
+&nbsp;     * @throws IOException errors
+&nbsp;     */
+&nbsp;    protected abstract void parseExecResult(BufferedReader lines) throws IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get the current sub-process executing the given command
+&nbsp;     * @return process executing the command
+&nbsp;     */
+&nbsp;    public Process getProcess() {
+<b class="nc">&nbsp;        return process;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** get the exit code
+&nbsp;     * @return the exit code of the process
+&nbsp;     */
+&nbsp;    public int getExitCode() {
+<b class="nc">&nbsp;        return exitCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Set if the command has timed out.
+&nbsp;     *
+&nbsp;     */
+&nbsp;    private void setTimedOut() {
+<b class="nc">&nbsp;        this.timedOut.set(true);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Timer which is used to timeout scripts spawned off by shell.
+&nbsp;     */
+&nbsp;    private static class ShellTimeoutTimerTask extends TimerTask {
+&nbsp;
+&nbsp;        private AbstractShell shell;
+&nbsp;
+<b class="nc">&nbsp;        public ShellTimeoutTimerTask(AbstractShell shell) {</b>
+<b class="nc">&nbsp;            this.shell = shell;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        @Override
+&nbsp;        public void run() {
+<b class="nc">&nbsp;            Process p = shell.getProcess();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                p.exitValue();</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+&nbsp;                // Process has not terminated.
+&nbsp;                // So check if it has completed
+&nbsp;                // if not just destroy it.
+<b class="nc">&nbsp;                if (p != null &amp;&amp; !shell.completed.get()) {</b>
+<b class="nc">&nbsp;                    shell.setTimedOut();</b>
+<b class="nc">&nbsp;                    p.destroy();</b>
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * This is an IOException with exit code added.
+&nbsp;     */
+&nbsp;    public static class ExitCodeException extends IOException {
+&nbsp;
+&nbsp;        int exitCode;
+&nbsp;
+&nbsp;        public ExitCodeException(int exitCode, String message) {
+<b class="nc">&nbsp;            super(message);</b>
+<b class="nc">&nbsp;            this.exitCode = exitCode;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        public int getExitCode() {
+<b class="nc">&nbsp;            return exitCode;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * process manage container
+&nbsp;     *
+&nbsp;     */
+&nbsp;    public static class ProcessContainer extends ConcurrentHashMap&lt;Integer, Process&gt; {
+&nbsp;
+<b class="nc">&nbsp;        private static final ProcessContainer container = new ProcessContainer();</b>
+&nbsp;
+&nbsp;        private ProcessContainer() {
+<b class="nc">&nbsp;            super();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        public static final ProcessContainer getInstance() {
+<b class="nc">&nbsp;            return container;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static void putProcess(Process process) {
+<b class="nc">&nbsp;            getInstance().put(process.hashCode(), process);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        public static int processSize() {
+<b class="nc">&nbsp;            return getInstance().size();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public static void removeProcess(Process process) {
+<b class="nc">&nbsp;            getInstance().remove(process.hashCode());</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        public static void destroyAllProcess() {
+<b class="nc">&nbsp;            Set&lt;Entry&lt;Integer, Process&gt;&gt; set = getInstance().entrySet();</b>
+<b class="nc">&nbsp;            for (Entry&lt;Integer, Process&gt; entry : set) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    entry.getValue().destroy();</b>
+<b class="nc">&nbsp;                } catch (Exception e) {</b>
+<b class="nc">&nbsp;                    log.error(&quot;Destroy All Processes error&quot;, e);</b>
+<b class="nc">&nbsp;                }</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            log.info(&quot;close &quot; + set.size() + &quot; executing process tasks&quot;);</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ImmutableYamlDelegate</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.config</a>
+</div>
+
+<h1>Coverage Summary for Class: ImmutableYamlDelegate (org.apache.dolphinscheduler.common.config)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ImmutableYamlDelegate</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/29)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.config;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.io.InputStream;
+&nbsp;import java.util.Properties;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+&nbsp;import org.springframework.core.io.InputStreamResource;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class ImmutableYamlDelegate implements IPropertyDelegate {
+&nbsp;
+&nbsp;    private static final String REMOTE_LOGGING_YAML_NAME = &quot;/remote-logging.yaml&quot;;
+&nbsp;
+&nbsp;    private final Properties properties;
+&nbsp;
+&nbsp;    public ImmutableYamlDelegate() {
+<b class="nc">&nbsp;        this(REMOTE_LOGGING_YAML_NAME);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    public ImmutableYamlDelegate(String... yamlAbsolutePath) {</b>
+<b class="nc">&nbsp;        properties = new Properties();</b>
+&nbsp;        // read from classpath
+<b class="nc">&nbsp;        for (String fileName : yamlAbsolutePath) {</b>
+<b class="nc">&nbsp;            try (InputStream fis = ImmutableYamlDelegate.class.getResourceAsStream(fileName)) {</b>
+<b class="nc">&nbsp;                if (fis == null) {</b>
+<b class="nc">&nbsp;                    log.warn(&quot;Cannot find the file: {} under classpath&quot;, fileName);</b>
+<b class="nc">&nbsp;                    continue;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();</b>
+<b class="nc">&nbsp;                factory.setResources(new InputStreamResource(fis));</b>
+<b class="nc">&nbsp;                factory.afterPropertiesSet();</b>
+<b class="nc">&nbsp;                Properties subProperties = factory.getObject();</b>
+<b class="nc">&nbsp;                properties.putAll(subProperties);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Load property: {} error, please check if the file exist under classpath&quot;,</b>
+&nbsp;                        yamlAbsolutePath, e);
+<b class="nc">&nbsp;                throw new RuntimeException(e);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+<b class="nc">&nbsp;        printProperties();</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+<b class="nc">&nbsp;    public ImmutableYamlDelegate(Properties properties) {</b>
+<b class="nc">&nbsp;        this.properties = properties;</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String get(String key) {
+<b class="nc">&nbsp;        return properties.getProperty(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String get(String key, String defaultValue) {
+<b class="nc">&nbsp;        return properties.getProperty(key, defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Set&lt;String&gt; getPropertyKeys() {
+<b class="nc">&nbsp;        return properties.stringPropertyNames();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void printProperties() {
+<b class="nc">&nbsp;        properties.forEach((k, v) -&gt; log.debug(&quot;Get property {} -&gt; {}&quot;, k, v));</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > MlflowTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.mlflow</a>
+</div>
+
+<h1>Coverage Summary for Class: MlflowTask (org.apache.dolphinscheduler.plugin.task.mlflow)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">MlflowTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/116)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.mlflow;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.OSUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class MlflowTask extends AbstractTask {
+&nbsp;
+<b class="nc">&nbsp;    private static final Pattern GIT_CHECK_PATTERN = Pattern.compile(&quot;^(git@|https?://)&quot;);</b>
+&nbsp;    /**
+&nbsp;     * shell command executor
+&nbsp;     */
+&nbsp;    private final ShellCommandExecutor shellCommandExecutor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * taskExecutionContext
+&nbsp;     */
+&nbsp;    private final TaskExecutionContext taskExecutionContext;
+&nbsp;    /**
+&nbsp;     * shell parameters
+&nbsp;     */
+&nbsp;    private MlflowParameters mlflowParameters;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * constructor
+&nbsp;     *
+&nbsp;     * @param taskExecutionContext taskExecutionContext
+&nbsp;     */
+&nbsp;    public MlflowTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+<b class="nc">&nbsp;        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static public String getPresetRepository() {
+<b class="nc">&nbsp;        String presetRepository = PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_KEY);</b>
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(presetRepository)) {</b>
+<b class="nc">&nbsp;            presetRepository = MlflowConstants.PRESET_REPOSITORY;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return presetRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static public String getPresetRepositoryVersion() {
+<b class="nc">&nbsp;        String version = PropertyUtils.getString(MlflowConstants.PRESET_REPOSITORY_VERSION_KEY);</b>
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(version)) {</b>
+<b class="nc">&nbsp;            version = MlflowConstants.PRESET_REPOSITORY_VERSION;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return version;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    static public String getVersionString(String version, String repository) {
+&nbsp;        String versionString;
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(version)) {</b>
+<b class="nc">&nbsp;            versionString = &quot;&quot;;</b>
+<b class="nc">&nbsp;        } else if (GIT_CHECK_PATTERN.matcher(repository).find()) {</b>
+<b class="nc">&nbsp;            versionString = String.format(&quot;--version=%s&quot;, version);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            versionString = &quot;&quot;;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return versionString;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+&nbsp;
+<b class="nc">&nbsp;        mlflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), MlflowParameters.class);</b>
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;Initialize MLFlow task params {}&quot;, JSONUtils.toPrettyJsonString(mlflowParameters));</b>
+<b class="nc">&nbsp;        if (mlflowParameters == null || !mlflowParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;MLFlow task params is not valid&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @SuppressWarnings(&quot;unchecked&quot;)
+&nbsp;    @Override
+&nbsp;    public void handle(TaskCallBack taskCallBack) throws TaskException {
+&nbsp;        try {
+&nbsp;            // construct process
+<b class="nc">&nbsp;            IShellInterceptorBuilder&lt;?, ?&gt; shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()</b>
+<b class="nc">&nbsp;                    .properties(ParameterUtils.convert(getParamsMap()))</b>
+<b class="nc">&nbsp;                    .appendScript(buildCommand());</b>
+<b class="nc">&nbsp;            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);</b>
+&nbsp;            int exitCode;
+<b class="nc">&nbsp;            if (mlflowParameters.getIsDeployDocker()) {</b>
+<b class="nc">&nbsp;                exitCode = checkDockerHealth();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                exitCode = commandExecuteResult.getExitStatusCode();</b>
+&nbsp;            }
+<b class="nc">&nbsp;            setExitStatusCode(exitCode);</b>
+<b class="nc">&nbsp;            setProcessId(commandExecuteResult.getProcessId());</b>
+<b class="nc">&nbsp;            mlflowParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(&quot;The current Mlflow task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;The current Mlflow task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Mlflow task error&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Execute Mlflow task failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancel() throws TaskException {
+&nbsp;        // cancel process
+&nbsp;        try {
+<b class="nc">&nbsp;            shellCommandExecutor.cancelApplication();</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;cancel application error&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String buildCommand() {
+<b class="nc">&nbsp;        String command = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (mlflowParameters.getMlflowTaskType().equals(MlflowConstants.MLFLOW_TASK_TYPE_PROJECTS)) {</b>
+<b class="nc">&nbsp;            command = buildCommandForMlflowProjects();</b>
+<b class="nc">&nbsp;        } else if (mlflowParameters.getMlflowTaskType().equals(MlflowConstants.MLFLOW_TASK_TYPE_MODELS)) {</b>
+<b class="nc">&nbsp;            command = buildCommandForMlflowModels();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;mlflow task command: \n{}&quot;, command);</b>
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create command
+&nbsp;     *
+&nbsp;     * @return file name
+&nbsp;     */
+&nbsp;    private String buildCommandForMlflowProjects() {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(</b>
+<b class="nc">&nbsp;                String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));</b>
+&nbsp;
+&nbsp;        String runCommand;
+&nbsp;        String versionString;
+&nbsp;
+<b class="nc">&nbsp;        if (mlflowParameters.isCustomProject()) {</b>
+<b class="nc">&nbsp;            versionString = getVersionString(mlflowParameters.getMlflowProjectVersion(),</b>
+<b class="nc">&nbsp;                    mlflowParameters.getMlflowProjectRepository());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            versionString = getVersionString(getPresetRepositoryVersion(), getPresetRepository());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        switch (mlflowParameters.getMlflowJobType()) {</b>
+&nbsp;            case MlflowConstants.JOB_TYPE_BASIC_ALGORITHM:
+<b class="nc">&nbsp;                args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));</b>
+&nbsp;
+<b class="nc">&nbsp;                String repoBasicAlgorithm = getPresetRepository() + MlflowConstants.PRESET_BASIC_ALGORITHM_PROJECT;</b>
+<b class="nc">&nbsp;                args.add(String.format(MlflowConstants.SET_REPOSITORY, repoBasicAlgorithm));</b>
+&nbsp;
+<b class="nc">&nbsp;                runCommand = MlflowConstants.MLFLOW_RUN_BASIC_ALGORITHM;</b>
+<b class="nc">&nbsp;                runCommand = String.format(runCommand, mlflowParameters.getAlgorithm(), mlflowParameters.getParams(),</b>
+<b class="nc">&nbsp;                        mlflowParameters.getSearchParams(), mlflowParameters.getModelName(),</b>
+<b class="nc">&nbsp;                        mlflowParameters.getExperimentName());</b>
+&nbsp;                break;
+&nbsp;
+&nbsp;            case MlflowConstants.JOB_TYPE_AUTOML:
+<b class="nc">&nbsp;                args.add(String.format(MlflowConstants.SET_DATA_PATH, mlflowParameters.getDataPath()));</b>
+<b class="nc">&nbsp;                String repoAutoML = getPresetRepository() + MlflowConstants.PRESET_AUTOML_PROJECT;</b>
+<b class="nc">&nbsp;                args.add(String.format(MlflowConstants.SET_REPOSITORY, repoAutoML));</b>
+&nbsp;
+<b class="nc">&nbsp;                runCommand = MlflowConstants.MLFLOW_RUN_AUTOML_PROJECT;</b>
+<b class="nc">&nbsp;                runCommand = String.format(runCommand, mlflowParameters.getAutomlTool(), mlflowParameters.getParams(),</b>
+<b class="nc">&nbsp;                        mlflowParameters.getModelName(), mlflowParameters.getExperimentName());</b>
+&nbsp;                break;
+&nbsp;
+&nbsp;            case MlflowConstants.JOB_TYPE_CUSTOM_PROJECT:
+<b class="nc">&nbsp;                args.add(String.format(MlflowConstants.SET_REPOSITORY, mlflowParameters.getMlflowProjectRepository()));</b>
+<b class="nc">&nbsp;                runCommand = MlflowConstants.MLFLOW_RUN_CUSTOM_PROJECT;</b>
+<b class="nc">&nbsp;                runCommand =</b>
+<b class="nc">&nbsp;                        String.format(runCommand, mlflowParameters.getParams(), mlflowParameters.getExperimentName());</b>
+&nbsp;                break;
+&nbsp;
+&nbsp;            default:
+<b class="nc">&nbsp;                throw new TaskException(&quot;Unsupported mlflow job type: &quot; + mlflowParameters.getMlflowJobType());</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // add version string to command if repository is local path
+<b class="nc">&nbsp;        if (StringUtils.isNotEmpty(versionString)) {</b>
+<b class="nc">&nbsp;            runCommand = runCommand + &quot; &quot; + versionString;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        args.add(runCommand);</b>
+<b class="nc">&nbsp;        return args.stream().collect(Collectors.joining(&quot;\n&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * build mlflow models command
+&nbsp;     */
+&nbsp;    protected String buildCommandForMlflowModels() {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(</b>
+<b class="nc">&nbsp;                String.format(MlflowConstants.EXPORT_MLFLOW_TRACKING_URI_ENV, mlflowParameters.getMlflowTrackingUri()));</b>
+<b class="nc">&nbsp;        String deployModelKey = mlflowParameters.getDeployModelKey();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_MLFLOW)) {</b>
+<b class="nc">&nbsp;            args.add(String.format(MlflowConstants.MLFLOW_MODELS_SERVE, deployModelKey,</b>
+<b class="nc">&nbsp;                    mlflowParameters.getDeployPort()));</b>
+&nbsp;
+<b class="nc">&nbsp;        } else if (mlflowParameters.getDeployType().equals(MlflowConstants.MLFLOW_MODELS_DEPLOY_TYPE_DOCKER)) {</b>
+<b class="nc">&nbsp;            String imageName = &quot;mlflow/&quot; + mlflowParameters.getModelKeyName(&quot;:&quot;);</b>
+<b class="nc">&nbsp;            String containerName = mlflowParameters.getContainerName();</b>
+&nbsp;
+<b class="nc">&nbsp;            args.add(String.format(MlflowConstants.MLFLOW_BUILD_DOCKER, deployModelKey, imageName));</b>
+<b class="nc">&nbsp;            args.add(String.format(MlflowConstants.DOCKER_RREMOVE_CONTAINER, containerName));</b>
+<b class="nc">&nbsp;            args.add(String.format(MlflowConstants.DOCKER_RUN, containerName, mlflowParameters.getDeployPort(),</b>
+&nbsp;                    imageName));
+&nbsp;        }
+<b class="nc">&nbsp;        return args.stream().collect(Collectors.joining(&quot;\n&quot;));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private Map&lt;String, Property&gt; getParamsMap() {
+<b class="nc">&nbsp;        return taskExecutionContext.getPrepareParamsMap();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    public int checkDockerHealth() {
+<b class="nc">&nbsp;        log.info(&quot;checking container healthy ... &quot;);</b>
+<b class="nc">&nbsp;        int exitCode = -1;</b>
+<b class="nc">&nbsp;        String[] command =</b>
+<b class="nc">&nbsp;                {&quot;sh&quot;, &quot;-c&quot;, String.format(MlflowConstants.DOCKER_HEALTH_CHECK, mlflowParameters.getContainerName())};</b>
+<b class="nc">&nbsp;        for (int x = 0; x &lt; MlflowConstants.DOCKER_HEALTH_CHECK_TIMEOUT; x = x + 1) {</b>
+&nbsp;            String status;
+&nbsp;            try {
+<b class="nc">&nbsp;                status = OSUtils.exeShell(command).replace(&quot;\n&quot;, &quot;&quot;).replace(&quot;\&quot;&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                status = String.format(&quot;error --- %s&quot;, e.getMessage());</b>
+&nbsp;            }
+<b class="nc">&nbsp;            log.info(&quot;container healthy status: {}&quot;, status);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (status.equals(&quot;healthy&quot;)) {</b>
+<b class="nc">&nbsp;                exitCode = 0;</b>
+<b class="nc">&nbsp;                log.info(&quot;container is healthy&quot;);</b>
+<b class="nc">&nbsp;                return exitCode;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.info(&quot;The health check has been running for {} seconds&quot;,</b>
+<b class="nc">&nbsp;                        x * MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL / 1000);</b>
+<b class="nc">&nbsp;                ThreadUtils.sleep(MlflowConstants.DOCKER_HEALTH_CHECK_INTERVAL);</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        log.info(&quot;health check fail&quot;);</b>
+<b class="nc">&nbsp;        return exitCode;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public MlflowParameters getParameters() {
+<b class="nc">&nbsp;        return mlflowParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

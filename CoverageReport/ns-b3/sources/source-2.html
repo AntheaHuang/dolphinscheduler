@@ -1,0 +1,401 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > InputParamProps</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.spi.params.input</a>
+</div>
+
+<h1>Coverage Summary for Class: InputParamProps (org.apache.dolphinscheduler.spi.params.input)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">InputParamProps</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.5%
+  </span>
+  <span class="absValue">
+    (23/43)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    53.5%
+  </span>
+  <span class="absValue">
+    (23/43)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.spi.params.input;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
+&nbsp;import org.apache.dolphinscheduler.spi.params.base.ResizeType;
+&nbsp;
+&nbsp;/**
+&nbsp; * front-end input component props attributes
+&nbsp; */
+<b class="fc">&nbsp;public class InputParamProps extends ParamsProps {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * input type
+&nbsp;     */
+&nbsp;    private String type;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * maximum input length
+&nbsp;     */
+&nbsp;    private Integer maxlength;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * minimum input length
+&nbsp;     */
+&nbsp;    private Integer minlength;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether it can be cleared, the default value is false
+&nbsp;     */
+&nbsp;    private Boolean clearable;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * input box head icon
+&nbsp;     */
+&nbsp;    private String prefixIcon;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * input box end icon
+&nbsp;     */
+&nbsp;    private String suffixIcon;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * number of lines in the input box, only valid for type=&quot;textarea&quot;
+&nbsp;     */
+&nbsp;    private Integer rows;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * adaptive content height, only valid for type=&quot;textarea&quot;, objects can be passed in, such as {minRows: 2, maxRows: 6}
+&nbsp;     */
+&nbsp;    private Object autosize;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * autocomplete attribute:on, off
+&nbsp;     */
+&nbsp;    private String autocomplete;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * name attribute
+&nbsp;     */
+&nbsp;    private String name;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether it is read-only, the default value is false
+&nbsp;     */
+&nbsp;    private Boolean readonly;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * set maximum
+&nbsp;     */
+&nbsp;    private Integer max;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * set minimum
+&nbsp;     */
+&nbsp;    private Integer min;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * set the legal number interval of the input field
+&nbsp;     */
+&nbsp;    private Integer step;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * control whether it can be zoomed by the user, the value is none, both, horizontal, vertical
+&nbsp;     */
+&nbsp;    private ResizeType resize;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get focus automatically, the default value is false
+&nbsp;     */
+&nbsp;    private Boolean autofocus;
+&nbsp;
+&nbsp;    private String form;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * the label text associated with the input box
+&nbsp;     */
+&nbsp;    private String label;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * tabindex of the input box
+&nbsp;     */
+&nbsp;    private String tabindex;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether to trigger the verification of the form during input, the default value is true
+&nbsp;     */
+&nbsp;    private Boolean validateEvent;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether to display the switch password icon
+&nbsp;     */
+&nbsp;    private Boolean showPassword;
+&nbsp;
+&nbsp;    public String getType() {
+<b class="fc">&nbsp;        return type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setType(String type) {
+<b class="fc">&nbsp;        this.type = type;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMaxlength() {
+<b class="fc">&nbsp;        return maxlength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMaxlength(Integer maxlength) {
+<b class="nc">&nbsp;        this.maxlength = maxlength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMinlength() {
+<b class="fc">&nbsp;        return minlength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMinlength(Integer minlength) {
+<b class="nc">&nbsp;        this.minlength = minlength;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean getClearable() {
+<b class="fc">&nbsp;        return clearable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setClearable(Boolean clearable) {
+<b class="nc">&nbsp;        this.clearable = clearable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getPrefixIcon() {
+<b class="fc">&nbsp;        return prefixIcon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPrefixIcon(String prefixIcon) {
+<b class="nc">&nbsp;        this.prefixIcon = prefixIcon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSuffixIcon() {
+<b class="fc">&nbsp;        return suffixIcon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSuffixIcon(String suffixIcon) {
+<b class="nc">&nbsp;        this.suffixIcon = suffixIcon;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getRows() {
+<b class="fc">&nbsp;        return rows;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setRows(Integer rows) {
+<b class="nc">&nbsp;        this.rows = rows;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Object getAutosize() {
+<b class="fc">&nbsp;        return autosize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutosize(Object autosize) {
+<b class="nc">&nbsp;        this.autosize = autosize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getAutocomplete() {
+<b class="fc">&nbsp;        return autocomplete;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutocomplete(String autocomplete) {
+<b class="nc">&nbsp;        this.autocomplete = autocomplete;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getName() {
+<b class="fc">&nbsp;        return name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setName(String name) {
+<b class="nc">&nbsp;        this.name = name;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean getReadonly() {
+<b class="fc">&nbsp;        return readonly;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setReadonly(Boolean readonly) {
+<b class="nc">&nbsp;        this.readonly = readonly;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMax() {
+<b class="fc">&nbsp;        return max;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMax(Integer max) {
+<b class="nc">&nbsp;        this.max = max;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getMin() {
+<b class="fc">&nbsp;        return min;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setMin(Integer min) {
+<b class="nc">&nbsp;        this.min = min;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Integer getStep() {
+<b class="fc">&nbsp;        return step;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setStep(Integer step) {
+<b class="nc">&nbsp;        this.step = step;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ResizeType getResize() {
+<b class="fc">&nbsp;        return resize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setResize(ResizeType resize) {
+<b class="nc">&nbsp;        this.resize = resize;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean getAutofocus() {
+<b class="fc">&nbsp;        return autofocus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setAutofocus(Boolean autofocus) {
+<b class="nc">&nbsp;        this.autofocus = autofocus;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getForm() {
+<b class="fc">&nbsp;        return form;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setForm(String form) {
+<b class="nc">&nbsp;        this.form = form;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getLabel() {
+<b class="fc">&nbsp;        return label;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setLabel(String label) {
+<b class="nc">&nbsp;        this.label = label;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTabindex() {
+<b class="fc">&nbsp;        return tabindex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTabindex(String tabindex) {
+<b class="nc">&nbsp;        this.tabindex = tabindex;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean getValidateEvent() {
+<b class="fc">&nbsp;        return validateEvent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setValidateEvent(Boolean validateEvent) {
+<b class="nc">&nbsp;        this.validateEvent = validateEvent;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean getShowPassword() {
+<b class="fc">&nbsp;        return showPassword;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setShowPassword(Boolean showPassword) {
+<b class="nc">&nbsp;        this.showPassword = showPassword;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

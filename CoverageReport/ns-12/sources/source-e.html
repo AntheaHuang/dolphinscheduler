@@ -1,0 +1,243 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > PropertyUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: PropertyUtils (org.apache.dolphinscheduler.common.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">PropertyUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/28)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.utils;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.common.constants.Constants.AWS_YAML_PATH;
+&nbsp;import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
+&nbsp;import static org.apache.dolphinscheduler.common.constants.Constants.REMOTE_LOGGING_YAML_PATH;
+&nbsp;import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_CENTER_YAML_PATH;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.config.ImmutablePriorityPropertyDelegate;
+&nbsp;import org.apache.dolphinscheduler.common.config.ImmutablePropertyDelegate;
+&nbsp;import org.apache.dolphinscheduler.common.config.ImmutableYamlDelegate;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.function.Function;
+&nbsp;
+&nbsp;import lombok.experimental.UtilityClass;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.google.common.base.Strings;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;@UtilityClass
+&nbsp;public class PropertyUtils {
+&nbsp;
+&nbsp;    // todo: add another implementation for zookeeper/etcd/consul/xx
+<b class="nc">&nbsp;    private final ImmutablePriorityPropertyDelegate propertyDelegate =</b>
+&nbsp;            new ImmutablePriorityPropertyDelegate(
+&nbsp;                    new ImmutablePropertyDelegate(COMMON_PROPERTIES_PATH),
+&nbsp;                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH, AWS_YAML_PATH, RESOURCE_CENTER_YAML_PATH));
+&nbsp;
+&nbsp;    public static String getString(String key) {
+<b class="nc">&nbsp;        return propertyDelegate.get(key.trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getString(String key, String defaultVal) {
+<b class="nc">&nbsp;        String val = getString(key);</b>
+<b class="nc">&nbsp;        return Strings.isNullOrEmpty(val) ? defaultVal : val;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static String getUpperCaseString(String key) {
+<b class="nc">&nbsp;        String val = getString(key);</b>
+<b class="nc">&nbsp;        return Strings.isNullOrEmpty(val) ? val : val.toUpperCase();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Integer getInt(String key) {
+<b class="nc">&nbsp;        return propertyDelegate.getInt(key.trim());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Integer getInt(String key, int defaultValue) {
+<b class="nc">&nbsp;        return propertyDelegate.getInt(key, defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Boolean getBoolean(String key) {
+<b class="nc">&nbsp;        return propertyDelegate.getBoolean(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Boolean getBoolean(String key, Boolean defaultValue) {
+<b class="nc">&nbsp;        return propertyDelegate.getBoolean(key, defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Long getLong(String key) {
+<b class="nc">&nbsp;        return propertyDelegate.getLong(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Long getLong(String key, Long defaultValue) {
+<b class="nc">&nbsp;        return propertyDelegate.getLong(key, defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Double getDouble(String key) {
+<b class="nc">&nbsp;        return propertyDelegate.getDouble(key);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static Double getDouble(String key, Double defaultValue) {
+<b class="nc">&nbsp;        return propertyDelegate.getDouble(key, defaultValue);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get all properties with specified prefix, like: fs.
+&nbsp;     *
+&nbsp;     * @param prefix prefix to search
+&nbsp;     * @return all properties with specified prefix
+&nbsp;     */
+&nbsp;    public static Map&lt;String, String&gt; getByPrefix(String prefix) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; matchedProperties = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String propName : propertyDelegate.getPropertyKeys()) {</b>
+<b class="nc">&nbsp;            if (propName.startsWith(prefix)) {</b>
+<b class="nc">&nbsp;                matchedProperties.put(propName, propertyDelegate.get(propName));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return matchedProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all properties with specified prefix, like: fs., will replace the prefix with newPrefix
+&nbsp;     */
+&nbsp;    public static Map&lt;String, String&gt; getByPrefix(String prefix, String newPrefix) {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; matchedProperties = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        for (String propName : propertyDelegate.getPropertyKeys()) {</b>
+<b class="nc">&nbsp;            if (propName.startsWith(prefix)) {</b>
+<b class="nc">&nbsp;                matchedProperties.put(propName.replace(prefix, newPrefix), propertyDelegate.get(propName));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+<b class="nc">&nbsp;        return matchedProperties;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static &lt;T&gt; Set&lt;T&gt; getSet(String key, Function&lt;String, Set&lt;T&gt;&gt; transformFunction, Set&lt;T&gt; defaultValue) {
+<b class="nc">&nbsp;        return propertyDelegate.get(key, transformFunction, defaultValue);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

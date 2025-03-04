@@ -1,0 +1,180 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskInstanceExecuteDto</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.extract.master.dto</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskInstanceExecuteDto (org.apache.dolphinscheduler.extract.master.dto)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">TaskInstanceExecuteDto</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.extract.master.dto;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.enums.Flag;
+&nbsp;import org.apache.dolphinscheduler.common.enums.Priority;
+&nbsp;import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import lombok.Data;
+&nbsp;
+&nbsp;@Data
+&nbsp;public class TaskInstanceExecuteDto {
+&nbsp;
+&nbsp;    private int id;
+&nbsp;
+&nbsp;    private String name;
+&nbsp;
+&nbsp;    private String taskType;
+&nbsp;
+&nbsp;    private int processInstanceId;
+&nbsp;
+&nbsp;    private long taskCode;
+&nbsp;
+&nbsp;    private int taskDefinitionVersion;
+&nbsp;
+&nbsp;    private String processInstanceName;
+&nbsp;
+&nbsp;    private int taskGroupPriority;
+&nbsp;
+&nbsp;    private TaskExecutionStatus state;
+&nbsp;
+&nbsp;    private Date firstSubmitTime;
+&nbsp;
+&nbsp;    private Date submitTime;
+&nbsp;
+&nbsp;    private Date startTime;
+&nbsp;
+&nbsp;    private Date endTime;
+&nbsp;
+&nbsp;    private String host;
+&nbsp;
+&nbsp;    private String executePath;
+&nbsp;
+&nbsp;    private String logPath;
+&nbsp;
+&nbsp;    private int retryTimes;
+&nbsp;
+&nbsp;    private Flag alertFlag;
+&nbsp;
+&nbsp;    private int pid;
+&nbsp;
+&nbsp;    private String appLink;
+&nbsp;
+&nbsp;    private Flag flag;
+&nbsp;
+&nbsp;    private String duration;
+&nbsp;
+&nbsp;    private int maxRetryTimes;
+&nbsp;
+&nbsp;    private int retryInterval;
+&nbsp;
+&nbsp;    private Priority taskInstancePriority;
+&nbsp;
+&nbsp;    private Priority processInstancePriority;
+&nbsp;
+&nbsp;    private String workerGroup;
+&nbsp;
+&nbsp;    private Long environmentCode;
+&nbsp;
+&nbsp;    private String environmentConfig;
+&nbsp;
+&nbsp;    private int executorId;
+&nbsp;
+&nbsp;    private String varPool;
+&nbsp;
+&nbsp;    private String executorName;
+&nbsp;
+&nbsp;    private Map&lt;String, String&gt; resources;
+&nbsp;
+&nbsp;    private int delayTime;
+&nbsp;
+&nbsp;    private String taskParams;
+&nbsp;
+&nbsp;    private int dryRun;
+&nbsp;
+&nbsp;    private int taskGroupId;
+&nbsp;
+&nbsp;    private Integer cpuQuota;
+&nbsp;
+&nbsp;    private Integer memoryMax;
+&nbsp;
+&nbsp;    private TaskExecuteType taskExecuteType;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

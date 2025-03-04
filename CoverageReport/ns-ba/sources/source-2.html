@@ -1,0 +1,353 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskExecutorEventBusCoordinator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.task.executor.eventbus</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskExecutorEventBusCoordinator (org.apache.dolphinscheduler.task.executor.eventbus)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskExecutorEventBusCoordinator</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TaskExecutorEventBusCoordinator$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/53)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.task.executor.eventbus;
+&nbsp;
+&nbsp;import static com.google.common.base.Preconditions.checkNotNull;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
+&nbsp;import org.apache.dolphinscheduler.task.executor.ITaskExecutorRepository;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.AbstractTaskExecutorLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.ITaskExecutorLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFinalizeLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKilledLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPausedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorSuccessLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.listener.ITaskExecutorLifecycleEventListener;
+&nbsp;import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.CompletableFuture;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.ScheduledExecutorService;
+&nbsp;import java.util.concurrent.ThreadPoolExecutor;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class TaskExecutorEventBusCoordinator implements ITaskExecutorEventBusCoordinator {
+&nbsp;
+&nbsp;    private final String coordinatorName;
+&nbsp;
+&nbsp;    private final ITaskExecutorRepository taskExecutorRepository;
+&nbsp;
+&nbsp;    private final List&lt;ITaskExecutorLifecycleEventListener&gt; taskExecutorLifecycleEventListeners;
+&nbsp;
+<b class="nc">&nbsp;    private static final int DEFAULT_WORKER_SIZE = Runtime.getRuntime().availableProcessors();</b>
+&nbsp;
+&nbsp;    private static final long DEFAULT_FIRE_INTERVAL = 50;
+&nbsp;
+<b class="nc">&nbsp;    private static final Set&lt;Integer&gt; firingTaskExecutorIds = ConcurrentHashMap.newKeySet();</b>
+&nbsp;
+&nbsp;    private ScheduledExecutorService mainExecutorThreadPool;
+&nbsp;
+&nbsp;    private ThreadPoolExecutor workerExecutorThreadPool;
+&nbsp;
+&nbsp;    public TaskExecutorEventBusCoordinator(final String coordinatorName,
+<b class="nc">&nbsp;                                           final ITaskExecutorRepository taskExecutorRepository) {</b>
+<b class="nc">&nbsp;        this.coordinatorName = coordinatorName;</b>
+<b class="nc">&nbsp;        this.taskExecutorRepository = taskExecutorRepository;</b>
+<b class="nc">&nbsp;        this.taskExecutorLifecycleEventListeners = new ArrayList&lt;&gt;();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void start() {
+<b class="nc">&nbsp;        mainExecutorThreadPool = ThreadUtils.newDaemonScheduledExecutorService(</b>
+&nbsp;                coordinatorName + &quot;-eventbus-coordinator-main-%d&quot;, 1);
+&nbsp;        // todo: use a event dispatcher to control a condition to fire the event
+<b class="nc">&nbsp;        mainExecutorThreadPool.scheduleWithFixedDelay(</b>
+&nbsp;                this::fireTaskExecutorEventBus,
+&nbsp;                0,
+&nbsp;                DEFAULT_FIRE_INTERVAL,
+&nbsp;                TimeUnit.MILLISECONDS);
+&nbsp;
+<b class="nc">&nbsp;        workerExecutorThreadPool = ThreadUtils.newDaemonFixedThreadExecutor(</b>
+&nbsp;                coordinatorName + &quot;-eventbus-coordinator-worker-%d&quot;, DEFAULT_WORKER_SIZE);
+<b class="nc">&nbsp;        log.info(&quot;{} started, worker size: {}&quot;, coordinatorName, DEFAULT_WORKER_SIZE);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void registerTaskExecutorLifecycleEventListener(final ITaskExecutorLifecycleEventListener taskExecutorLifecycleEventListener) {
+<b class="nc">&nbsp;        checkNotNull(taskExecutorLifecycleEventListener);</b>
+<b class="nc">&nbsp;        taskExecutorLifecycleEventListeners.add(taskExecutorLifecycleEventListener);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+<b class="nc">&nbsp;        mainExecutorThreadPool.shutdownNow();</b>
+<b class="nc">&nbsp;        log.info(&quot;{} closed&quot;, coordinatorName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void fireTaskExecutorEventBus() {
+&nbsp;        try {
+&nbsp;
+<b class="nc">&nbsp;            final Collection&lt;ITaskExecutor&gt; taskExecutors = taskExecutorRepository.getAll();</b>
+<b class="nc">&nbsp;            if (CollectionUtils.isEmpty(taskExecutors)) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            for (final ITaskExecutor taskExecutor : taskExecutors) {</b>
+<b class="nc">&nbsp;                if (isFiring(taskExecutor)) {</b>
+&nbsp;                    continue;
+&nbsp;                }
+<b class="nc">&nbsp;                final Integer taskExecutorId = taskExecutor.getId();</b>
+<b class="nc">&nbsp;                CompletableFuture</b>
+<b class="nc">&nbsp;                        .runAsync(() -&gt; firingTaskExecutorIds.add(taskExecutorId), workerExecutorThreadPool)</b>
+<b class="nc">&nbsp;                        .thenAccept(v -&gt; doFireTaskExecutorEventBus(taskExecutor))</b>
+<b class="nc">&nbsp;                        .whenComplete((v, e) -&gt; firingTaskExecutorIds.remove(taskExecutorId));</b>
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (Throwable throwable) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Fire TaskExecutorEventBus error&quot;, throwable);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private void doFireTaskExecutorEventBus(final ITaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        try (final TaskExecutorMDCUtils.MDCAutoClosable ignored = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {</b>
+<b class="nc">&nbsp;            final TaskExecutorEventBus taskExecutorEventBus = taskExecutor.getTaskExecutorEventBus();</b>
+<b class="nc">&nbsp;            if (taskExecutorEventBus.isEmpty()) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            Optional&lt;AbstractTaskExecutorLifecycleEvent&gt; headEventOptional = taskExecutorEventBus.poll();</b>
+<b class="nc">&nbsp;            if (!headEventOptional.isPresent()) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            final ITaskExecutorLifecycleEvent taskExecutorLifecycleEvent = headEventOptional.get();</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                for (final ITaskExecutorLifecycleEventListener taskExecutorLifecycleEventListener : taskExecutorLifecycleEventListeners) {</b>
+<b class="nc">&nbsp;                    switch (taskExecutorLifecycleEvent.getType()) {</b>
+&nbsp;                        case DISPATCHED:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorDispatchedLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorDispatchedLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case RUNNING:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorStartedLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorStartedLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case RUNTIME_CONTEXT_CHANGE:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorRuntimeContextChangedEvent(</b>
+&nbsp;                                    ((TaskExecutorRuntimeContextChangedLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case PAUSE:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorPauseLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorPauseLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case PAUSED:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorPausedLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorPausedLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case KILL:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorKillLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorKillLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case KILLED:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorKilledLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorKilledLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case SUCCESS:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorSuccessLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorSuccessLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case FAILED:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorFailLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorFailedLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        case FINALIZE:
+<b class="nc">&nbsp;                            taskExecutorLifecycleEventListener.onTaskExecutorFinalizeLifecycleEvent(</b>
+&nbsp;                                    ((TaskExecutorFinalizeLifecycleEvent) taskExecutorLifecycleEvent));
+&nbsp;                            break;
+&nbsp;                        default:
+<b class="nc">&nbsp;                            throw new IllegalArgumentException(</b>
+&nbsp;                                    &quot;Unsupported TaskExecutorLifecycleEvent: &quot; + taskExecutorLifecycleEvent);
+&nbsp;                    }
+&nbsp;                }
+<b class="nc">&nbsp;                log.info(&quot;Success fire {}: {} &quot;,</b>
+<b class="nc">&nbsp;                        taskExecutorLifecycleEvent.getClass().getSimpleName(),</b>
+<b class="nc">&nbsp;                        JSONUtils.toPrettyJsonString(taskExecutorLifecycleEvent));</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Fire TaskExecutorLifecycleEvent: {} error&quot;, taskExecutorLifecycleEvent, e);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isFiring(final ITaskExecutor taskExecutor) {
+<b class="nc">&nbsp;        return firingTaskExecutorIds.contains(taskExecutor.getId());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

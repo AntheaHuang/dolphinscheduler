@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > K8sTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.k8s</a>
+</div>
+
+<h1>Coverage Summary for Class: K8sTask (org.apache.dolphinscheduler.plugin.task.k8s)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">K8sTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/11)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/52)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.k8s;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.k8s.param.K8sConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Label;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.DbType;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class K8sTask extends AbstractK8sTask {
+&nbsp;
+&nbsp;    private final TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    private K8sTaskParameters k8sTaskParameters;
+&nbsp;
+&nbsp;    private K8sTaskExecutionContext k8sTaskExecutionContext;
+&nbsp;
+&nbsp;    private K8sConnectionParam k8sConnectionParam;
+&nbsp;    public K8sTask(TaskExecutionContext taskRequest) {
+<b class="nc">&nbsp;        super(taskRequest);</b>
+<b class="nc">&nbsp;        this.taskExecutionContext = taskRequest;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+<b class="nc">&nbsp;        String taskParams = taskExecutionContext.getTaskParams();</b>
+<b class="nc">&nbsp;        k8sTaskParameters = JSONUtils.parseObject(taskParams, K8sTaskParameters.class);</b>
+<b class="nc">&nbsp;        if (k8sTaskParameters == null || !k8sTaskParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;K8S task params is not valid&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        k8sTaskExecutionContext =</b>
+<b class="nc">&nbsp;                k8sTaskParameters.generateK8sTaskExecutionContext(taskExecutionContext.getResourceParametersHelper(),</b>
+<b class="nc">&nbsp;                        k8sTaskParameters.getDatasource());</b>
+<b class="nc">&nbsp;        k8sConnectionParam =</b>
+<b class="nc">&nbsp;                (K8sConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(k8sTaskParameters.getType()),</b>
+<b class="nc">&nbsp;                        k8sTaskExecutionContext.getConnectionParams());</b>
+<b class="nc">&nbsp;        String kubeConfig = k8sConnectionParam.getKubeConfig();</b>
+<b class="nc">&nbsp;        k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());</b>
+<b class="nc">&nbsp;        k8sTaskParameters.setKubeConfig(kubeConfig);</b>
+<b class="nc">&nbsp;        k8sTaskExecutionContext.setConfigYaml(kubeConfig);</b>
+<b class="nc">&nbsp;        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize k8s task params:{}&quot;, JSONUtils.toPrettyJsonString(k8sTaskParameters));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getApplicationIds() throws TaskException {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return k8sTaskParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected String buildCommand() {
+<b class="nc">&nbsp;        K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();</b>
+<b class="nc">&nbsp;        Map&lt;String, Property&gt; paramsMap = taskExecutionContext.getPrepareParamsMap();</b>
+<b class="nc">&nbsp;        String namespaceName = k8sTaskParameters.getNamespace();</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setPullSecret(k8sTaskParameters.getPullSecret());</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setNamespaceName(namespaceName);</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setParamsMap(ParameterUtils.convert(paramsMap));</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setLabelMap(convertToLabelMap(k8sTaskParameters.getCustomizedLabels()));</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters</b>
+<b class="nc">&nbsp;                .setNodeSelectorRequirements(convertToNodeSelectorRequirements(k8sTaskParameters.getNodeSelectors()));</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());</b>
+<b class="nc">&nbsp;        k8sTaskMainParameters.setImagePullPolicy(k8sTaskParameters.getImagePullPolicy());</b>
+<b class="nc">&nbsp;        return JSONUtils.toJsonString(k8sTaskMainParameters);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    protected void dealOutParam(Map&lt;String, String&gt; taskOutputParams) {
+<b class="nc">&nbsp;        this.k8sTaskParameters.dealOutParam(taskOutputParams);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;NodeSelectorRequirement&gt; convertToNodeSelectorRequirements(List&lt;NodeSelectorExpression&gt; expressions) {
+<b class="nc">&nbsp;        if (CollectionUtils.isEmpty(expressions)) {</b>
+<b class="nc">&nbsp;            return Collections.emptyList();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return expressions.stream().map(expression -&gt; new NodeSelectorRequirement(</b>
+<b class="nc">&nbsp;                expression.getKey(),</b>
+<b class="nc">&nbsp;                expression.getOperator(),</b>
+<b class="nc">&nbsp;                StringUtils.isEmpty(expression.getValues()) ? Collections.emptyList()</b>
+<b class="nc">&nbsp;                        : Arrays.asList(expression.getValues().trim().split(&quot;\\s*,\\s*&quot;))))</b>
+<b class="nc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Map&lt;String, String&gt; convertToLabelMap(List&lt;Label&gt; labels) {
+<b class="nc">&nbsp;        if (CollectionUtils.isEmpty(labels)) {</b>
+<b class="nc">&nbsp;            return Collections.emptyMap();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        HashMap&lt;String, String&gt; labelMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        labels.forEach(label -&gt; {</b>
+<b class="nc">&nbsp;            labelMap.put(label.getLabel(), label.getValue());</b>
+&nbsp;        });
+<b class="nc">&nbsp;        return labelMap;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

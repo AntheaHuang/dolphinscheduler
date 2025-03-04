@@ -1,0 +1,453 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > TaskExecutorLifecycleEventRemoteReporter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.task.executor.eventbus</a>
+</div>
+
+<h1>Coverage Summary for Class: TaskExecutorLifecycleEventRemoteReporter (org.apache.dolphinscheduler.task.executor.eventbus)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">TaskExecutorLifecycleEventRemoteReporter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/17)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/42)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/102)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">TaskExecutorLifecycleEventRemoteReporter$ReportableTaskExecutorLifecycleEventChannel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/117)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.task.executor.eventbus;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
+&nbsp;import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
+&nbsp;import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ConcurrentHashMap;
+&nbsp;import java.util.concurrent.LinkedBlockingQueue;
+&nbsp;import java.util.concurrent.TimeUnit;
+&nbsp;import java.util.concurrent.atomic.AtomicReference;
+&nbsp;import java.util.concurrent.locks.Condition;
+&nbsp;import java.util.concurrent.locks.Lock;
+&nbsp;import java.util.concurrent.locks.ReentrantLock;
+&nbsp;
+&nbsp;import lombok.Getter;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.google.common.annotations.VisibleForTesting;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
+&nbsp;        implements
+&nbsp;            ITaskExecutorLifecycleEventReporter {
+&nbsp;
+<b class="nc">&nbsp;    private static final Long DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL = TimeUnit.MINUTES.toMillis(3);</b>
+&nbsp;
+&nbsp;    private final String reporterName;
+&nbsp;
+<b class="nc">&nbsp;    private final Map&lt;Integer, ReportableTaskExecutorLifecycleEventChannel&gt; eventChannels = new ConcurrentHashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;    private final ITaskExecutorEventRemoteReporterClient taskExecutorEventRemoteReporterClient;
+&nbsp;
+&nbsp;    private volatile boolean runningFlag;
+&nbsp;
+<b class="nc">&nbsp;    private final Lock eventChannelsLock = new ReentrantLock();</b>
+&nbsp;
+<b class="nc">&nbsp;    private final Condition taskExecutionEventEmptyCondition = eventChannelsLock.newCondition();</b>
+&nbsp;
+&nbsp;    public TaskExecutorLifecycleEventRemoteReporter(final String reporterName,
+&nbsp;                                                    final ITaskExecutorEventRemoteReporterClient taskExecutorEventRemoteReporterClient) {
+<b class="nc">&nbsp;        super(reporterName);</b>
+<b class="nc">&nbsp;        this.reporterName = reporterName;</b>
+<b class="nc">&nbsp;        this.taskExecutorEventRemoteReporterClient = taskExecutorEventRemoteReporterClient;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void start() {
+&nbsp;        // start a thread to send the events
+<b class="nc">&nbsp;        this.runningFlag = true;</b>
+<b class="nc">&nbsp;        super.start();</b>
+<b class="nc">&nbsp;        log.info(&quot;{} started&quot;, reporterName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void run() {
+<b class="nc">&nbsp;        while (runningFlag) {</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                for (final ReportableTaskExecutorLifecycleEventChannel eventChannel : eventChannels.values()) {</b>
+<b class="nc">&nbsp;                    if (eventChannel.isEmpty()) {</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    handleTaskExecutionEventChannel(eventChannel);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                tryToWaitIfAllTaskExecutionEventChannelEmpty();</b>
+<b class="nc">&nbsp;                waitIfAnyTaskExecutionEventChannelRetryIntervalPassed();</b>
+<b class="nc">&nbsp;            } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;                log.info(&quot;{} interrupted&quot;, reporterName);</b>
+<b class="nc">&nbsp;                Thread.currentThread().interrupt();</b>
+&nbsp;                break;
+<b class="nc">&nbsp;            } catch (Exception ex) {</b>
+<b class="nc">&nbsp;                log.error(&quot;Fire ReportableTaskExecutorLifecycleEventChannel error&quot;, ex);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;{} break loop&quot;, reporterName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void reportTaskExecutorLifecycleEvent(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
+<b class="nc">&nbsp;        eventChannelsLock.lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            log.debug(&quot;Report : {}&quot;, JSONUtils.toPrettyJsonString(reportableTaskExecutorLifecycleEvent));</b>
+<b class="nc">&nbsp;            int taskInstanceId = reportableTaskExecutorLifecycleEvent.getTaskInstanceId();</b>
+<b class="nc">&nbsp;            eventChannels.computeIfAbsent(</b>
+<b class="nc">&nbsp;                    taskInstanceId,</b>
+<b class="nc">&nbsp;                    k -&gt; new ReportableTaskExecutorLifecycleEventChannel(taskInstanceId))</b>
+<b class="nc">&nbsp;                    .addTaskExecutionEvent(reportableTaskExecutorLifecycleEvent);</b>
+<b class="nc">&nbsp;            taskExecutionEventEmptyCondition.signalAll();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            eventChannelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void receiveTaskExecutorLifecycleEventACK(final TaskExecutorLifecycleEventAck eventAck) {
+<b class="nc">&nbsp;        final int taskExecutorId = eventAck.getTaskExecutorId();</b>
+<b class="nc">&nbsp;        eventChannelsLock.lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskExecutorId);</b>
+<b class="nc">&nbsp;            if (eventChannel == null) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            final IReportableTaskExecutorLifecycleEvent removed =</b>
+<b class="nc">&nbsp;                    eventChannel.remove(eventAck.getTaskExecutorLifecycleEventType());</b>
+<b class="nc">&nbsp;            if (removed != null) {</b>
+<b class="nc">&nbsp;                log.info(&quot;Success removed {} by ack: {}&quot;, removed, eventAck);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                log.info(&quot;Failed removed ReportableTaskExecutorLifecycleEvent by ack: {}&quot;, eventAck);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (eventChannel.isEmpty()) {</b>
+<b class="nc">&nbsp;                eventChannels.remove(taskExecutorId);</b>
+<b class="nc">&nbsp;                log.debug(&quot;Removed ReportableTaskExecutorLifecycleEventChannel: {}&quot;, taskExecutorId);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            taskExecutionEventEmptyCondition.signalAll();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            eventChannelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean reassignWorkflowInstanceHost(int taskInstanceId, String workflowHost) {
+<b class="nc">&nbsp;        eventChannelsLock.lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            final ReportableTaskExecutorLifecycleEventChannel eventChannel = eventChannels.get(taskInstanceId);</b>
+<b class="nc">&nbsp;            if (eventChannel == null) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            eventChannel.taskExecutionEventsQueue.forEach(event -&gt; event.setWorkflowInstanceHost(workflowHost));</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            eventChannelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void close() {
+&nbsp;        // shutdown the thread
+<b class="nc">&nbsp;        runningFlag = false;</b>
+<b class="nc">&nbsp;        log.info(&quot;{} closed&quot;, reporterName);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @VisibleForTesting
+&nbsp;    public Map&lt;Integer, ReportableTaskExecutorLifecycleEventChannel&gt; getEventChannels() {
+<b class="nc">&nbsp;        return eventChannels;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void handleTaskExecutionEventChannel(final ReportableTaskExecutorLifecycleEventChannel reportableTaskExecutorLifecycleEventChannel) {
+<b class="nc">&nbsp;        if (reportableTaskExecutorLifecycleEventChannel.isEmpty()) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        while (!reportableTaskExecutorLifecycleEventChannel.isEmpty()) {</b>
+<b class="nc">&nbsp;            final IReportableTaskExecutorLifecycleEvent headEvent = reportableTaskExecutorLifecycleEventChannel.peek();</b>
+<b class="nc">&nbsp;            try (</b>
+<b class="nc">&nbsp;                    final TaskExecutorMDCUtils.MDCAutoClosable ignore =</b>
+<b class="nc">&nbsp;                            TaskExecutorMDCUtils.logWithMDC(headEvent.getTaskInstanceId())) {</b>
+&nbsp;                try {
+<b class="nc">&nbsp;                    if (isTaskExecutorEventNeverSent(headEvent) || isRetryIntervalExceeded(headEvent)) {</b>
+<b class="nc">&nbsp;                        taskExecutorEventRemoteReporterClient.reportTaskExecutionEventToMaster(headEvent);</b>
+&nbsp;                        continue;
+&nbsp;                    }
+<b class="nc">&nbsp;                    if (log.isDebugEnabled()) {</b>
+<b class="nc">&nbsp;                        log.debug(</b>
+&nbsp;                                &quot;The ReportableTaskExecutorLifecycleEvent: {} latest send time: {} doesn&#39;t exceeded retry interval&quot;,
+&nbsp;                                headEvent,
+<b class="nc">&nbsp;                                headEvent.getLatestReportTime());</b>
+&nbsp;                    }
+&nbsp;                    break;
+<b class="nc">&nbsp;                } catch (Exception ex) {</b>
+<b class="nc">&nbsp;                    log.error(&quot;Send TaskExecutionEvent: {} to master error will retry after {} mills&quot;,</b>
+&nbsp;                            headEvent,
+&nbsp;                            DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL,
+&nbsp;                            ex);
+&nbsp;                    break;
+&nbsp;
+&nbsp;                }
+<b class="nc">&nbsp;            }</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isAllTaskExecutorEventChannelEmpty() {
+<b class="nc">&nbsp;        return eventChannels</b>
+<b class="nc">&nbsp;                .values()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .allMatch(ReportableTaskExecutorLifecycleEventChannel::isEmpty);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private long getOldestReportTime() {
+<b class="nc">&nbsp;        return eventChannels.values()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .filter(ReportableTaskExecutorLifecycleEventChannel::isNotEmpty)</b>
+<b class="nc">&nbsp;                .map(ReportableTaskExecutorLifecycleEventChannel::peek)</b>
+<b class="nc">&nbsp;                .filter(event -&gt; !isTaskExecutorEventNeverSent(event))</b>
+<b class="nc">&nbsp;                .map(IReportableTaskExecutorLifecycleEvent::getLatestReportTime)</b>
+<b class="nc">&nbsp;                .min(Long::compareTo)</b>
+<b class="nc">&nbsp;                .orElse(0L);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isTaskExecutorEventNeverSent(final IReportableTaskExecutorLifecycleEvent headEvent) {
+<b class="nc">&nbsp;        return headEvent.getLatestReportTime() == null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private boolean isRetryIntervalExceeded(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
+<b class="nc">&nbsp;        if (isTaskExecutorEventNeverSent(reportableTaskExecutorLifecycleEvent)) {</b>
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        long currentTime = System.currentTimeMillis();</b>
+<b class="nc">&nbsp;        return currentTime - reportableTaskExecutorLifecycleEvent</b>
+<b class="nc">&nbsp;                .getLatestReportTime() &gt; DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void tryToWaitIfAllTaskExecutionEventChannelEmpty() throws InterruptedException {
+<b class="nc">&nbsp;        eventChannelsLock.lock();</b>
+<b class="nc">&nbsp;        while (isAllTaskExecutorEventChannelEmpty()) {</b>
+<b class="nc">&nbsp;            taskExecutionEventEmptyCondition.await();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        eventChannelsLock.unlock();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void waitIfAnyTaskExecutionEventChannelRetryIntervalPassed() throws InterruptedException {
+<b class="nc">&nbsp;        eventChannelsLock.lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            final long waitInterval =</b>
+<b class="nc">&nbsp;                    (getOldestReportTime() + DEFAULT_TASK_EXECUTOR_EVENT_RETRY_INTERVAL) - System.currentTimeMillis();</b>
+<b class="nc">&nbsp;            if (waitInterval &lt;= 0) {</b>
+&nbsp;                return;
+&nbsp;            }
+<b class="nc">&nbsp;            taskExecutionEventEmptyCondition.await(waitInterval, TimeUnit.MILLISECONDS);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            eventChannelsLock.unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class ReportableTaskExecutorLifecycleEventChannel {</b>
+&nbsp;
+&nbsp;        @Getter
+&nbsp;        private final int taskExecutorId;
+&nbsp;
+&nbsp;        private final LinkedBlockingQueue&lt;IReportableTaskExecutorLifecycleEvent&gt; taskExecutionEventsQueue;
+&nbsp;
+&nbsp;        // todo: remove the master address from the channel, we need to get the master address from the TaskExecutor
+<b class="nc">&nbsp;        public ReportableTaskExecutorLifecycleEventChannel(int taskExecutorId) {</b>
+<b class="nc">&nbsp;            this.taskExecutorId = taskExecutorId;</b>
+<b class="nc">&nbsp;            this.taskExecutionEventsQueue = new LinkedBlockingQueue&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public void addTaskExecutionEvent(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
+<b class="nc">&nbsp;            taskExecutionEventsQueue.add(reportableTaskExecutorLifecycleEvent);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public IReportableTaskExecutorLifecycleEvent peek() {
+<b class="nc">&nbsp;            return taskExecutionEventsQueue.peek();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public IReportableTaskExecutorLifecycleEvent remove(TaskExecutorLifecycleEventType type) {
+<b class="nc">&nbsp;            final AtomicReference&lt;IReportableTaskExecutorLifecycleEvent&gt; removed = new AtomicReference&lt;&gt;();</b>
+<b class="nc">&nbsp;            taskExecutionEventsQueue.removeIf(event -&gt; {</b>
+<b class="nc">&nbsp;                if (event.getType() == type) {</b>
+<b class="nc">&nbsp;                    removed.set(event);</b>
+<b class="nc">&nbsp;                    return true;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            });
+<b class="nc">&nbsp;            return removed.get();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean isEmpty() {
+<b class="nc">&nbsp;            return taskExecutionEventsQueue.isEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean isNotEmpty() {
+<b class="nc">&nbsp;            return !isEmpty();</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

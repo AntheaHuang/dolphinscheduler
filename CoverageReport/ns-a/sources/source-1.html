@@ -1,0 +1,635 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DAG</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.common.graph</a>
+</div>
+
+<h1>Coverage Summary for Class: DAG (org.apache.dolphinscheduler.common.graph)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DAG</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/25)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/141)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.common.graph;
+&nbsp;
+&nbsp;import org.apache.commons.collections4.CollectionUtils;
+&nbsp;
+&nbsp;import java.util.AbstractMap;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collection;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Queue;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.concurrent.locks.ReadWriteLock;
+&nbsp;import java.util.concurrent.locks.ReentrantReadWriteLock;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;/**
+&nbsp; * analysis of DAG
+&nbsp; * Node: node
+&nbsp; * NodeInfo：node description information
+&nbsp; * EdgeInfo: edge description information
+&nbsp; */
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class DAG&lt;Node, NodeInfo, EdgeInfo&gt; {
+&nbsp;
+<b class="nc">&nbsp;    private final ReadWriteLock lock = new ReentrantReadWriteLock();</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * node map, key is node, value is node information
+&nbsp;     */
+&nbsp;    private final Map&lt;Node, NodeInfo&gt; nodesMap;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * edge map. key is node of origin;value is Map with key for destination node and value for edge
+&nbsp;     */
+&nbsp;    private final Map&lt;Node, Map&lt;Node, EdgeInfo&gt;&gt; edgesMap;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * reversed edge set，key is node of destination, value is Map with key for origin node and value for edge
+&nbsp;     */
+&nbsp;    private final Map&lt;Node, Map&lt;Node, EdgeInfo&gt;&gt; reverseEdgesMap;
+&nbsp;
+<b class="nc">&nbsp;    public DAG() {</b>
+<b class="nc">&nbsp;        nodesMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        edgesMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        reverseEdgesMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * add node information
+&nbsp;     *
+&nbsp;     * @param node node
+&nbsp;     * @param nodeInfo node information
+&nbsp;     */
+&nbsp;    public void addNode(Node node, NodeInfo nodeInfo) {
+<b class="nc">&nbsp;        lock.writeLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            nodesMap.put(node, nodeInfo);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.writeLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * add edge
+&nbsp;     *
+&nbsp;     * @param fromNode node of origin
+&nbsp;     * @param toNode node of destination
+&nbsp;     * @return The result of adding an edge. returns false if the DAG result is a ring result
+&nbsp;     */
+&nbsp;    public boolean addEdge(Node fromNode, Node toNode) {
+<b class="nc">&nbsp;        return addEdge(fromNode, toNode, false);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * add edge
+&nbsp;     *
+&nbsp;     * @param fromNode node of origin
+&nbsp;     * @param toNode node of destination
+&nbsp;     * @param createNode whether the node needs to be created if it does not exist
+&nbsp;     * @return The result of adding an edge. returns false if the DAG result is a ring result
+&nbsp;     */
+&nbsp;    private boolean addEdge(Node fromNode, Node toNode, boolean createNode) {
+<b class="nc">&nbsp;        return addEdge(fromNode, toNode, null, createNode);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * add edge
+&nbsp;     *
+&nbsp;     * @param fromNode node of origin
+&nbsp;     * @param toNode node of destination
+&nbsp;     * @param edge edge description
+&nbsp;     * @param createNode whether the node needs to be created if it does not exist
+&nbsp;     * @return The result of adding an edge. returns false if the DAG result is a ring result
+&nbsp;     */
+&nbsp;    public boolean addEdge(Node fromNode, Node toNode, EdgeInfo edge, boolean createNode) {
+<b class="nc">&nbsp;        lock.writeLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+&nbsp;            // Whether an edge can be successfully added(fromNode -&gt; toNode)
+<b class="nc">&nbsp;            if (!isLegalAddEdge(fromNode, toNode, createNode)) {</b>
+<b class="nc">&nbsp;                log.error(&quot;serious error: add edge({} -&gt; {}) is invalid, cause cycle！&quot;, fromNode, toNode);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            addNodeIfAbsent(fromNode, null);</b>
+<b class="nc">&nbsp;            addNodeIfAbsent(toNode, null);</b>
+&nbsp;
+<b class="nc">&nbsp;            addEdge(fromNode, toNode, edge, edgesMap);</b>
+<b class="nc">&nbsp;            addEdge(toNode, fromNode, edge, reverseEdgesMap);</b>
+&nbsp;
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.writeLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether this node is contained
+&nbsp;     *
+&nbsp;     * @param node node
+&nbsp;     * @return true if contains
+&nbsp;     */
+&nbsp;    public boolean containsNode(Node node) {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return nodesMap.containsKey(node);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether this edge is contained
+&nbsp;     *
+&nbsp;     * @param fromNode node of origin
+&nbsp;     * @param toNode node of destination
+&nbsp;     * @return true if contains
+&nbsp;     */
+&nbsp;    public boolean containsEdge(Node fromNode, Node toNode) {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            Map&lt;Node, EdgeInfo&gt; endEdges = edgesMap.get(fromNode);</b>
+<b class="nc">&nbsp;            if (endEdges == null) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            return endEdges.containsKey(toNode);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get node description
+&nbsp;     *
+&nbsp;     * @param node node
+&nbsp;     * @return node description
+&nbsp;     */
+&nbsp;    public NodeInfo getNode(Node node) {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return nodesMap.get(node);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the number of nodes
+&nbsp;     *
+&nbsp;     * @return the number of nodes
+&nbsp;     */
+&nbsp;    public int getNodesCount() {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return nodesMap.size();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the number of edges
+&nbsp;     *
+&nbsp;     * @return the number of edges
+&nbsp;     */
+&nbsp;    public int getEdgesCount() {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            int count = 0;</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Map.Entry&lt;Node, Map&lt;Node, EdgeInfo&gt;&gt; entry : edgesMap.entrySet()) {</b>
+<b class="nc">&nbsp;                count += entry.getValue().size();</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            return count;</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get the start node of DAG
+&nbsp;     *
+&nbsp;     * @return the start node of DAG
+&nbsp;     */
+&nbsp;    public Collection&lt;Node&gt; getBeginNode() {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return CollectionUtils.subtract(nodesMap.keySet(), reverseEdgesMap.keySet());</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get the end node of DAG
+&nbsp;     *
+&nbsp;     * @return the end node of DAG
+&nbsp;     */
+&nbsp;    public Collection&lt;Node&gt; getEndNode() {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return CollectionUtils.subtract(nodesMap.keySet(), edgesMap.keySet());</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets all previous nodes of the node
+&nbsp;     *
+&nbsp;     * @param node node id to be calculated
+&nbsp;     * @return all previous nodes of the node
+&nbsp;     */
+&nbsp;    public Set&lt;Node&gt; getPreviousNodes(Node node) {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return getNeighborNodes(node, reverseEdgesMap);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all subsequent nodes of the node
+&nbsp;     *
+&nbsp;     * @param node node id to be calculated
+&nbsp;     * @return all subsequent nodes of the node
+&nbsp;     */
+&nbsp;    public Set&lt;Node&gt; getSubsequentNodes(Node node) {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return getNeighborNodes(node, edgesMap);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Gets the degree of entry of the node
+&nbsp;     *
+&nbsp;     * @param node node id
+&nbsp;     * @return the degree of entry of the node
+&nbsp;     */
+&nbsp;    public int getIndegree(Node node) {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return getPreviousNodes(node).size();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * whether the graph has a ring
+&nbsp;     *
+&nbsp;     * @return true if has cycle, else return false.
+&nbsp;     */
+&nbsp;    public boolean hasCycle() {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            return !topologicalSortImpl().getKey();</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Only DAG has a topological sort
+&nbsp;     *
+&nbsp;     * @return topologically sorted results, returns false if the DAG result is a ring result
+&nbsp;     * @throws Exception errors
+&nbsp;     */
+&nbsp;    public List&lt;Node&gt; topologicalSort() throws Exception {
+<b class="nc">&nbsp;        lock.readLock().lock();</b>
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            Map.Entry&lt;Boolean, List&lt;Node&gt;&gt; entry = topologicalSortImpl();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (entry.getKey()) {</b>
+<b class="nc">&nbsp;                return entry.getValue();</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            throw new Exception(&quot;serious error: graph has cycle ! &quot;);</b>
+&nbsp;        } finally {
+<b class="nc">&nbsp;            lock.readLock().unlock();</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * if tho node does not exist,add this node
+&nbsp;     *
+&nbsp;     * @param node node
+&nbsp;     * @param nodeInfo node information
+&nbsp;     */
+&nbsp;    private void addNodeIfAbsent(Node node, NodeInfo nodeInfo) {
+<b class="nc">&nbsp;        if (!containsNode(node)) {</b>
+<b class="nc">&nbsp;            addNode(node, nodeInfo);</b>
+&nbsp;        }
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * add edge
+&nbsp;     *
+&nbsp;     * @param fromNode node of origin
+&nbsp;     * @param toNode node of destination
+&nbsp;     * @param edge edge description
+&nbsp;     * @param edges edge set
+&nbsp;     */
+&nbsp;    private void addEdge(Node fromNode, Node toNode, EdgeInfo edge, Map&lt;Node, Map&lt;Node, EdgeInfo&gt;&gt; edges) {
+<b class="nc">&nbsp;        edges.putIfAbsent(fromNode, new HashMap&lt;&gt;());</b>
+<b class="nc">&nbsp;        Map&lt;Node, EdgeInfo&gt; toNodeEdges = edges.get(fromNode);</b>
+<b class="nc">&nbsp;        toNodeEdges.put(toNode, edge);</b>
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Whether an edge can be successfully added(fromNode -&gt; toNode)
+&nbsp;     * need to determine whether the DAG has cycle
+&nbsp;     *
+&nbsp;     * @param fromNode node of origin
+&nbsp;     * @param toNode node of destination
+&nbsp;     * @param createNode whether to create a node
+&nbsp;     * @return true if added
+&nbsp;     */
+&nbsp;    private boolean isLegalAddEdge(Node fromNode, Node toNode, boolean createNode) {
+<b class="nc">&nbsp;        if (fromNode.equals(toNode)) {</b>
+<b class="nc">&nbsp;            log.error(&quot;edge fromNode({}) can&#39;t equals toNode({})&quot;, fromNode, toNode);</b>
+<b class="nc">&nbsp;            return false;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (!createNode) {</b>
+<b class="nc">&nbsp;            if (!containsNode(fromNode) || !containsNode(toNode)) {</b>
+<b class="nc">&nbsp;                log.error(&quot;edge fromNode({}) or toNode({}) is not in vertices map&quot;, fromNode, toNode);</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Whether an edge can be successfully added(fromNode -&gt; toNode),need to determine whether the DAG has cycle!
+<b class="nc">&nbsp;        int verticesCount = getNodesCount();</b>
+&nbsp;
+<b class="nc">&nbsp;        Queue&lt;Node&gt; queue = new LinkedList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        queue.add(toNode);</b>
+&nbsp;
+&nbsp;        // if DAG doesn&#39;t find fromNode, it&#39;s not has cycle!
+<b class="nc">&nbsp;        while (!queue.isEmpty() &amp;&amp; (--verticesCount &gt; 0)) {</b>
+<b class="nc">&nbsp;            Node key = queue.poll();</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node subsequentNode : getSubsequentNodes(key)) {</b>
+<b class="nc">&nbsp;                if (subsequentNode.equals(fromNode)) {</b>
+<b class="nc">&nbsp;                    return false;</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                queue.add(subsequentNode);</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all neighbor nodes of the node
+&nbsp;     *
+&nbsp;     * @param node Node id to be calculated
+&nbsp;     * @param edges neighbor edge information
+&nbsp;     * @return all neighbor nodes of the node
+&nbsp;     */
+&nbsp;    private Set&lt;Node&gt; getNeighborNodes(Node node, final Map&lt;Node, Map&lt;Node, EdgeInfo&gt;&gt; edges) {
+<b class="nc">&nbsp;        final Map&lt;Node, EdgeInfo&gt; neighborEdges = edges.get(node);</b>
+<b class="nc">&nbsp;        if (neighborEdges == null) {</b>
+<b class="nc">&nbsp;            return Collections.emptySet();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return neighborEdges.keySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine whether there are ring and topological sorting results
+&nbsp;     * &lt;p&gt;
+&nbsp;     * Directed acyclic graph (DAG) has topological ordering
+&nbsp;     * Breadth First Search：
+&nbsp;     * 1、Traversal of all the vertices in the graph, the degree of entry is 0 vertex into the queue
+&nbsp;     * 2、Poll a vertex in the queue to update its adjacency (minus 1) and queue the adjacency if it is 0 after minus 1
+&nbsp;     * 3、Do step 2 until the queue is empty
+&nbsp;     * If you cannot traverse all the nodes, it means that the current graph is not a directed acyclic graph.
+&nbsp;     * There is no topological sort.
+&nbsp;     *
+&nbsp;     * @return key Returns the state
+&nbsp;     * if success (acyclic) is true, failure (acyclic) is looped,
+&nbsp;     * and value (possibly one of the topological sort results)
+&nbsp;     */
+&nbsp;    private Map.Entry&lt;Boolean, List&lt;Node&gt;&gt; topologicalSortImpl() {
+&nbsp;        // node queue with degree of entry 0
+<b class="nc">&nbsp;        Queue&lt;Node&gt; zeroIndegreeNodeQueue = new LinkedList&lt;&gt;();</b>
+&nbsp;        // save result
+<b class="nc">&nbsp;        List&lt;Node&gt; topoResultList = new ArrayList&lt;&gt;();</b>
+&nbsp;        // save the node whose degree is not 0
+<b class="nc">&nbsp;        Map&lt;Node, Integer&gt; notZeroIndegreeNodeMap = new HashMap&lt;&gt;();</b>
+&nbsp;
+&nbsp;        // Scan all the vertices and push vertexs with an entry degree of 0 to queue
+<b class="nc">&nbsp;        for (Map.Entry&lt;Node, NodeInfo&gt; vertices : nodesMap.entrySet()) {</b>
+<b class="nc">&nbsp;            Node node = vertices.getKey();</b>
+<b class="nc">&nbsp;            int inDegree = getIndegree(node);</b>
+&nbsp;
+<b class="nc">&nbsp;            if (inDegree == 0) {</b>
+<b class="nc">&nbsp;                zeroIndegreeNodeQueue.add(node);</b>
+<b class="nc">&nbsp;                topoResultList.add(node);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                notZeroIndegreeNodeMap.put(node, inDegree);</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        /*
+&nbsp;         * After scanning, there is no node with 0 degree of entry, indicating that there is a ring, and return directly
+&nbsp;         */
+<b class="nc">&nbsp;        if (zeroIndegreeNodeQueue.isEmpty()) {</b>
+<b class="nc">&nbsp;            return new AbstractMap.SimpleEntry&lt;&gt;(false, topoResultList);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // The topology algorithm is used to delete nodes with 0 degree of entry and its associated edges
+<b class="nc">&nbsp;        while (!zeroIndegreeNodeQueue.isEmpty()) {</b>
+<b class="nc">&nbsp;            Node v = zeroIndegreeNodeQueue.poll();</b>
+&nbsp;            // Get the neighbor node
+<b class="nc">&nbsp;            Set&lt;Node&gt; subsequentNodes = getSubsequentNodes(v);</b>
+&nbsp;
+<b class="nc">&nbsp;            for (Node subsequentNode : subsequentNodes) {</b>
+&nbsp;
+<b class="nc">&nbsp;                Integer degree = notZeroIndegreeNodeMap.get(subsequentNode);</b>
+&nbsp;
+<b class="nc">&nbsp;                if (--degree == 0) {</b>
+<b class="nc">&nbsp;                    topoResultList.add(subsequentNode);</b>
+<b class="nc">&nbsp;                    zeroIndegreeNodeQueue.add(subsequentNode);</b>
+<b class="nc">&nbsp;                    notZeroIndegreeNodeMap.remove(subsequentNode);</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    notZeroIndegreeNodeMap.put(subsequentNode, degree);</b>
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // if notZeroIndegreeNodeMap is empty,there is no ring!
+<b class="nc">&nbsp;        return new AbstractMap.SimpleEntry&lt;&gt;(notZeroIndegreeNodeMap.size() == 0, topoResultList);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get all the nodes that are in the graph
+&nbsp;     *
+&nbsp;     * @return all nodes in the graph
+&nbsp;     */
+&nbsp;    public Set&lt;Node&gt; getAllNodesList() {
+<b class="nc">&nbsp;        return nodesMap.keySet();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;DAG{&quot;</b>
+&nbsp;                + &quot;nodesMap=&quot;
+&nbsp;                + nodesMap
+&nbsp;                + &quot;, edgesMap=&quot;
+&nbsp;                + edgesMap
+&nbsp;                + &quot;, reverseEdgesMap=&quot;
+&nbsp;                + reverseEdgesMap
+&nbsp;                + &#39;}&#39;;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

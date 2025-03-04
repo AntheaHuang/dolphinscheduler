@@ -1,0 +1,398 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > LinkisTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.linkis</a>
+</div>
+
+<h1>Coverage Summary for Class: LinkisTask (org.apache.dolphinscheduler.plugin.task.linkis)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">LinkisTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/101)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">LinkisTask$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/19)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/102)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.linkis;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.BooleanUtils;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.List;
+&nbsp;import java.util.regex.Matcher;
+&nbsp;import java.util.regex.Pattern;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class LinkisTask extends AbstractRemoteTask {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * linkis parameters
+&nbsp;     */
+&nbsp;    private LinkisParameters linkisParameters;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * shell command executor
+&nbsp;     */
+&nbsp;    private ShellCommandExecutor shellCommandExecutor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * taskExecutionContext
+&nbsp;     */
+&nbsp;    protected final TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    private String taskId;
+&nbsp;
+<b class="nc">&nbsp;    protected static final Pattern LINKIS_TASK_ID_REGEX = Pattern.compile(Constants.LINKIS_TASK_ID_REGEX);</b>
+&nbsp;
+<b class="nc">&nbsp;    protected static final Pattern LINKIS_STATUS_REGEX = Pattern.compile(Constants.LINKIS_STATUS_REGEX);</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * constructor
+&nbsp;     *
+&nbsp;     * @param taskExecutionContext taskExecutionContext
+&nbsp;     */
+&nbsp;    public LinkisTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+<b class="nc">&nbsp;        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getApplicationIds() throws TaskException {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+<b class="nc">&nbsp;        linkisParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), LinkisParameters.class);</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize Linkis task params {}&quot;, JSONUtils.toPrettyJsonString(linkisParameters));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (!linkisParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new RuntimeException(&quot;Linkis task params is not valid&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void submitApplication() throws TaskException {
+&nbsp;        try {
+&nbsp;            // construct process
+<b class="nc">&nbsp;            IShellInterceptorBuilder&lt;?, ?&gt; shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()</b>
+<b class="nc">&nbsp;                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))</b>
+<b class="nc">&nbsp;                    .appendScript(buildCommand());</b>
+<b class="nc">&nbsp;            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, null);</b>
+<b class="nc">&nbsp;            setExitStatusCode(commandExecuteResult.getExitStatusCode());</b>
+<b class="nc">&nbsp;            setAppIds(findTaskId(commandExecuteResult.getResultString()));</b>
+<b class="nc">&nbsp;            setProcessId(commandExecuteResult.getProcessId());</b>
+<b class="nc">&nbsp;            linkisParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(&quot;The current Linkis task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;The current Linkis task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Linkis task error&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Execute Linkis task failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void trackApplicationStatus() throws TaskException {
+<b class="nc">&nbsp;        initTaskId();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            args.add(Constants.SHELL_CLI_OPTIONS);</b>
+<b class="nc">&nbsp;            args.add(Constants.STATUS_OPTIONS);</b>
+<b class="nc">&nbsp;            args.add(taskId);</b>
+<b class="nc">&nbsp;            String command = String.join(Constants.SPACE, args);</b>
+<b class="nc">&nbsp;            IShellInterceptorBuilder&lt;?, ?&gt; shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()</b>
+<b class="nc">&nbsp;                    .appendScript(command);</b>
+<b class="nc">&nbsp;            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, null);</b>
+<b class="nc">&nbsp;            String status = findStatus(commandExecuteResult.getResultString());</b>
+<b class="nc">&nbsp;            LinkisJobStatus jobStatus = LinkisJobStatus.convertFromJobStatusString(status);</b>
+<b class="nc">&nbsp;            switch (jobStatus) {</b>
+&nbsp;                case FAILED:
+<b class="nc">&nbsp;                    setExitStatusCode(EXIT_CODE_FAILURE);</b>
+&nbsp;                    break;
+&nbsp;                case SUCCEED:
+<b class="nc">&nbsp;                    setExitStatusCode(EXIT_CODE_SUCCESS);</b>
+&nbsp;                    break;
+&nbsp;                case CANCELLED:
+<b class="nc">&nbsp;                    setExitStatusCode(EXIT_CODE_KILL);</b>
+&nbsp;                    break;
+&nbsp;            }
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(&quot;The current Linkis task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;The current Linkis task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;track linkis status error&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelApplication() throws TaskException {
+&nbsp;        // cancel process
+<b class="nc">&nbsp;        initTaskId();</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;            args.add(Constants.SHELL_CLI_OPTIONS);</b>
+<b class="nc">&nbsp;            args.add(Constants.KILL_OPTIONS);</b>
+<b class="nc">&nbsp;            args.add(taskId);</b>
+<b class="nc">&nbsp;            String command = String.join(Constants.SPACE, args);</b>
+&nbsp;
+<b class="nc">&nbsp;            IShellInterceptorBuilder&lt;?, ?&gt; shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()</b>
+<b class="nc">&nbsp;                    .appendScript(command);</b>
+<b class="nc">&nbsp;            shellCommandExecutor.run(shellActuatorBuilder, null);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_KILL);</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(&quot;The current Linkis task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;The current Linkis task has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;cancel linkis task error&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildCommand() {
+&nbsp;
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.addAll(buildOptions());</b>
+&nbsp;
+<b class="nc">&nbsp;        String command = String.join(&quot; &quot;, args);</b>
+<b class="nc">&nbsp;        log.info(&quot;Linkis task command: {}&quot;, command);</b>
+&nbsp;
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected List&lt;String&gt; buildOptions() {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(Constants.SHELL_CLI_OPTIONS);</b>
+<b class="nc">&nbsp;        args.add(Constants.ASYNC_OPTIONS);</b>
+<b class="nc">&nbsp;        if (BooleanUtils.isTrue(linkisParameters.getUseCustom())) {</b>
+<b class="nc">&nbsp;            args.add(linkisParameters.getRawScript());</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            args.add(buildParamConfigContent());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return args;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildParamConfigContent() {
+<b class="nc">&nbsp;        log.info(&quot;raw param config content : {}&quot;, linkisParameters.getParamScript());</b>
+<b class="nc">&nbsp;        String script = &quot;&quot;;</b>
+<b class="nc">&nbsp;        List&lt;LinkisParameters.Param&gt; paramList = linkisParameters.getParamScript();</b>
+<b class="nc">&nbsp;        for (LinkisParameters.Param param : paramList) {</b>
+<b class="nc">&nbsp;            script = script.concat(param.getProps())</b>
+<b class="nc">&nbsp;                    .concat(Constants.SPACE)</b>
+<b class="nc">&nbsp;                    .concat(param.getValue());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return script;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private void initTaskId() {
+<b class="nc">&nbsp;        if (taskId == null) {</b>
+<b class="nc">&nbsp;            if (StringUtils.isNotEmpty(getAppIds())) {</b>
+<b class="nc">&nbsp;                taskId = getAppIds();</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        if (taskId == null) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;linkis task id is null&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String findTaskId(String line) {
+<b class="nc">&nbsp;        Matcher matcher = LINKIS_TASK_ID_REGEX.matcher(line);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            String str = matcher.group();</b>
+<b class="nc">&nbsp;            return str.substring(11);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    protected String findStatus(String line) {
+<b class="nc">&nbsp;        Matcher matcher = LINKIS_STATUS_REGEX.matcher(line);</b>
+<b class="nc">&nbsp;        if (matcher.find()) {</b>
+<b class="nc">&nbsp;            String str = matcher.group();</b>
+<b class="nc">&nbsp;            return str.substring(11);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return linkisParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

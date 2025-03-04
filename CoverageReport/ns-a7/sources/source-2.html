@@ -1,0 +1,398 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > ZeppelinTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.zeppelin</a>
+</div>
+
+<h1>Coverage Summary for Class: ZeppelinTask (org.apache.dolphinscheduler.plugin.task.zeppelin)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ZeppelinTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/94)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">ZeppelinTask$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/26)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/95)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.zeppelin;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.DateUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.DbType;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.zeppelin.client.ClientConfig;
+&nbsp;import org.apache.zeppelin.client.NoteResult;
+&nbsp;import org.apache.zeppelin.client.ParagraphResult;
+&nbsp;import org.apache.zeppelin.client.Status;
+&nbsp;import org.apache.zeppelin.client.ZeppelinClient;
+&nbsp;
+&nbsp;import java.util.Collections;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import kong.unirest.Unirest;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.databind.ObjectMapper;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class ZeppelinTask extends AbstractRemoteTask {
+&nbsp;
+&nbsp;    private final TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    private ZeppelinParameters zeppelinParameters;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * zeppelin api client
+&nbsp;     */
+&nbsp;    private ZeppelinClient zClient;
+&nbsp;
+&nbsp;    private ZeppelinConnectionParam zeppelinConnectionParam;
+&nbsp;
+&nbsp;    private ZeppelinTaskExecutionContext zeppelinTaskExecutionContext;
+&nbsp;
+&nbsp;    protected ZeppelinTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+<b class="nc">&nbsp;        final String taskParams = taskExecutionContext.getTaskParams();</b>
+<b class="nc">&nbsp;        this.zeppelinParameters = JSONUtils.parseObject(taskParams, ZeppelinParameters.class);</b>
+<b class="nc">&nbsp;        if (this.zeppelinParameters == null || !this.zeppelinParameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new ZeppelinTaskException(&quot;zeppelin task params is not valid&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        zeppelinTaskExecutionContext =</b>
+<b class="nc">&nbsp;                zeppelinParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());</b>
+<b class="nc">&nbsp;        zeppelinConnectionParam = (ZeppelinConnectionParam) DataSourceUtils</b>
+<b class="nc">&nbsp;                .buildConnectionParams(DbType.valueOf(zeppelinParameters.getType()),</b>
+<b class="nc">&nbsp;                        zeppelinTaskExecutionContext.getConnectionParams());</b>
+<b class="nc">&nbsp;        zeppelinParameters.setUsername(zeppelinConnectionParam.getUsername());</b>
+<b class="nc">&nbsp;        zeppelinParameters.setPassword(zeppelinConnectionParam.getPassword());</b>
+<b class="nc">&nbsp;        zeppelinParameters.setRestEndpoint(zeppelinConnectionParam.getRestEndpoint());</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize zeppelin task params:{}&quot;, JSONUtils.toPrettyJsonString(zeppelinParameters));</b>
+<b class="nc">&nbsp;        this.zClient = getZeppelinClient();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public boolean login() throws Exception {
+<b class="nc">&nbsp;        String username = this.zeppelinParameters.getUsername();</b>
+<b class="nc">&nbsp;        String password = this.zeppelinParameters.getPassword();</b>
+<b class="nc">&nbsp;        if (StringUtils.isNotBlank(username) &amp;&amp; StringUtils.isNotBlank(password)) {</b>
+<b class="nc">&nbsp;            this.zClient.login(username, password);</b>
+<b class="nc">&nbsp;            log.info(&quot;username : {}  login  success &quot;, username);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return true;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // todo split handle to submit and track
+&nbsp;    @Override
+&nbsp;    public void handle(TaskCallBack taskCallBack) throws TaskException {
+&nbsp;        try {
+<b class="nc">&nbsp;            login();</b>
+<b class="nc">&nbsp;            final String paragraphId = this.zeppelinParameters.getParagraphId();</b>
+<b class="nc">&nbsp;            final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();</b>
+<b class="nc">&nbsp;            final String parameters = this.zeppelinParameters.getParameters();</b>
+&nbsp;            // noteId may be replaced with cloned noteId
+<b class="nc">&nbsp;            String noteId = this.zeppelinParameters.getNoteId();</b>
+<b class="nc">&nbsp;            Map&lt;String, String&gt; zeppelinParamsMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;            if (parameters != null) {</b>
+<b class="nc">&nbsp;                ObjectMapper mapper = new ObjectMapper();</b>
+<b class="nc">&nbsp;                zeppelinParamsMap = mapper.readValue(parameters, Map.class);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Submit zeppelin task
+&nbsp;            String resultContent;
+<b class="nc">&nbsp;            Status status = Status.FINISHED;</b>
+&nbsp;            // If in production, clone the note and run the cloned one for stability
+<b class="nc">&nbsp;            if (productionNoteDirectory != null) {</b>
+<b class="nc">&nbsp;                final String cloneNotePath =</b>
+<b class="nc">&nbsp;                        String.format(&quot;%s%s_%s&quot;, productionNoteDirectory, noteId, DateUtils.getTimestampString());</b>
+<b class="nc">&nbsp;                noteId = this.zClient.cloneNote(noteId, cloneNotePath);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (paragraphId == null || paragraphId.trim().length() == 0) {</b>
+<b class="nc">&nbsp;                final NoteResult noteResult = this.zClient.executeNote(noteId, zeppelinParamsMap);</b>
+<b class="nc">&nbsp;                final List&lt;ParagraphResult&gt; paragraphResultList = noteResult.getParagraphResultList();</b>
+<b class="nc">&nbsp;                StringBuilder resultContentBuilder = new StringBuilder();</b>
+<b class="nc">&nbsp;                for (ParagraphResult paragraphResult : paragraphResultList) {</b>
+<b class="nc">&nbsp;                    resultContentBuilder.append(String.format(&quot;paragraph_id: %s, paragraph_result: %s\n&quot;,</b>
+<b class="nc">&nbsp;                            paragraphResult.getParagraphId(), paragraphResult.getResultInText()));</b>
+<b class="nc">&nbsp;                    status = paragraphResult.getStatus();</b>
+&nbsp;                    // we treat note execution as failure if any paragraph in the note fails
+&nbsp;                    // status will be further processed in method mapStatusToExitCode below
+<b class="nc">&nbsp;                    if (status != Status.FINISHED) {</b>
+&nbsp;                        break;
+&nbsp;                    }
+&nbsp;                }
+&nbsp;
+<b class="nc">&nbsp;                resultContent = resultContentBuilder.toString();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                final ParagraphResult paragraphResult =</b>
+<b class="nc">&nbsp;                        this.zClient.executeParagraph(noteId, paragraphId, zeppelinParamsMap);</b>
+<b class="nc">&nbsp;                resultContent = paragraphResult.getResultInText();</b>
+<b class="nc">&nbsp;                status = paragraphResult.getStatus();</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Delete cloned note
+<b class="nc">&nbsp;            if (productionNoteDirectory != null) {</b>
+<b class="nc">&nbsp;                this.zClient.deleteNote(noteId);</b>
+&nbsp;            }
+&nbsp;
+&nbsp;            // Use noteId-paragraph-Id as app id
+<b class="nc">&nbsp;            final int exitStatusCode = mapStatusToExitCode(status);</b>
+<b class="nc">&nbsp;            setAppIds(String.format(&quot;%s-%s&quot;, noteId, paragraphId));</b>
+<b class="nc">&nbsp;            setExitStatusCode(exitStatusCode);</b>
+<b class="nc">&nbsp;            log.info(&quot;zeppelin task finished with results: {}&quot;, resultContent);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            log.error(&quot;zeppelin task submit failed with error&quot;, e);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Execute ZeppelinTask exception&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void submitApplication() throws TaskException {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void trackApplicationStatus() throws TaskException {
+&nbsp;
+<b class="nc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create zeppelin client from zeppelin config
+&nbsp;     *
+&nbsp;     * @return ZeppelinClient
+&nbsp;     */
+&nbsp;    protected ZeppelinClient getZeppelinClient() {
+<b class="nc">&nbsp;        final String restEndpoint = zeppelinParameters.getRestEndpoint();</b>
+<b class="nc">&nbsp;        final ClientConfig clientConfig = new ClientConfig(restEndpoint);</b>
+<b class="nc">&nbsp;        ZeppelinClient zClient = null;</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            zClient = new ZeppelinClient(clientConfig);</b>
+<b class="nc">&nbsp;            final String zeppelinVersion = zClient.getVersion();</b>
+<b class="nc">&nbsp;            log.info(&quot;zeppelin version: {}&quot;, zeppelinVersion);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+&nbsp;            // TODO: complete error handling
+<b class="nc">&nbsp;            log.error(&quot;some error&quot;);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return zClient;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * map zeppelin task status to exitStatusCode
+&nbsp;     *
+&nbsp;     * @param status zeppelin job status
+&nbsp;     * @return exitStatusCode
+&nbsp;     */
+&nbsp;    private int mapStatusToExitCode(Status status) {
+<b class="nc">&nbsp;        switch (status) {</b>
+&nbsp;            case FINISHED:
+<b class="nc">&nbsp;                return TaskConstants.EXIT_CODE_SUCCESS;</b>
+&nbsp;            case ABORT:
+<b class="nc">&nbsp;                return TaskConstants.EXIT_CODE_KILL;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                return TaskConstants.EXIT_CODE_FAILURE;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return zeppelinParameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancelApplication() throws TaskException {
+<b class="nc">&nbsp;        final String restEndpoint = this.zeppelinParameters.getRestEndpoint();</b>
+<b class="nc">&nbsp;        final String noteId = this.zeppelinParameters.getNoteId();</b>
+<b class="nc">&nbsp;        final String paragraphId = this.zeppelinParameters.getParagraphId();</b>
+<b class="nc">&nbsp;        if (paragraphId == null) {</b>
+<b class="nc">&nbsp;            log.info(&quot;trying terminate zeppelin task, taskId: {}, noteId: {}&quot;,</b>
+<b class="nc">&nbsp;                    this.taskExecutionContext.getTaskInstanceId(), noteId);</b>
+<b class="nc">&nbsp;            Unirest.config().defaultBaseUrl(restEndpoint + &quot;/api&quot;);</b>
+<b class="nc">&nbsp;            Unirest.delete(&quot;/notebook/job/{noteId}&quot;).routeParam(&quot;noteId&quot;, noteId).asJson();</b>
+<b class="nc">&nbsp;            log.info(&quot;zeppelin task terminated, taskId: {}, noteId: {}&quot;, this.taskExecutionContext.getTaskInstanceId(),</b>
+&nbsp;                    noteId);
+&nbsp;        } else {
+<b class="nc">&nbsp;            log.info(&quot;trying terminate zeppelin task, taskId: {}, noteId: {}, paragraphId: {}&quot;,</b>
+<b class="nc">&nbsp;                    this.taskExecutionContext.getTaskInstanceId(), noteId, paragraphId);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                this.zClient.cancelParagraph(noteId, paragraphId);</b>
+<b class="nc">&nbsp;            } catch (Exception e) {</b>
+<b class="nc">&nbsp;                throw new TaskException(&quot;cancel paragraph error&quot;, e);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            log.info(&quot;zeppelin task terminated, taskId: {}, noteId: {}, paragraphId: {}&quot;,</b>
+<b class="nc">&nbsp;                    this.taskExecutionContext.getTaskInstanceId(), noteId, paragraphId);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;String&gt; getApplicationIds() throws TaskException {
+<b class="nc">&nbsp;        return Collections.emptyList();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DatasyncParameters</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.datasync</a>
+</div>
+
+<h1>Coverage Summary for Class: DatasyncParameters (org.apache.dolphinscheduler.plugin.task.datasync)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DatasyncParameters</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DatasyncParameters$FilterRule</td>
+  </tr>
+  <tr>
+    <td class="name">DatasyncParameters$Options</td>
+  </tr>
+  <tr>
+    <td class="name">DatasyncParameters$TagListEntry</td>
+  </tr>
+  <tr>
+    <td class="name">DatasyncParameters$TaskSchedule</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.datasync;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import lombok.Getter;
+&nbsp;import lombok.NoArgsConstructor;
+&nbsp;import lombok.Setter;
+&nbsp;import lombok.ToString;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;
+&nbsp;@Setter
+&nbsp;@Getter
+&nbsp;@NoArgsConstructor
+&nbsp;@ToString
+&nbsp;public class DatasyncParameters extends AbstractParameters {
+&nbsp;
+&nbsp;    private String destinationLocationArn;
+&nbsp;    private String sourceLocationArn;
+&nbsp;    private String name;
+&nbsp;    private String cloudWatchLogGroupArn;
+&nbsp;
+&nbsp;    private boolean jsonFormat;
+&nbsp;    private String json;
+&nbsp;    @JsonProperty(&quot;Options&quot;)
+&nbsp;    private Options options;
+&nbsp;    @JsonProperty(&quot;Schedule&quot;)
+&nbsp;    private TaskSchedule schedule;
+&nbsp;    @JsonProperty(&quot;Excludes&quot;)
+&nbsp;    private List&lt;FilterRule&gt; excludes;
+&nbsp;    @JsonProperty(&quot;Includes&quot;)
+&nbsp;    private List&lt;FilterRule&gt; includes;
+&nbsp;    @JsonProperty(&quot;Tags&quot;)
+&nbsp;    private List&lt;TagListEntry&gt; tags;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean checkParameters() {
+<b class="nc">&nbsp;        if (jsonFormat) {</b>
+<b class="nc">&nbsp;            return StringUtils.isNotEmpty(json);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return StringUtils.isNotEmpty(destinationLocationArn) &amp;&amp; StringUtils.isNotEmpty(sourceLocationArn)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(name);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Setter
+&nbsp;    @Getter
+&nbsp;    @NoArgsConstructor
+&nbsp;    @ToString
+&nbsp;    public class Options {
+&nbsp;
+&nbsp;        private String verifyMode;
+&nbsp;        private String overwriteMode;
+&nbsp;        private String atime;
+&nbsp;        private String mtime;
+&nbsp;        private String uid;
+&nbsp;        private String gid;
+&nbsp;        private String preserveDeletedFiles;
+&nbsp;        private String preserveDevices;
+&nbsp;        private String posixPermissions;
+&nbsp;        private Long bytesPerSecond;
+&nbsp;        private String taskQueueing;
+&nbsp;        private String logLevel;
+&nbsp;        private String transferMode;
+&nbsp;        private String securityDescriptorCopyFlags;
+&nbsp;        private String objectTags;
+&nbsp;    }
+&nbsp;    @Setter
+&nbsp;    @Getter
+&nbsp;    @NoArgsConstructor
+&nbsp;    @ToString
+&nbsp;    public static class TaskSchedule {
+&nbsp;
+&nbsp;        private String scheduleExpression;
+&nbsp;    }
+&nbsp;    @Setter
+&nbsp;    @Getter
+&nbsp;    @NoArgsConstructor
+&nbsp;    @ToString
+&nbsp;    public static class FilterRule {
+&nbsp;
+&nbsp;        private String filterType;
+&nbsp;        private String value;
+&nbsp;    }
+&nbsp;    @Setter
+&nbsp;    @Getter
+&nbsp;    @NoArgsConstructor
+&nbsp;    @ToString
+&nbsp;    public static class TagListEntry {
+&nbsp;
+&nbsp;        private String key;
+&nbsp;        private String value;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,224 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > StorageOperator</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.storage.api</a>
+</div>
+
+<h1>Coverage Summary for Class: StorageOperator (org.apache.dolphinscheduler.plugin.storage.api)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">StorageOperator</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.storage.api;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.ResourceType;
+&nbsp;
+&nbsp;import java.nio.file.FileAlreadyExistsException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public interface StorageOperator {
+&nbsp;
+&nbsp;    String FILE_FOLDER_NAME = &quot;resources&quot;;
+&nbsp;
+&nbsp;    ResourceMetadata getResourceMetaData(String resourceAbsolutePath);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the absolute path of base directory.
+&nbsp;     *
+&nbsp;     * @return the base directory. e.g. file:///tmp/dolphinscheduler/, /tmp/dolphinscheduler/
+&nbsp;     */
+&nbsp;    String getStorageBaseDirectory();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the absolute path of directory which will be used by the given tenant. the tenant directory is under the base directory.
+&nbsp;     *
+&nbsp;     * @param tenantCode the tenant code, cannot be empty
+&nbsp;     * @return the tenant directory. e.g. file:///tmp/dolphinscheduler/default/
+&nbsp;     */
+&nbsp;    String getStorageBaseDirectory(String tenantCode);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the absolute path of directory which will be used by the given tenant and resource type. the resource directory is under the tenant directory.
+&nbsp;     * &lt;p&gt; If the resource type is FILE, will be &#39;file:///tmp/dolphinscheduler/default/resources/&#39;.
+&nbsp;     * &lt;p&gt; If the resource type is UDF, will be &#39;is file:///tmp/dolphinscheduler/default/udfs/&#39;.
+&nbsp;     * &lt;p&gt; If the resource type is ALL, will be &#39;is file:///tmp/dolphinscheduler/default/&#39;.
+&nbsp;     *
+&nbsp;     * @param tenantCode   the tenant code, cannot be empty
+&nbsp;     * @param resourceType the resource type, cannot be null
+&nbsp;     * @return the resource directory. e.g. file:///tmp/dolphinscheduler/default/resources/
+&nbsp;     */
+&nbsp;    String getStorageBaseDirectory(String tenantCode, ResourceType resourceType);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Get the absolute path of the file in the storage. the file will under the file resource directory.
+&nbsp;     *
+&nbsp;     * @param tenantCode the tenant code, cannot be empty
+&nbsp;     * @param fileName   the file name, cannot be empty
+&nbsp;     * @return the file absolute path. e.g. file:///tmp/dolphinscheduler/default/resources/test.sh
+&nbsp;     */
+&nbsp;    String getStorageFileAbsolutePath(String tenantCode, String fileName);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Create a directory if the directory is already exists will throw exception(Dependent on the storage implementation).
+&nbsp;     * &lt;p&gt; If the directory is not exists, will create the directory.
+&nbsp;     * &lt;p&gt; If the parent directory is not exists, will create the parent directory.
+&nbsp;     * &lt;p&gt; If the directory is already exists, will throw {@link FileAlreadyExistsException}.
+&nbsp;     *
+&nbsp;     * @param directoryAbsolutePath the directory absolute path
+&nbsp;     */
+&nbsp;    void createStorageDir(String directoryAbsolutePath);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Check if the resource exists.
+&nbsp;     *
+&nbsp;     * @param resourceAbsolutePath the resource absolute path
+&nbsp;     * @return true if the resource exists, otherwise false
+&nbsp;     */
+&nbsp;    boolean exists(String resourceAbsolutePath);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Delete the resource, if the resourceAbsolutePath is not exists, will do nothing.
+&nbsp;     *
+&nbsp;     * @param resourceAbsolutePath the resource absolute path
+&nbsp;     * @param recursive            whether to delete all the sub file/directory under the given resource
+&nbsp;     */
+&nbsp;    void delete(String resourceAbsolutePath, boolean recursive);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Copy the resource from the source path to the destination path.
+&nbsp;     *
+&nbsp;     * @param srcAbsolutePath the source path
+&nbsp;     * @param dstAbsolutePath the destination path
+&nbsp;     * @param deleteSource    whether to delete the source path after copying
+&nbsp;     * @param overwrite       whether to overwrite the destination path if it exists
+&nbsp;     */
+&nbsp;    void copy(String srcAbsolutePath, String dstAbsolutePath, boolean deleteSource, boolean overwrite);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Move the resource from the source path to the destination path.
+&nbsp;     *
+&nbsp;     * @param srcLocalFileAbsolutePath the source local file
+&nbsp;     * @param dstAbsolutePath          the destination path
+&nbsp;     * @param deleteSource             whether to delete the source path after moving
+&nbsp;     * @param overwrite                whether to overwrite the destination path if it exists
+&nbsp;     */
+&nbsp;    void upload(String srcLocalFileAbsolutePath, String dstAbsolutePath, boolean deleteSource, boolean overwrite);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Download the resource from the source path to the destination path.
+&nbsp;     *
+&nbsp;     * @param srcFileAbsolutePath the source path
+&nbsp;     * @param dstAbsoluteFile     the destination file
+&nbsp;     * @param overwrite           whether to overwrite the destination file if it exists
+&nbsp;     */
+&nbsp;    void download(String srcFileAbsolutePath, String dstAbsoluteFile, boolean overwrite);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Fetch the content of the file.
+&nbsp;     *
+&nbsp;     * @param fileAbsolutePath the file path
+&nbsp;     * @param skipLineNums     the number of lines to skip
+&nbsp;     * @param limit            the number of lines to read
+&nbsp;     * @return the content of the file
+&nbsp;     */
+&nbsp;    List&lt;String&gt; fetchFileContent(String fileAbsolutePath, int skipLineNums, int limit);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the {@link StorageEntity} under the given path.
+&nbsp;     * &lt;p&gt;If the path is a file, return the file status.
+&nbsp;     * &lt;p&gt;If the path is a directory, return the file/directory under the directory.
+&nbsp;     * &lt;p&gt;If the path is not exist, will return empty.
+&nbsp;     *
+&nbsp;     * @param resourceAbsolutePath the resource absolute path, cannot be empty
+&nbsp;     */
+&nbsp;    List&lt;StorageEntity&gt; listStorageEntity(String resourceAbsolutePath);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the {@link StorageEntity} which is file under the given path
+&nbsp;     *
+&nbsp;     * @param resourceAbsolutePath the resource absolute path, cannot be empty
+&nbsp;     */
+&nbsp;    List&lt;StorageEntity&gt; listFileStorageEntityRecursively(String resourceAbsolutePath);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Return the {@link StorageEntity} under the current directory
+&nbsp;     *
+&nbsp;     * @param resourceAbsolutePath the resource absolute path, cannot be empty
+&nbsp;     */
+&nbsp;    StorageEntity getStorageEntity(String resourceAbsolutePath);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

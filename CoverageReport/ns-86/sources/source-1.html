@@ -1,0 +1,530 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DmsHook</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.dms</a>
+</div>
+
+<h1>Coverage Summary for Class: DmsHook (org.apache.dolphinscheduler.plugin.task.dms)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DmsHook</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/124)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">DmsHook$ApplicationIds</td>
+  </tr>
+  <tr>
+    <td class="name">DmsHook$AWS_KEY</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DmsHook$CONSTANTS</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DmsHook$START_TYPE</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+  <tr>
+    <td class="name">DmsHook$STATUS</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/32)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/128)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.dms;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.authentication.aws.AWSDatabaseMigrationServiceClientFactory;
+&nbsp;import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+&nbsp;import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+&nbsp;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.Arrays;
+&nbsp;import java.util.Date;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;import lombok.AllArgsConstructor;
+&nbsp;import lombok.Data;
+&nbsp;import lombok.NoArgsConstructor;
+&nbsp;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;
+&nbsp;import com.amazonaws.services.databasemigrationservice.AWSDatabaseMigrationService;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.CreateReplicationTaskRequest;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.CreateReplicationTaskResult;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.DeleteReplicationTaskRequest;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.DescribeConnectionsRequest;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.DescribeConnectionsResult;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.DescribeReplicationTasksRequest;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.DescribeReplicationTasksResult;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.Filter;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.ReplicationTaskStats;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.ResourceNotFoundException;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.StartReplicationTaskRequest;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.StartReplicationTaskResult;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.StopReplicationTaskRequest;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.Tag;
+&nbsp;import com.amazonaws.services.databasemigrationservice.model.TestConnectionRequest;
+&nbsp;
+&nbsp;@Data
+&nbsp;public class DmsHook {
+&nbsp;
+<b class="nc">&nbsp;    protected final Logger log =</b>
+<b class="nc">&nbsp;            LoggerFactory.getLogger(DmsHook.class);</b>
+&nbsp;    private AWSDatabaseMigrationService client;
+&nbsp;    private String replicationTaskIdentifier;
+&nbsp;    private String sourceEndpointArn;
+&nbsp;    private String targetEndpointArn;
+&nbsp;    private String replicationInstanceArn;
+&nbsp;    private String migrationType;
+&nbsp;    private String tableMappings;
+&nbsp;    private String replicationTaskSettings;
+&nbsp;    private Date cdcStartTime;
+&nbsp;    private String cdcStartPosition;
+&nbsp;    private String cdcStopPosition;
+&nbsp;    private List&lt;Tag&gt; tags;
+&nbsp;    private String taskData;
+&nbsp;    private String resourceIdentifier;
+&nbsp;    private String replicationTaskArn;
+&nbsp;    private String startReplicationTaskType;
+&nbsp;
+<b class="nc">&nbsp;    public DmsHook() {</b>
+<b class="nc">&nbsp;        this.client = createClient();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public static AWSDatabaseMigrationService createClient() {
+<b class="nc">&nbsp;        Map&lt;String, String&gt; awsProperties = PropertyUtils.getByPrefix(&quot;aws.dms.&quot;, &quot;&quot;);</b>
+<b class="nc">&nbsp;        return AWSDatabaseMigrationServiceClientFactory.createAWSDatabaseMigrationServiceClient(awsProperties);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean createReplicationTask() throws Exception {
+<b class="nc">&nbsp;        log.info(&quot;createReplicationTask ......&quot;);</b>
+<b class="nc">&nbsp;        CreateReplicationTaskRequest request = new CreateReplicationTaskRequest()</b>
+<b class="nc">&nbsp;                .withReplicationTaskIdentifier(replicationTaskIdentifier)</b>
+<b class="nc">&nbsp;                .withSourceEndpointArn(sourceEndpointArn)</b>
+<b class="nc">&nbsp;                .withTargetEndpointArn(targetEndpointArn)</b>
+<b class="nc">&nbsp;                .withReplicationInstanceArn(replicationInstanceArn)</b>
+<b class="nc">&nbsp;                .withMigrationType(migrationType)</b>
+<b class="nc">&nbsp;                .withTableMappings(tableMappings)</b>
+<b class="nc">&nbsp;                .withReplicationTaskSettings(replicationTaskSettings)</b>
+<b class="nc">&nbsp;                .withCdcStartTime(cdcStartTime)</b>
+<b class="nc">&nbsp;                .withCdcStartPosition(cdcStartPosition)</b>
+<b class="nc">&nbsp;                .withCdcStopPosition(cdcStopPosition)</b>
+<b class="nc">&nbsp;                .withTags(tags)</b>
+<b class="nc">&nbsp;                .withTaskData(taskData)</b>
+<b class="nc">&nbsp;                .withResourceIdentifier(resourceIdentifier);</b>
+&nbsp;
+<b class="nc">&nbsp;        request.setTableMappings(replaceFileParameters(request.getTableMappings()));</b>
+<b class="nc">&nbsp;        request.setReplicationTaskSettings(replaceFileParameters(request.getReplicationTaskSettings()));</b>
+&nbsp;
+<b class="nc">&nbsp;        CreateReplicationTaskResult result = client.createReplicationTask(request);</b>
+<b class="nc">&nbsp;        replicationTaskIdentifier = result.getReplicationTask().getReplicationTaskIdentifier();</b>
+<b class="nc">&nbsp;        replicationTaskArn = result.getReplicationTask().getReplicationTaskArn();</b>
+<b class="nc">&nbsp;        log.info(&quot;replicationTaskIdentifier: {}, replicationTaskArn: {}&quot;, replicationTaskIdentifier,</b>
+&nbsp;                replicationTaskArn);
+<b class="nc">&nbsp;        return awaitReplicationTaskStatus(STATUS.READY);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean startReplicationTask() {
+<b class="nc">&nbsp;        log.info(&quot;startReplicationTask ......&quot;);</b>
+<b class="nc">&nbsp;        StartReplicationTaskRequest request = new StartReplicationTaskRequest()</b>
+<b class="nc">&nbsp;                .withReplicationTaskArn(replicationTaskArn)</b>
+<b class="nc">&nbsp;                .withStartReplicationTaskType(startReplicationTaskType)</b>
+<b class="nc">&nbsp;                .withCdcStartTime(cdcStartTime)</b>
+<b class="nc">&nbsp;                .withCdcStartPosition(cdcStartPosition)</b>
+<b class="nc">&nbsp;                .withCdcStopPosition(cdcStopPosition);</b>
+<b class="nc">&nbsp;        StartReplicationTaskResult result = client.startReplicationTask(request);</b>
+<b class="nc">&nbsp;        replicationTaskArn = result.getReplicationTask().getReplicationTaskArn();</b>
+<b class="nc">&nbsp;        return awaitReplicationTaskStatus(STATUS.RUNNING);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean checkFinishedReplicationTask() {
+<b class="nc">&nbsp;        log.info(&quot;checkFinishedReplicationTask ......&quot;);</b>
+<b class="nc">&nbsp;        awaitReplicationTaskStatus(STATUS.STOPPED);</b>
+<b class="nc">&nbsp;        String stopReason = describeReplicationTasks().getStopReason();</b>
+<b class="nc">&nbsp;        return stopReason.endsWith(STATUS.FINISH_END_TOKEN);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void stopReplicationTask() {
+<b class="nc">&nbsp;        log.info(&quot;stopReplicationTask ......&quot;);</b>
+<b class="nc">&nbsp;        if (replicationTaskArn == null) {</b>
+&nbsp;            return;
+&nbsp;        }
+<b class="nc">&nbsp;        StopReplicationTaskRequest request = new StopReplicationTaskRequest()</b>
+<b class="nc">&nbsp;                .withReplicationTaskArn(replicationTaskArn);</b>
+<b class="nc">&nbsp;        client.stopReplicationTask(request);</b>
+<b class="nc">&nbsp;        awaitReplicationTaskStatus(STATUS.STOPPED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean deleteReplicationTask() {
+<b class="nc">&nbsp;        log.info(&quot;deleteReplicationTask ......&quot;);</b>
+<b class="nc">&nbsp;        DeleteReplicationTaskRequest request = new DeleteReplicationTaskRequest()</b>
+<b class="nc">&nbsp;                .withReplicationTaskArn(replicationTaskArn);</b>
+<b class="nc">&nbsp;        client.deleteReplicationTask(request);</b>
+&nbsp;        Boolean isDeleteSuccessfully;
+&nbsp;        try {
+<b class="nc">&nbsp;            isDeleteSuccessfully = awaitReplicationTaskStatus(STATUS.DELETE);</b>
+<b class="nc">&nbsp;        } catch (ResourceNotFoundException e) {</b>
+<b class="nc">&nbsp;            isDeleteSuccessfully = true;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return isDeleteSuccessfully;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean testConnectionEndpoint() {
+<b class="nc">&nbsp;        return (testConnection(replicationInstanceArn, sourceEndpointArn)</b>
+<b class="nc">&nbsp;                &amp;&amp; testConnection(replicationInstanceArn, targetEndpointArn));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean testConnection(String replicationInstanceArn, String endpointArn) {
+<b class="nc">&nbsp;        log.info(&quot;Test connect replication instance: {} and endpoint: {}&quot;, replicationInstanceArn, endpointArn);</b>
+<b class="nc">&nbsp;        TestConnectionRequest request = new TestConnectionRequest().withReplicationInstanceArn(replicationInstanceArn)</b>
+<b class="nc">&nbsp;                .withEndpointArn(endpointArn);</b>
+&nbsp;        try {
+<b class="nc">&nbsp;            client.testConnection(request);</b>
+<b class="nc">&nbsp;        } catch (InvalidResourceStateException e) {</b>
+<b class="nc">&nbsp;            log.info(e.getErrorMessage());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return awaitConnectSuccess(replicationInstanceArn, endpointArn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean awaitConnectSuccess(String replicationInstanceArn, String endpointArn) {
+<b class="nc">&nbsp;        Filter instanceFilters =</b>
+<b class="nc">&nbsp;                new Filter().withName(AWS_KEY.REPLICATION_INSTANCE_ARN).withValues(replicationInstanceArn);</b>
+<b class="nc">&nbsp;        Filter endpointFilters = new Filter().withName(AWS_KEY.ENDPOINT_ARN).withValues(endpointArn);</b>
+<b class="nc">&nbsp;        DescribeConnectionsRequest request =</b>
+<b class="nc">&nbsp;                new DescribeConnectionsRequest().withFilters(endpointFilters, instanceFilters)</b>
+<b class="nc">&nbsp;                        .withMarker(&quot;&quot;);</b>
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            ThreadUtils.sleep(CONSTANTS.CHECK_INTERVAL);</b>
+<b class="nc">&nbsp;            DescribeConnectionsResult response = client.describeConnections(request);</b>
+<b class="nc">&nbsp;            String status = response.getConnections().get(0).getStatus();</b>
+<b class="nc">&nbsp;            if (status.equals(STATUS.SUCCESSFUL)) {</b>
+<b class="nc">&nbsp;                log.info(&quot;Connect successful&quot;);</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;            } else if (!status.equals(STATUS.TESTING)) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;Connect error&quot;);</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ReplicationTask describeReplicationTasks() {
+<b class="nc">&nbsp;        Filter replicationTaskFilter =</b>
+<b class="nc">&nbsp;                new Filter().withName(AWS_KEY.REPLICATION_TASK_ARN).withValues(replicationTaskArn);</b>
+<b class="nc">&nbsp;        DescribeReplicationTasksRequest request = new DescribeReplicationTasksRequest()</b>
+<b class="nc">&nbsp;                .withFilters(replicationTaskFilter).withMaxRecords(20).withMarker(&quot;&quot;);</b>
+<b class="nc">&nbsp;        DescribeReplicationTasksResult result = client.describeReplicationTasks(request);</b>
+<b class="nc">&nbsp;        ReplicationTask replicationTask = result.getReplicationTasks().get(0);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (sourceEndpointArn == null) {</b>
+<b class="nc">&nbsp;            sourceEndpointArn = replicationTask.getSourceEndpointArn();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (targetEndpointArn == null) {</b>
+<b class="nc">&nbsp;            targetEndpointArn = replicationTask.getTargetEndpointArn();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (replicationInstanceArn == null) {</b>
+<b class="nc">&nbsp;            replicationInstanceArn = replicationTask.getReplicationInstanceArn();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (replicationTaskArn == null) {</b>
+<b class="nc">&nbsp;            replicationTaskArn = replicationTask.getReplicationTaskArn();</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return replicationTask;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public Boolean awaitReplicationTaskStatus(String exceptStatus, String... stopStatus) {
+<b class="nc">&nbsp;        List&lt;String&gt; stopStatusSet = Arrays.asList(stopStatus);</b>
+<b class="nc">&nbsp;        Integer lastPercent = 0;</b>
+&nbsp;        while (true) {
+<b class="nc">&nbsp;            ThreadUtils.sleep(CONSTANTS.CHECK_INTERVAL);</b>
+<b class="nc">&nbsp;            ReplicationTask replicationTask = describeReplicationTasks();</b>
+<b class="nc">&nbsp;            String status = replicationTask.getStatus();</b>
+&nbsp;
+<b class="nc">&nbsp;            if (status.equals(STATUS.RUNNING) || status.equals(STATUS.STOPPED)) {</b>
+<b class="nc">&nbsp;                ReplicationTaskStats taskStats = replicationTask.getReplicationTaskStats();</b>
+&nbsp;                Integer percent;
+<b class="nc">&nbsp;                if (taskStats != null) {</b>
+<b class="nc">&nbsp;                    percent = taskStats.getFullLoadProgressPercent();</b>
+&nbsp;                } else {
+<b class="nc">&nbsp;                    percent = 0;</b>
+&nbsp;                }
+<b class="nc">&nbsp;                if (!lastPercent.equals(percent)) {</b>
+<b class="nc">&nbsp;                    String runningMessage = String.format(&quot;fullLoadProgressPercent: %s &quot;, percent);</b>
+<b class="nc">&nbsp;                    log.info(runningMessage);</b>
+&nbsp;                }
+<b class="nc">&nbsp;                lastPercent = percent;</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            if (exceptStatus.equals(status)) {</b>
+<b class="nc">&nbsp;                log.info(&quot;success&quot;);</b>
+<b class="nc">&nbsp;                return true;</b>
+<b class="nc">&nbsp;            } else if (stopStatusSet.contains(status)) {</b>
+&nbsp;                break;
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;error&quot;);</b>
+<b class="nc">&nbsp;        return false;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String replaceFileParameters(String parameter) throws IOException {
+<b class="nc">&nbsp;        if (parameter == null) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (parameter.startsWith(&quot;file://&quot;)) {</b>
+<b class="nc">&nbsp;            String filePath = parameter.substring(7);</b>
+&nbsp;            try {
+<b class="nc">&nbsp;                return IOUtils.toString(new FileInputStream(filePath), StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;            } catch (IOException e) {</b>
+<b class="nc">&nbsp;                throw new IOException(&quot;Error reading file: &quot; + filePath, e);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="nc">&nbsp;        return parameter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public ApplicationIds getApplicationIds() {
+<b class="nc">&nbsp;        return new ApplicationIds(replicationTaskArn);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Data
+&nbsp;    @AllArgsConstructor
+&nbsp;    @NoArgsConstructor
+&nbsp;    public static class ApplicationIds {
+&nbsp;
+&nbsp;        private String replicationTaskArn;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class STATUS {</b>
+&nbsp;
+&nbsp;        public static final String DELETE = &quot;delete&quot;;
+&nbsp;        public static final String READY = &quot;ready&quot;;
+&nbsp;        public static final String RUNNING = &quot;running&quot;;
+&nbsp;        public static final String STOPPED = &quot;stopped&quot;;
+&nbsp;        public static final String SUCCESSFUL = &quot;successful&quot;;
+&nbsp;        public static final String TESTING = &quot;testing&quot;;
+&nbsp;        public static final String FINISH_END_TOKEN = &quot;FINISHED&quot;;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class AWS_KEY {</b>
+&nbsp;
+&nbsp;        public static final String REPLICATION_TASK_ARN = &quot;replication-task-arn&quot;;
+&nbsp;        public static final String REPLICATION_INSTANCE_ARN = &quot;replication-instance-arn&quot;;
+&nbsp;        public static final String ENDPOINT_ARN = &quot;endpoint-arn&quot;;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class START_TYPE {</b>
+&nbsp;
+&nbsp;        public static final String START_REPLICATION = &quot;start-replication&quot;;
+&nbsp;        public static final String RELOAD_TARGET = &quot;reload-target&quot;;
+&nbsp;    }
+&nbsp;
+<b class="nc">&nbsp;    public static class CONSTANTS {</b>
+&nbsp;
+&nbsp;        public static final int CHECK_INTERVAL = 1000;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

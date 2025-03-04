@@ -1,0 +1,289 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DvcTask</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.dvc</a>
+</div>
+
+<h1>Coverage Summary for Class: DvcTask (org.apache.dolphinscheduler.plugin.task.dvc)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DvcTask</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/65)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.dvc;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public class DvcTask extends AbstractTask {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * dvc parameters
+&nbsp;     */
+&nbsp;    private DvcParameters parameters;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * shell command executor
+&nbsp;     */
+&nbsp;    private ShellCommandExecutor shellCommandExecutor;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * taskExecutionContext
+&nbsp;     */
+&nbsp;    private TaskExecutionContext taskExecutionContext;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * constructor
+&nbsp;     *
+&nbsp;     * @param taskExecutionContext taskExecutionContext
+&nbsp;     */
+&nbsp;    public DvcTask(TaskExecutionContext taskExecutionContext) {
+<b class="nc">&nbsp;        super(taskExecutionContext);</b>
+&nbsp;
+<b class="nc">&nbsp;        this.taskExecutionContext = taskExecutionContext;</b>
+<b class="nc">&nbsp;        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void init() {
+&nbsp;
+<b class="nc">&nbsp;        parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DvcParameters.class);</b>
+<b class="nc">&nbsp;        log.info(&quot;Initialize dvc task params {}&quot;, JSONUtils.toPrettyJsonString(parameters));</b>
+&nbsp;
+<b class="nc">&nbsp;        if (parameters == null || !parameters.checkParameters()) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;dvc task params is not valid&quot;);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void handle(TaskCallBack taskCallBack) throws TaskException {
+&nbsp;        try {
+&nbsp;            // construct process
+<b class="nc">&nbsp;            IShellInterceptorBuilder&lt;?, ?&gt; shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()</b>
+<b class="nc">&nbsp;                    .appendScript(buildCommand());</b>
+<b class="nc">&nbsp;            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);</b>
+<b class="nc">&nbsp;            setExitStatusCode(commandExecuteResult.getExitStatusCode());</b>
+<b class="nc">&nbsp;            setProcessId(commandExecuteResult.getProcessId());</b>
+<b class="nc">&nbsp;            parameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());</b>
+<b class="nc">&nbsp;        } catch (InterruptedException e) {</b>
+<b class="nc">&nbsp;            Thread.currentThread().interrupt();</b>
+<b class="nc">&nbsp;            log.error(&quot;The current DvcTask has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;The current DvcTask has been interrupted&quot;, e);</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;dvc task error&quot;, e);</b>
+<b class="nc">&nbsp;            setExitStatusCode(EXIT_CODE_FAILURE);</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;Execute dvc task failed&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void cancel() throws TaskException {
+&nbsp;        // cancel process
+&nbsp;        try {
+<b class="nc">&nbsp;            shellCommandExecutor.cancelApplication();</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            throw new TaskException(&quot;cancel application error&quot;, e);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    public String buildCommand() {
+<b class="nc">&nbsp;        String command = &quot;&quot;;</b>
+<b class="nc">&nbsp;        String taskType = parameters.getDvcTaskType();</b>
+<b class="nc">&nbsp;        if (taskType.equals(DvcConstants.DVC_TASK_TYPE.UPLOAD)) {</b>
+<b class="nc">&nbsp;            command = buildUploadCommond();</b>
+<b class="nc">&nbsp;        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.DOWNLOAD)) {</b>
+<b class="nc">&nbsp;            command = buildDownCommond();</b>
+<b class="nc">&nbsp;        } else if (taskType.equals(DvcConstants.DVC_TASK_TYPE.INIT)) {</b>
+<b class="nc">&nbsp;            command = buildInitDvcCommond();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        log.info(&quot;Run DVC task with command: \n{}&quot;, command);</b>
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildUploadCommond() {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.CHECK_AND_SET_DVC_REPO, parameters.getDvcRepository()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_DATA_PATH, parameters.getDvcLoadSaveDataPath()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_DATA_LOCATION, parameters.getDvcDataLocation()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_VERSION, parameters.getDvcVersion()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_MESSAGE, parameters.getDvcMessage()));</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.GIT_CLONE_DVC_REPO);</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.DVC_AUTOSTAGE);</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.DVC_ADD_DATA);</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.GIT_UPDATE_FOR_UPDATE_DATA);</b>
+&nbsp;
+<b class="nc">&nbsp;        String command = String.join(&quot;\n&quot;, args);</b>
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildDownCommond() {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.CHECK_AND_SET_DVC_REPO, parameters.getDvcRepository()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_DATA_PATH, parameters.getDvcLoadSaveDataPath()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_DATA_LOCATION, parameters.getDvcDataLocation()));</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.SET_VERSION, parameters.getDvcVersion()));</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.DVC_DOWNLOAD);</b>
+&nbsp;
+<b class="nc">&nbsp;        String command = String.join(&quot;\n&quot;, args);</b>
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    private String buildInitDvcCommond() {
+<b class="nc">&nbsp;        List&lt;String&gt; args = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.CHECK_AND_SET_DVC_REPO, parameters.getDvcRepository()));</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.GIT_CLONE_DVC_REPO);</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.DVC_INIT);</b>
+<b class="nc">&nbsp;        args.add(String.format(DvcConstants.DVC_ADD_REMOTE, parameters.getDvcStoreUrl()));</b>
+<b class="nc">&nbsp;        args.add(DvcConstants.GIT_UPDATE_FOR_INIT_DVC);</b>
+&nbsp;
+<b class="nc">&nbsp;        String command = String.join(&quot;\n&quot;, args);</b>
+<b class="nc">&nbsp;        return command;</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public AbstractParameters getParameters() {
+<b class="nc">&nbsp;        return parameters;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

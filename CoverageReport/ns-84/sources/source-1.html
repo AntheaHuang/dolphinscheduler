@@ -1,0 +1,425 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataxParameters</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.datax</a>
+</div>
+
+<h1>Coverage Summary for Class: DataxParameters (org.apache.dolphinscheduler.plugin.task.datax)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DataxParameters</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/16)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/61)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.datax;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.Flag;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * DataX parameter
+&nbsp; */
+<b class="nc">&nbsp;public class DataxParameters extends AbstractParameters {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * if custom json config，eg  0, 1
+&nbsp;     */
+&nbsp;    private int customConfig;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * if customConfig eq 1 ,then json is usable
+&nbsp;     */
+&nbsp;    private String json;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * data source type，eg  MYSQL, POSTGRES ...
+&nbsp;     */
+&nbsp;    private String dsType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * datasource id
+&nbsp;     */
+&nbsp;    private int dataSource;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * data target type，eg  MYSQL, POSTGRES ...
+&nbsp;     */
+&nbsp;    private String dtType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * datatarget id
+&nbsp;     */
+&nbsp;    private int dataTarget;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sql
+&nbsp;     */
+&nbsp;    private String sql;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * target table
+&nbsp;     */
+&nbsp;    private String targetTable;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Pre Statements
+&nbsp;     */
+&nbsp;    private List&lt;String&gt; preStatements;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Post Statements
+&nbsp;     */
+&nbsp;    private List&lt;String&gt; postStatements;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * speed byte num
+&nbsp;     */
+&nbsp;    private int jobSpeedByte;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * speed record count
+&nbsp;     */
+&nbsp;    private int jobSpeedRecord;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Xms memory
+&nbsp;     */
+&nbsp;    private int xms;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Xmx memory
+&nbsp;     */
+&nbsp;    private int xmx;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * resource list
+&nbsp;     */
+&nbsp;    private List&lt;ResourceInfo&gt; resourceList;
+&nbsp;
+&nbsp;    public int getCustomConfig() {
+<b class="nc">&nbsp;        return customConfig;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomConfig(int customConfig) {
+<b class="nc">&nbsp;        this.customConfig = customConfig;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getJson() {
+<b class="nc">&nbsp;        return json;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJson(String json) {
+<b class="nc">&nbsp;        this.json = json;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDsType() {
+<b class="nc">&nbsp;        return dsType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDsType(String dsType) {
+<b class="nc">&nbsp;        this.dsType = dsType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDataSource() {
+<b class="nc">&nbsp;        return dataSource;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDataSource(int dataSource) {
+<b class="nc">&nbsp;        this.dataSource = dataSource;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getDtType() {
+<b class="nc">&nbsp;        return dtType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDtType(String dtType) {
+<b class="nc">&nbsp;        this.dtType = dtType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getDataTarget() {
+<b class="nc">&nbsp;        return dataTarget;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setDataTarget(int dataTarget) {
+<b class="nc">&nbsp;        this.dataTarget = dataTarget;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSql() {
+<b class="nc">&nbsp;        return sql;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSql(String sql) {
+<b class="nc">&nbsp;        this.sql = sql;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTargetTable() {
+<b class="nc">&nbsp;        return targetTable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTargetTable(String targetTable) {
+<b class="nc">&nbsp;        this.targetTable = targetTable;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getPreStatements() {
+<b class="nc">&nbsp;        return preStatements;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPreStatements(List&lt;String&gt; preStatements) {
+<b class="nc">&nbsp;        this.preStatements = preStatements;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;String&gt; getPostStatements() {
+<b class="nc">&nbsp;        return postStatements;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setPostStatements(List&lt;String&gt; postStatements) {
+<b class="nc">&nbsp;        this.postStatements = postStatements;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getJobSpeedByte() {
+<b class="nc">&nbsp;        return jobSpeedByte;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJobSpeedByte(int jobSpeedByte) {
+<b class="nc">&nbsp;        this.jobSpeedByte = jobSpeedByte;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getJobSpeedRecord() {
+<b class="nc">&nbsp;        return jobSpeedRecord;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJobSpeedRecord(int jobSpeedRecord) {
+<b class="nc">&nbsp;        this.jobSpeedRecord = jobSpeedRecord;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getXms() {
+<b class="nc">&nbsp;        return xms;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setXms(int xms) {
+<b class="nc">&nbsp;        this.xms = xms;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getXmx() {
+<b class="nc">&nbsp;        return xmx;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setXmx(int xmx) {
+<b class="nc">&nbsp;        this.xmx = xmx;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;ResourceInfo&gt; getResourceList() {
+<b class="nc">&nbsp;        return resourceList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setResourceList(List&lt;ResourceInfo&gt; resourceList) {
+<b class="nc">&nbsp;        this.resourceList = resourceList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean checkParameters() {
+<b class="nc">&nbsp;        if (customConfig == Flag.NO.ordinal()) {</b>
+<b class="nc">&nbsp;            return dataSource != 0</b>
+&nbsp;                    &amp;&amp; dataTarget != 0
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(sql)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(targetTable);</b>
+&nbsp;        } else {
+<b class="nc">&nbsp;            return StringUtils.isNotEmpty(json);</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public List&lt;ResourceInfo&gt; getResourceFilesList() {
+<b class="nc">&nbsp;        return resourceList;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public String toString() {
+<b class="nc">&nbsp;        return &quot;DataxParameters{&quot;</b>
+&nbsp;                + &quot;customConfig=&quot; + customConfig
+&nbsp;                + &quot;, json=&#39;&quot; + json + &#39;\&#39;&#39;
+&nbsp;                + &quot;, dsType=&#39;&quot; + dsType + &#39;\&#39;&#39;
+&nbsp;                + &quot;, dataSource=&quot; + dataSource
+&nbsp;                + &quot;, dtType=&#39;&quot; + dtType + &#39;\&#39;&#39;
+&nbsp;                + &quot;, dataTarget=&quot; + dataTarget
+&nbsp;                + &quot;, sql=&#39;&quot; + sql + &#39;\&#39;&#39;
+&nbsp;                + &quot;, targetTable=&#39;&quot; + targetTable + &#39;\&#39;&#39;
+&nbsp;                + &quot;, preStatements=&quot; + preStatements
+&nbsp;                + &quot;, postStatements=&quot; + postStatements
+&nbsp;                + &quot;, jobSpeedByte=&quot; + jobSpeedByte
+&nbsp;                + &quot;, jobSpeedRecord=&quot; + jobSpeedRecord
+&nbsp;                + &quot;, xms=&quot; + xms
+&nbsp;                + &quot;, xmx=&quot; + xmx
+<b class="nc">&nbsp;                + &quot;, resourceList=&quot; + JSONUtils.toJsonString(resourceList)</b>
+&nbsp;                + &#39;}&#39;;
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResourceParametersHelper getResources() {
+<b class="nc">&nbsp;        ResourceParametersHelper resources = super.getResources();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (customConfig == Flag.YES.ordinal()) {</b>
+<b class="nc">&nbsp;            return resources;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        resources.put(ResourceType.DATASOURCE, dataSource);</b>
+<b class="nc">&nbsp;        resources.put(ResourceType.DATASOURCE, dataTarget);</b>
+<b class="nc">&nbsp;        return resources;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public DataxTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+&nbsp;
+<b class="nc">&nbsp;        DataxTaskExecutionContext dataxTaskExecutionContext = new DataxTaskExecutionContext();</b>
+&nbsp;
+<b class="nc">&nbsp;        if (customConfig == Flag.YES.ordinal()) {</b>
+<b class="nc">&nbsp;            return dataxTaskExecutionContext;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        DataSourceParameters dbSource =</b>
+<b class="nc">&nbsp;                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataSource);</b>
+<b class="nc">&nbsp;        DataSourceParameters dbTarget =</b>
+<b class="nc">&nbsp;                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, dataTarget);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.nonNull(dbSource)) {</b>
+<b class="nc">&nbsp;            dataxTaskExecutionContext.setDataSourceId(dataSource);</b>
+<b class="nc">&nbsp;            dataxTaskExecutionContext.setSourcetype(dbSource.getType());</b>
+<b class="nc">&nbsp;            dataxTaskExecutionContext.setSourceConnectionParams(dbSource.getConnectionParams());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.nonNull(dbTarget)) {</b>
+<b class="nc">&nbsp;            dataxTaskExecutionContext.setDataTargetId(dataTarget);</b>
+<b class="nc">&nbsp;            dataxTaskExecutionContext.setTargetType(dbTarget.getType());</b>
+<b class="nc">&nbsp;            dataxTaskExecutionContext.setTargetConnectionParams(dbTarget.getConnectionParams());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return dataxTaskExecutionContext;</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

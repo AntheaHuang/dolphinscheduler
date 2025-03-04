@@ -1,0 +1,468 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > WeChatSender</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.alert.wechat</a>
+</div>
+
+<h1>Coverage Summary for Class: WeChatSender (org.apache.dolphinscheduler.plugin.alert.wechat)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">WeChatSender</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/115)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">WeChatSender$WeChatSendMsgResponse</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/68)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/139)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.alert.wechat;
+&nbsp;
+&nbsp;import static java.util.Objects.requireNonNull;
+&nbsp;import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO;
+&nbsp;import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.WE_CHAT_ENABLE_ID_TRANS;
+&nbsp;import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstants.WE_CHAT_MESSAGE_SAFE_PUBLICITY;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.alert.api.AlertConstants;
+&nbsp;import org.apache.dolphinscheduler.alert.api.AlertResult;
+&nbsp;import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;import org.apache.http.HttpEntity;
+&nbsp;import org.apache.http.client.methods.CloseableHttpResponse;
+&nbsp;import org.apache.http.client.methods.HttpGet;
+&nbsp;import org.apache.http.client.methods.HttpPost;
+&nbsp;import org.apache.http.entity.StringEntity;
+&nbsp;import org.apache.http.impl.client.CloseableHttpClient;
+&nbsp;import org.apache.http.impl.client.HttpClients;
+&nbsp;import org.apache.http.util.EntityUtils;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.nio.charset.StandardCharsets;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.LinkedHashMap;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Map.Entry;
+&nbsp;import java.util.Set;
+&nbsp;
+&nbsp;import lombok.Getter;
+&nbsp;import lombok.Setter;
+&nbsp;import lombok.extern.slf4j.Slf4j;
+&nbsp;
+<b class="nc">&nbsp;@Slf4j</b>
+&nbsp;public final class WeChatSender {
+&nbsp;
+&nbsp;    private static final String MUST_NOT_NULL = &quot; must not null&quot;;
+&nbsp;    private static final String AGENT_ID_REG_EXP = &quot;{agentId}&quot;;
+&nbsp;    private static final String MSG_REG_EXP = &quot;{msg}&quot;;
+&nbsp;    private static final String USER_REG_EXP = &quot;{toUser}&quot;;
+&nbsp;    private static final String CORP_ID_REGEX = &quot;{corpId}&quot;;
+&nbsp;    private static final String SECRET_REGEX = &quot;{secret}&quot;;
+&nbsp;    private static final String TOKEN_REGEX = &quot;{token}&quot;;
+&nbsp;    private final String weChatAgentIdChatId;
+&nbsp;    private final String weChatUsers;
+&nbsp;    private final String weChatTokenUrlReplace;
+&nbsp;    private final String weChatToken;
+&nbsp;    private final String sendType;
+&nbsp;    private final String showType;
+&nbsp;
+<b class="nc">&nbsp;    WeChatSender(Map&lt;String, String&gt; config) {</b>
+<b class="nc">&nbsp;        weChatAgentIdChatId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_AGENT_ID);</b>
+<b class="nc">&nbsp;        weChatUsers = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_USERS);</b>
+<b class="nc">&nbsp;        String weChatCorpId = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_CORP_ID);</b>
+<b class="nc">&nbsp;        String weChatSecret = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SECRET);</b>
+<b class="nc">&nbsp;        String weChatTokenUrl = WeChatAlertConstants.WE_CHAT_TOKEN_URL;</b>
+<b class="nc">&nbsp;        sendType = config.get(WeChatAlertParamsConstants.NAME_ENTERPRISE_WE_CHAT_SEND_TYPE);</b>
+<b class="nc">&nbsp;        showType = config.get(AlertConstants.NAME_SHOW_TYPE);</b>
+<b class="nc">&nbsp;        requireNonNull(showType, AlertConstants.NAME_SHOW_TYPE + MUST_NOT_NULL);</b>
+<b class="nc">&nbsp;        weChatTokenUrlReplace = weChatTokenUrl</b>
+<b class="nc">&nbsp;                .replace(CORP_ID_REGEX, weChatCorpId)</b>
+<b class="nc">&nbsp;                .replace(SECRET_REGEX, weChatSecret);</b>
+<b class="nc">&nbsp;        weChatToken = getToken();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String post(String url, String data) throws IOException {
+<b class="nc">&nbsp;        try (</b>
+&nbsp;                CloseableHttpClient httpClient =
+<b class="nc">&nbsp;                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {</b>
+<b class="nc">&nbsp;            HttpPost httpPost = new HttpPost(url);</b>
+<b class="nc">&nbsp;            httpPost.setEntity(new StringEntity(data, StandardCharsets.UTF_8));</b>
+<b class="nc">&nbsp;            CloseableHttpResponse response = httpClient.execute(httpPost);</b>
+&nbsp;            String resp;
+&nbsp;            try {
+<b class="nc">&nbsp;                HttpEntity entity = response.getEntity();</b>
+<b class="nc">&nbsp;                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                EntityUtils.consume(entity);</b>
+&nbsp;            } finally {
+<b class="nc">&nbsp;                response.close();</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            log.info(&quot;Enterprise WeChat send [{}], param:{}, resp:{}&quot;,</b>
+&nbsp;                    url, data, resp);
+<b class="nc">&nbsp;            return resp;</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * convert text to markdown style
+&nbsp;     *
+&nbsp;     * @param title   the title
+&nbsp;     * @param content the content
+&nbsp;     * @return markdown text
+&nbsp;     */
+&nbsp;    private static String markdownText(String title, String content) {
+<b class="nc">&nbsp;        if (StringUtils.isNotEmpty(content)) {</b>
+<b class="nc">&nbsp;            List&lt;LinkedHashMap&gt; mapItemsList = JSONUtils.toList(content, LinkedHashMap.class);</b>
+<b class="nc">&nbsp;            if (null == mapItemsList || mapItemsList.isEmpty()) {</b>
+<b class="nc">&nbsp;                log.error(&quot;itemsList is null&quot;);</b>
+<b class="nc">&nbsp;                throw new RuntimeException(&quot;itemsList is null&quot;);</b>
+&nbsp;            }
+&nbsp;
+<b class="nc">&nbsp;            StringBuilder contents = new StringBuilder(100);</b>
+<b class="nc">&nbsp;            contents.append(String.format(&quot;`%s`%n&quot;, title));</b>
+<b class="nc">&nbsp;            for (LinkedHashMap mapItems : mapItemsList) {</b>
+&nbsp;
+<b class="nc">&nbsp;                Set&lt;Map.Entry&lt;String, Object&gt;&gt; entries = mapItems.entrySet();</b>
+<b class="nc">&nbsp;                for (Entry&lt;String, Object&gt; entry : entries) {</b>
+<b class="nc">&nbsp;                    contents.append(WeChatAlertConstants.MARKDOWN_QUOTE);</b>
+<b class="nc">&nbsp;                    contents.append(entry.getKey()).append(&quot;:&quot;).append(entry.getValue());</b>
+<b class="nc">&nbsp;                    contents.append(WeChatAlertConstants.MARKDOWN_ENTER);</b>
+&nbsp;                }
+&nbsp;
+&nbsp;            }
+<b class="nc">&nbsp;            return contents.toString();</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String get(String url) throws IOException {
+&nbsp;        String resp;
+&nbsp;
+<b class="nc">&nbsp;        try (</b>
+&nbsp;                CloseableHttpClient httpClient =
+<b class="nc">&nbsp;                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();) {</b>
+<b class="nc">&nbsp;            HttpGet httpGet = new HttpGet(url);</b>
+<b class="nc">&nbsp;            try (CloseableHttpResponse response = httpClient.execute(httpGet)) {</b>
+<b class="nc">&nbsp;                HttpEntity entity = response.getEntity();</b>
+<b class="nc">&nbsp;                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);</b>
+<b class="nc">&nbsp;                EntityUtils.consume(entity);</b>
+<b class="nc">&nbsp;            }</b>
+&nbsp;
+<b class="nc">&nbsp;            HashMap&lt;String, Object&gt; map = JSONUtils.parseObject(resp, HashMap.class);</b>
+<b class="nc">&nbsp;            if (map != null &amp;&amp; null != map.get(&quot;access_token&quot;)) {</b>
+<b class="nc">&nbsp;                return map.get(&quot;access_token&quot;).toString();</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;            }
+<b class="nc">&nbsp;        }</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static String mkString(Iterable&lt;String&gt; list) {
+<b class="nc">&nbsp;        if (null == list || StringUtils.isEmpty(&quot;|&quot;)) {</b>
+<b class="nc">&nbsp;            return null;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="nc">&nbsp;        boolean first = true;</b>
+<b class="nc">&nbsp;        for (String item : list) {</b>
+<b class="nc">&nbsp;            if (first) {</b>
+<b class="nc">&nbsp;                first = false;</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;                sb.append(&quot;|&quot;);</b>
+&nbsp;            }
+<b class="nc">&nbsp;            sb.append(item);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return sb.toString();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private static AlertResult checkWeChatSendMsgResult(String result) {
+<b class="nc">&nbsp;        AlertResult alertResult = new AlertResult();</b>
+<b class="nc">&nbsp;        alertResult.setSuccess(false);</b>
+&nbsp;
+<b class="nc">&nbsp;        if (null == result) {</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;we chat send fail&quot;);</b>
+<b class="nc">&nbsp;            log.info(&quot;send we chat msg error,resp is null&quot;);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        WeChatSendMsgResponse sendMsgResponse = JSONUtils.parseObject(result, WeChatSendMsgResponse.class);</b>
+<b class="nc">&nbsp;        if (null == sendMsgResponse) {</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;we chat send fail&quot;);</b>
+<b class="nc">&nbsp;            log.info(&quot;send we chat msg error,resp error&quot;);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (sendMsgResponse.errcode == 0) {</b>
+<b class="nc">&nbsp;            alertResult.setSuccess(true);</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;we chat alert send success&quot;);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        alertResult.setSuccess(false);</b>
+<b class="nc">&nbsp;        alertResult.setMessage(sendMsgResponse.getErrmsg());</b>
+<b class="nc">&nbsp;        return alertResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * send Enterprise WeChat
+&nbsp;     *
+&nbsp;     * @return Enterprise WeChat resp, demo: {&quot;errcode&quot;:0,&quot;errmsg&quot;:&quot;ok&quot;,&quot;invaliduser&quot;:&quot;&quot;}
+&nbsp;     */
+&nbsp;    public AlertResult sendEnterpriseWeChat(String title, String content) {
+&nbsp;        AlertResult alertResult;
+<b class="nc">&nbsp;        String data = markdownByAlert(title, content);</b>
+<b class="nc">&nbsp;        if (null == weChatToken) {</b>
+<b class="nc">&nbsp;            alertResult = new AlertResult();</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;send we chat alert fail,get weChat token error&quot;);</b>
+<b class="nc">&nbsp;            alertResult.setSuccess(false);</b>
+<b class="nc">&nbsp;            return alertResult;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        String enterpriseWeChatPushUrlReplace = &quot;&quot;;</b>
+<b class="nc">&nbsp;        Map&lt;String, String&gt; contentMap = new HashMap&lt;&gt;();</b>
+<b class="nc">&nbsp;        contentMap.put(WeChatAlertConstants.WE_CHAT_CONTENT_KEY, data);</b>
+<b class="nc">&nbsp;        String msgJson = &quot;&quot;;</b>
+<b class="nc">&nbsp;        if (sendType.equals(WeChatType.APP.getDescp())) {</b>
+<b class="nc">&nbsp;            enterpriseWeChatPushUrlReplace = WeChatAlertConstants.WE_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);</b>
+<b class="nc">&nbsp;            WechatAppMessage wechatAppMessage = new WechatAppMessage(weChatUsers, showType,</b>
+<b class="nc">&nbsp;                    Integer.valueOf(weChatAgentIdChatId), contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY,</b>
+&nbsp;                    WE_CHAT_ENABLE_ID_TRANS, WE_CHAT_DUPLICATE_CHECK_INTERVAL_ZERO);
+<b class="nc">&nbsp;            msgJson = JSONUtils.toJsonString(wechatAppMessage);</b>
+<b class="nc">&nbsp;        } else if (sendType.equals(WeChatType.APPCHAT.getDescp())) {</b>
+<b class="nc">&nbsp;            enterpriseWeChatPushUrlReplace =</b>
+<b class="nc">&nbsp;                    WeChatAlertConstants.WE_CHAT_APP_CHAT_PUSH_URL.replace(TOKEN_REGEX, weChatToken);</b>
+<b class="nc">&nbsp;            WechatAppChatMessage wechatAppChatMessage =</b>
+&nbsp;                    new WechatAppChatMessage(weChatAgentIdChatId, showType, contentMap, WE_CHAT_MESSAGE_SAFE_PUBLICITY);
+<b class="nc">&nbsp;            msgJson = JSONUtils.toJsonString(wechatAppChatMessage);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        try {
+<b class="nc">&nbsp;            return checkWeChatSendMsgResult(post(enterpriseWeChatPushUrlReplace, msgJson));</b>
+<b class="nc">&nbsp;        } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.info(&quot;send we chat alert msg  exception : {}&quot;, e.getMessage());</b>
+<b class="nc">&nbsp;            alertResult = new AlertResult();</b>
+<b class="nc">&nbsp;            alertResult.setMessage(&quot;send we chat alert fail&quot;);</b>
+<b class="nc">&nbsp;            alertResult.setSuccess(false);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return alertResult;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Determine the mardown style based on the show type of the alert
+&nbsp;     *
+&nbsp;     * @return the markdown alert table/text
+&nbsp;     */
+&nbsp;    private String markdownByAlert(String title, String content) {
+<b class="nc">&nbsp;        return markdownText(title, content);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    private String getToken() {
+&nbsp;        try {
+<b class="nc">&nbsp;            return get(weChatTokenUrlReplace);</b>
+<b class="nc">&nbsp;        } catch (IOException e) {</b>
+<b class="nc">&nbsp;            log.info(&quot;we chat alert get token error{}&quot;, e.getMessage());</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return null;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Getter
+&nbsp;    @Setter
+<b class="nc">&nbsp;    static final class WeChatSendMsgResponse {</b>
+&nbsp;
+&nbsp;        private Integer errcode;
+&nbsp;        private String errmsg;
+&nbsp;
+<b class="nc">&nbsp;        public WeChatSendMsgResponse() {</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public boolean equals(final Object o) {
+<b class="nc">&nbsp;            if (o == this) {</b>
+<b class="nc">&nbsp;                return true;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            if (!(o instanceof WeChatSendMsgResponse)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            final WeChatSendMsgResponse other = (WeChatSendMsgResponse) o;</b>
+<b class="nc">&nbsp;            final Object this$errcode = this.getErrcode();</b>
+<b class="nc">&nbsp;            final Object other$errcode = other.getErrcode();</b>
+<b class="nc">&nbsp;            if (this$errcode == null ? other$errcode != null : !this$errcode.equals(other$errcode)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            final Object this$errmsg = this.getErrmsg();</b>
+<b class="nc">&nbsp;            final Object other$errmsg = other.getErrmsg();</b>
+<b class="nc">&nbsp;            if (this$errmsg == null ? other$errmsg != null : !this$errmsg.equals(other$errmsg)) {</b>
+<b class="nc">&nbsp;                return false;</b>
+&nbsp;            }
+<b class="nc">&nbsp;            return true;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public int hashCode() {
+<b class="nc">&nbsp;            final int PRIME = 59;</b>
+<b class="nc">&nbsp;            int result = 1;</b>
+<b class="nc">&nbsp;            final Object $errcode = this.getErrcode();</b>
+<b class="nc">&nbsp;            result = result * PRIME + ($errcode == null ? 43 : $errcode.hashCode());</b>
+<b class="nc">&nbsp;            final Object $errmsg = this.getErrmsg();</b>
+<b class="nc">&nbsp;            result = result * PRIME + ($errmsg == null ? 43 : $errmsg.hashCode());</b>
+<b class="nc">&nbsp;            return result;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        public String toString() {
+<b class="nc">&nbsp;            return &quot;WeChatSender.WeChatSendMsgResponse(errcode=&quot; + this.getErrcode() + &quot;, errmsg=&quot; + this.getErrmsg()</b>
+&nbsp;                    + &quot;)&quot;;
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

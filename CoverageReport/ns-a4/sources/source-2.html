@@ -1,0 +1,455 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SqoopParameters</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.task.sqoop.parameter</a>
+</div>
+
+<h1>Coverage Summary for Class: SqoopParameters (org.apache.dolphinscheduler.plugin.task.sqoop.parameter)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SqoopParameters</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/46)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/88)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
+&nbsp;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HANA;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HDFS;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.MYSQL;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.ORACLE;
+&nbsp;import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.SQLSERVER;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.common.utils.JSONUtils;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopJobType;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHanaParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHdfsParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHiveParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceOracleParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceSqlServerParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHanaParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHdfsParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetHiveParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetMysqlParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetOracleParameter;
+&nbsp;import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets.TargetSqlServerParameter;
+&nbsp;
+&nbsp;import org.apache.commons.lang3.StringUtils;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Objects;
+&nbsp;
+&nbsp;/**
+&nbsp; * sqoop parameters
+&nbsp; */
+<b class="nc">&nbsp;public class SqoopParameters extends AbstractParameters {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sqoop job type:
+&nbsp;     * CUSTOM - custom sqoop job
+&nbsp;     * TEMPLATE - sqoop template job
+&nbsp;     */
+&nbsp;    private String jobType;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * customJob eq 1, use customShell
+&nbsp;     */
+&nbsp;    private String customShell;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sqoop job name - map-reduce job name
+&nbsp;     */
+&nbsp;    private String jobName;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * model type
+&nbsp;     */
+&nbsp;    private String modelType;
+&nbsp;    /**
+&nbsp;     * concurrency
+&nbsp;     */
+&nbsp;    private int concurrency;
+&nbsp;    /**
+&nbsp;     * split by
+&nbsp;     */
+&nbsp;    private String splitBy;
+&nbsp;    /**
+&nbsp;     * source type
+&nbsp;     */
+&nbsp;    private String sourceType;
+&nbsp;    /**
+&nbsp;     * target type
+&nbsp;     */
+&nbsp;    private String targetType;
+&nbsp;    /**
+&nbsp;     * source params
+&nbsp;     */
+&nbsp;    private String sourceParams;
+&nbsp;    /**
+&nbsp;     * target params
+&nbsp;     */
+&nbsp;    private String targetParams;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * hadoop custom param for sqoop job
+&nbsp;     */
+&nbsp;    private List&lt;Property&gt; hadoopCustomParams;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * sqoop advanced param
+&nbsp;     */
+&nbsp;    private List&lt;Property&gt; sqoopAdvancedParams;
+&nbsp;
+&nbsp;    public String getModelType() {
+<b class="nc">&nbsp;        return modelType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setModelType(String modelType) {
+<b class="nc">&nbsp;        this.modelType = modelType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public int getConcurrency() {
+<b class="nc">&nbsp;        return concurrency;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setConcurrency(int concurrency) {
+<b class="nc">&nbsp;        this.concurrency = concurrency;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSplitBy() {
+<b class="nc">&nbsp;        return splitBy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSplitBy(String splitBy) {
+<b class="nc">&nbsp;        this.splitBy = splitBy;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSourceType() {
+<b class="nc">&nbsp;        return sourceType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSourceType(String sourceType) {
+<b class="nc">&nbsp;        this.sourceType = sourceType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTargetType() {
+<b class="nc">&nbsp;        return targetType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTargetType(String targetType) {
+<b class="nc">&nbsp;        this.targetType = targetType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getSourceParams() {
+<b class="nc">&nbsp;        return sourceParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSourceParams(String sourceParams) {
+<b class="nc">&nbsp;        this.sourceParams = sourceParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getTargetParams() {
+<b class="nc">&nbsp;        return targetParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setTargetParams(String targetParams) {
+<b class="nc">&nbsp;        this.targetParams = targetParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getJobType() {
+<b class="nc">&nbsp;        return jobType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJobType(String jobType) {
+<b class="nc">&nbsp;        this.jobType = jobType;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getJobName() {
+<b class="nc">&nbsp;        return jobName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setJobName(String jobName) {
+<b class="nc">&nbsp;        this.jobName = jobName;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public String getCustomShell() {
+<b class="nc">&nbsp;        return customShell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setCustomShell(String customShell) {
+<b class="nc">&nbsp;        this.customShell = customShell;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Property&gt; getHadoopCustomParams() {
+<b class="nc">&nbsp;        return hadoopCustomParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setHadoopCustomParams(List&lt;Property&gt; hadoopCustomParams) {
+<b class="nc">&nbsp;        this.hadoopCustomParams = hadoopCustomParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public List&lt;Property&gt; getSqoopAdvancedParams() {
+<b class="nc">&nbsp;        return sqoopAdvancedParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public void setSqoopAdvancedParams(List&lt;Property&gt; sqoopAdvancedParams) {
+<b class="nc">&nbsp;        this.sqoopAdvancedParams = sqoopAdvancedParams;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public boolean checkParameters() {
+&nbsp;
+<b class="nc">&nbsp;        boolean sqoopParamsCheck = false;</b>
+&nbsp;
+<b class="nc">&nbsp;        if (StringUtils.isEmpty(jobType)) {</b>
+<b class="nc">&nbsp;            return sqoopParamsCheck;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (SqoopJobType.TEMPLATE.getDescp().equals(jobType)) {</b>
+<b class="nc">&nbsp;            sqoopParamsCheck = StringUtils.isEmpty(customShell)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(modelType)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(jobName)</b>
+&nbsp;                    &amp;&amp; concurrency != 0
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(sourceType)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(targetType)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(sourceParams)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isNotEmpty(targetParams);</b>
+<b class="nc">&nbsp;        } else if (SqoopJobType.CUSTOM.getDescp().equals(jobType)) {</b>
+<b class="nc">&nbsp;            sqoopParamsCheck = StringUtils.isNotEmpty(customShell)</b>
+<b class="nc">&nbsp;                    &amp;&amp; StringUtils.isEmpty(jobName);</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sqoopParamsCheck;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public ResourceParametersHelper getResources() {
+<b class="nc">&nbsp;        ResourceParametersHelper resources = super.getResources();</b>
+<b class="nc">&nbsp;        if (!SqoopJobType.TEMPLATE.getDescp().equals(this.getJobType())) {</b>
+<b class="nc">&nbsp;            return resources;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SourceCommonParameter sourceParameter = (SourceCommonParameter) JSONUtils.parseObject(this.getSourceParams(),</b>
+<b class="nc">&nbsp;                getSourceParameter(this.getSourceType()));</b>
+<b class="nc">&nbsp;        if (sourceParameter.getSrcDatasource() != 0) {</b>
+<b class="nc">&nbsp;            resources.put(ResourceType.DATASOURCE, sourceParameter.getSrcDatasource());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        TargetCommonParameter targetParameter = (TargetCommonParameter) JSONUtils.parseObject(this.getTargetParams(),</b>
+<b class="nc">&nbsp;                getTargetParameter(this.getTargetType()));</b>
+<b class="nc">&nbsp;        if (targetParameter.getTargetDatasource() != 0) {</b>
+<b class="nc">&nbsp;            resources.put(ResourceType.DATASOURCE, targetParameter.getTargetDatasource());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return resources;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public SqoopTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+&nbsp;
+<b class="nc">&nbsp;        SqoopTaskExecutionContext sqoopTaskExecutionContext = new SqoopTaskExecutionContext();</b>
+<b class="nc">&nbsp;        if (!SqoopJobType.TEMPLATE.getDescp().equals(this.getJobType())) {</b>
+<b class="nc">&nbsp;            return sqoopTaskExecutionContext;</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        SourceCommonParameter sourceParameter = (SourceCommonParameter) JSONUtils.parseObject(this.getSourceParams(),</b>
+<b class="nc">&nbsp;                getSourceParameter(this.getSourceType()));</b>
+<b class="nc">&nbsp;        TargetCommonParameter targetParameter = (TargetCommonParameter) JSONUtils.parseObject(this.getTargetParams(),</b>
+<b class="nc">&nbsp;                getTargetParameter(this.getTargetType()));</b>
+&nbsp;
+<b class="nc">&nbsp;        DataSourceParameters dataSource = (DataSourceParameters) parametersHelper</b>
+<b class="nc">&nbsp;                .getResourceParameters(ResourceType.DATASOURCE, sourceParameter.getSrcDatasource());</b>
+<b class="nc">&nbsp;        DataSourceParameters dataTarget = (DataSourceParameters) parametersHelper</b>
+<b class="nc">&nbsp;                .getResourceParameters(ResourceType.DATASOURCE, targetParameter.getTargetDatasource());</b>
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.nonNull(dataSource)) {</b>
+<b class="nc">&nbsp;            sqoopTaskExecutionContext.setDataSourceId(sourceParameter.getSrcDatasource());</b>
+<b class="nc">&nbsp;            sqoopTaskExecutionContext.setSourcetype(dataSource.getType());</b>
+<b class="nc">&nbsp;            sqoopTaskExecutionContext.setSourceConnectionParams(dataSource.getConnectionParams());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        if (Objects.nonNull(dataTarget)) {</b>
+<b class="nc">&nbsp;            sqoopTaskExecutionContext.setDataTargetId(targetParameter.getTargetDatasource());</b>
+<b class="nc">&nbsp;            sqoopTaskExecutionContext.setTargetType(dataTarget.getType());</b>
+<b class="nc">&nbsp;            sqoopTaskExecutionContext.setTargetConnectionParams(dataTarget.getConnectionParams());</b>
+&nbsp;        }
+&nbsp;
+<b class="nc">&nbsp;        return sqoopTaskExecutionContext;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get the target generator
+&nbsp;     *
+&nbsp;     * @param targetType sqoop target type
+&nbsp;     * @return sqoop target generator
+&nbsp;     */
+&nbsp;    private Class&lt;?&gt; getTargetParameter(String targetType) {
+<b class="nc">&nbsp;        switch (targetType) {</b>
+&nbsp;            case MYSQL:
+<b class="nc">&nbsp;                return TargetMysqlParameter.class;</b>
+&nbsp;            case HIVE:
+<b class="nc">&nbsp;                return TargetHiveParameter.class;</b>
+&nbsp;            case HDFS:
+<b class="nc">&nbsp;                return TargetHdfsParameter.class;</b>
+&nbsp;            case ORACLE:
+<b class="nc">&nbsp;                return TargetOracleParameter.class;</b>
+&nbsp;            case HANA:
+<b class="nc">&nbsp;                return TargetHanaParameter.class;</b>
+&nbsp;            case SQLSERVER:
+<b class="nc">&nbsp;                return TargetSqlServerParameter.class;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get the target generator
+&nbsp;     *
+&nbsp;     * @param targetType sqoop target type
+&nbsp;     * @return sqoop target generator
+&nbsp;     */
+&nbsp;    private Class&lt;?&gt; getSourceParameter(String targetType) {
+<b class="nc">&nbsp;        switch (targetType) {</b>
+&nbsp;            case HIVE:
+<b class="nc">&nbsp;                return SourceHiveParameter.class;</b>
+&nbsp;            case HDFS:
+<b class="nc">&nbsp;                return SourceHdfsParameter.class;</b>
+&nbsp;            case MYSQL:
+<b class="nc">&nbsp;                return SourceMysqlParameter.class;</b>
+&nbsp;            case ORACLE:
+<b class="nc">&nbsp;                return SourceOracleParameter.class;</b>
+&nbsp;            case HANA:
+<b class="nc">&nbsp;                return SourceHanaParameter.class;</b>
+&nbsp;            case SQLSERVER:
+<b class="nc">&nbsp;                return SourceSqlServerParameter.class;</b>
+&nbsp;            default:
+<b class="nc">&nbsp;                return null;</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>

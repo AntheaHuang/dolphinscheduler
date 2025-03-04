@@ -1,0 +1,187 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DataSourceProcessor</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.apache.dolphinscheduler.plugin.datasource.api.datasource</a>
+</div>
+
+<h1>Coverage Summary for Class: DataSourceProcessor (org.apache.dolphinscheduler.plugin.datasource.api.datasource)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">DataSourceProcessor</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;/*
+&nbsp; * Licensed to the Apache Software Foundation (ASF) under one or more
+&nbsp; * contributor license agreements.  See the NOTICE file distributed with
+&nbsp; * this work for additional information regarding copyright ownership.
+&nbsp; * The ASF licenses this file to You under the Apache License, Version 2.0
+&nbsp; * (the &quot;License&quot;); you may not use this file except in compliance with
+&nbsp; * the License.  You may obtain a copy of the License at
+&nbsp; *
+&nbsp; *    http://www.apache.org/licenses/LICENSE-2.0
+&nbsp; *
+&nbsp; * Unless required by applicable law or agreed to in writing, software
+&nbsp; * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+&nbsp; * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+&nbsp; * See the License for the specific language governing permissions and
+&nbsp; * limitations under the License.
+&nbsp; */
+&nbsp;
+&nbsp;package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
+&nbsp;
+&nbsp;import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+&nbsp;import org.apache.dolphinscheduler.spi.enums.DbType;
+&nbsp;
+&nbsp;import java.io.IOException;
+&nbsp;import java.sql.Connection;
+&nbsp;import java.sql.SQLException;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;public interface DataSourceProcessor {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * cast JSON to relate DTO
+&nbsp;     *
+&nbsp;     * @param paramJson
+&nbsp;     * @return {@link BaseDataSourceParamDTO}
+&nbsp;     */
+&nbsp;    BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * check datasource param is valid
+&nbsp;     */
+&nbsp;    void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get Datasource Client UniqueId
+&nbsp;     *
+&nbsp;     * @return UniqueId
+&nbsp;     */
+&nbsp;    String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create BaseDataSourceParamDTO by connectionJson
+&nbsp;     *
+&nbsp;     * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.Datasource}
+&nbsp;     * @return {@link BaseDataSourceParamDTO}
+&nbsp;     */
+&nbsp;    BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * create datasource connection parameter which will be stored at DataSource
+&nbsp;     * &lt;p&gt;
+&nbsp;     * see {@code org.apache.dolphinscheduler.dao.entity.DataSource.connectionParams}
+&nbsp;     */
+&nbsp;    ConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * deserialize json to datasource connection param
+&nbsp;     *
+&nbsp;     * @param connectionJson {@code org.apache.dolphinscheduler.dao.entity.DataSource.connectionParams}
+&nbsp;     * @return {@link BaseConnectionParam}
+&nbsp;     */
+&nbsp;    ConnectionParam createConnectionParams(String connectionJson);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get datasource Driver
+&nbsp;     */
+&nbsp;    String getDatasourceDriver();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get validation Query
+&nbsp;     */
+&nbsp;    String getValidationQuery();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get jdbcUrl by connection param, the jdbcUrl is different with ConnectionParam.jdbcUrl, this method will inject
+&nbsp;     * other to jdbcUrl
+&nbsp;     *
+&nbsp;     * @param connectionParam connection param
+&nbsp;     */
+&nbsp;    String getJdbcUrl(ConnectionParam connectionParam);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get connection by connectionParam
+&nbsp;     *
+&nbsp;     * @param connectionParam connectionParam
+&nbsp;     * @return {@link Connection}
+&nbsp;     */
+&nbsp;    // todo: Change to return a ConnectionWrapper
+&nbsp;    Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * test connection
+&nbsp;     *
+&nbsp;     * @param connectionParam connectionParam
+&nbsp;     * @return true if connection is valid
+&nbsp;     */
+&nbsp;    boolean checkDataSourceConnectivity(ConnectionParam connectionParam);
+&nbsp;
+&nbsp;    /**
+&nbsp;     * @return {@link DbType}
+&nbsp;     */
+&nbsp;    DbType getDbType();
+&nbsp;
+&nbsp;    /**
+&nbsp;     * get datasource processor
+&nbsp;     */
+&nbsp;    DataSourceProcessor create();
+&nbsp;
+&nbsp;    List&lt;String&gt; splitAndRemoveComment(String sql);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-02-16 17:42</div>
+</div>
+</body>
+</html>
