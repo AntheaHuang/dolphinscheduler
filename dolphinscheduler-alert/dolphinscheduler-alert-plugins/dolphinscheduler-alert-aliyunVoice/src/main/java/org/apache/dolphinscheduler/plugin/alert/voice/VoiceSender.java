@@ -73,7 +73,7 @@ public final class VoiceSender {
         return alertResult;
     }
     /**
-     * New 'dummy' or 'refactored' method demonstrating Dependency Injection with VoiceService.
+     * New 'dummy' method demonstrating Dependency Injection with VoiceService.
      * This does not break the existing code but shows how to make a more testable design.
      *
      * @param service a VoiceService interface, which can be a real or mock implementation.
