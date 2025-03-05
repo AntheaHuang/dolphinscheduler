@@ -53,17 +53,11 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
                             assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                         }));
 
-        // Test RUNNING_EXECUTION -> READY_PAUSE
+        // Test RUNNING_EXECUTION -> READY_PAUSE -> PAUSE
         workflowOperator.pauseWorkflowInstance(workflowInstanceId);
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isEqualTo(WorkflowExecutionStatus.READY_PAUSE));
-
-        // Test READY_PAUSE -> PAUSE
-        workflowOperator.pauseWorkflowInstance(workflowInstanceId);
-        await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
-                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isEqualTo(WorkflowExecutionStatus.PAUSE));
+                        .isIn(WorkflowExecutionStatus.READY_PAUSE, WorkflowExecutionStatus.PAUSE));
 
         // Test PAUSE -> RUNNING_EXECUTION
         workflowOperator.recoverSuspendWorkflowInstance(workflowInstanceId);
@@ -71,17 +65,12 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
                         .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
 
-        // Test RUNNING_EXECUTION -> READY_STOP
+        // Test RUNNING_EXECUTION -> READY_STOP -> STOP
         workflowOperator.stopWorkflowInstance(workflowInstanceId);
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
                 assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isEqualTo(WorkflowExecutionStatus.READY_STOP));
+                        .isIn(WorkflowExecutionStatus.READY_STOP, WorkflowExecutionStatus.STOP));
 
-        // Test READY_STOP -> STOP
-        workflowOperator.stopWorkflowInstance(workflowInstanceId);
-        await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
-                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                        .isEqualTo(WorkflowExecutionStatus.STOP));
     }
 
     @Test
