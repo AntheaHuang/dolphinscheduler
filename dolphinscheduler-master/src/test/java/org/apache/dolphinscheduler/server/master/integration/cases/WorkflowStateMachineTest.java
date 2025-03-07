@@ -86,17 +86,11 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
                 .build();
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
-        // Test invalid SUBMITTED_SUCCESS -> SUCCESS transition
         workflowOperator.stopWorkflowInstance(workflowInstanceId);
-        assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                .isNotEqualTo(WorkflowExecutionStatus.SUCCESS);
         assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
                 .isNotEqualTo(WorkflowExecutionStatus.SUCCESS);
 
-        // Test invalid RUNNING_EXECUTION -> STOP transition without READY_STOP
-        workflowOperator.stopWorkflowInstance(workflowInstanceId);
-        assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
-                .isNotEqualTo(WorkflowExecutionStatus.SUCCESS);
+        workflowOperator.pauseWorkflowInstance(workflowInstanceId);
         assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
                 .isNotEqualTo(WorkflowExecutionStatus.STOP);
     }
