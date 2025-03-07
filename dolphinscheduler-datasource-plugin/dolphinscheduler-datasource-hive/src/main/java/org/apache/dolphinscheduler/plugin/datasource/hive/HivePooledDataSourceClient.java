@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.datasource.hive.security.UserGroupInfo
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import sun.security.krb5s.Config;
+//import sun.security.krb5s.Config;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import lombok.extern.slf4j.Slf4j;
 
 import com.zaxxer.hikari.HikariDataSource;
+import sun.security.krb5.Config;
 
 @Slf4j
 public class HivePooledDataSourceClient extends BasePooledDataSourceClient {

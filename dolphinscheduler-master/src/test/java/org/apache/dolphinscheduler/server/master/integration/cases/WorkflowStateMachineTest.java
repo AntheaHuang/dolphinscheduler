@@ -37,26 +37,26 @@ public class WorkflowStateMachineTest extends AbstractMasterIntegrationTestCase 
     @Test
     @DisplayName("Test valid state transitions")
     public void testValidStateTransitions() {
-        final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
-        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
-        final WorkflowDefinition workflow = context.getOneWorkflow();
+        final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";   // path to test resource file
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml); // parses to WorkflowTestCaseContext object
+        final WorkflowDefinition workflow = context.getOneWorkflow();   // get the first workflow for this test
 
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
-                .build();
-        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+                .build();   // the data needed to trigger the workflow
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);  // request to start the workflow
 
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
-                assertThat(repository.queryWorkflowInstance(workflowInstanceId))
-                        .satisfies(workflowInstance -> {
+                assertThat(repository.queryWorkflowInstance(workflowInstanceId))    // get the current state from the database
+                        .satisfies(workflowInstance -> {    // asserts the workflow state
                             assertThat(workflowInstance.getState()).isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
                         }));
 
         // Test RUNNING_EXECUTION -> READY_PAUSE -> PAUSE
-        workflowOperator.pauseWorkflowInstance(workflowInstanceId);
+        workflowOperator.pauseWorkflowInstance(workflowInstanceId); // send a pause request
         await().atMost(Duration.ofMinutes(1)).untilAsserted(() ->
-                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState())
+                assertThat(repository.queryWorkflowInstance(workflowInstanceId).getState()) // ensuring expected state is set after each transition
                         .isIn(WorkflowExecutionStatus.READY_PAUSE, WorkflowExecutionStatus.PAUSE));
 
         // Test PAUSE -> RUNNING_EXECUTION
